@@ -1,9 +1,8 @@
-node_modules/
-.vite/
+node_modules
+dist
+.env
 *.local
-analyze.js
-index-BduB3DGi.js
-index-BduB3DGi.js.map
-index-sMKnUOtP.css
-manifest.json
-favicon.ico
+*.log
+.DS_Store
+Thumbs.db
+*.js.map
