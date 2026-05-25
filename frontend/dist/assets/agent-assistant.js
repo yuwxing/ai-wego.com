@@ -14,28 +14,25 @@
     } catch { return null; }
   }
 
-  const SYSTEM_PROMPT = `你叫"智能体助手"，是 AI-Wego 平台的7x24小时在线客服。你的职责是帮助用户了解和使用平台上的智能体（Agent）。
+  const SYSTEM_PROMPT = `你叫小W，是AI-Wego平台的导航助手。你只回答以下平台功能，不知道的就说"这个问题我不清楚，请联系开发者"：
 
-平台核心概念：
-1. 智能体(Agent)：由AI驱动的自动任务执行者，每个智能体有特定能力（编程、设计、写作等）
-2. 任务(Task)：用户发布的需求，智能体可以自动接单
-3. WEG币：平台代币，用于发布任务和奖励智能体
+可用功能：
+- 智能体市场：浏览和挑选AI智能体
+- 我的智能体：查看已拥有的智能体
+- 任务大厅：发布和查看任务
+- 创作工坊：使用AI工具创作
+- 求职广场：找工作/招聘
+- 领养宠物：领养虚拟宠物
+- 英语角：英语学习
 
-配置智能体自动抢单步骤：
-1. 在"我的智能体"页面查看已拥有的智能体
-2. 每个智能体有"能力标签"（capabilities），标签越匹配的任务越容易自动接单
-3. 确保智能体 token_balance > 0（有足够的WEG币作为押金）
-4. 在任务大厅发布任务时，选择合适的分类
-5. 智能体会自动扫描匹配的任务并抢单
-6. 执行完成后自动交付成果
-7. 任务发布者验收后，WEG币自动结算到智能体账户
+操作指引（只说操作，不编造）：
+- 问"怎么用" → 告诉用户点哪个菜单
+- 问"发任务" → "去任务大厅点发布"
+- 问"换头像" → "在智能体详情页点头像上的✏️"
+- 问"充币" → "完成任务赚WEG币，或联系开发者充值"
+- 问"APIKey" → "目前平台不支持用户填APIKey"
 
-常见问题：
-- Q: 为什么智能体不抢单？ A: 检查token_balance是否充足，capabilities是否匹配任务标签
-- Q: 如何增加token_balance？ A: 完成任务获得报酬，或联系管理员充值
-- Q: 智能体可以接什么样的任务？ A: 取决于智能体的capabilities字段
-
-请用友好、专业的语气回答用户问题，使用中文。如果不知道具体答案，引导用户联系管理员。`;
+不知道的一律说"这个我不清楚，去反馈中心提交问题吧"。`;
 
   // ===================== CHAT WIDGET =====================
 
@@ -143,7 +140,7 @@
           <button id="acwClose">✕</button>
         </div>
         <div class="acw-messages" id="acwMessages">
-          <div class="acw-msg bot">你好！我是智能体助手💡 我可以教你如何使用智能体、配置自动抢单，以及解答平台相关问题。有什么可以帮你的？</div>
+          <div class="acw-msg bot">我是小W，直接说你要干嘛。发任务 / 管理智能体 / 换头像 / 充币?</div>
         </div>
         <div class="acw-input-area">
           <input id="acwInput" type="text" placeholder="输入问题..." />
@@ -336,11 +333,11 @@
       <h3 style="margin:0 0 16px;font-size:18px;font-weight:600;color:#1e293b;">选择头像</h3>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;" id="acvGrid">
         ${avatars.map((a, i) => `
-          <div class="acv-option" data-src="/avatars/${a}" style="
+          <div class="acv-option" data-src="./avatars/${a}" style="
             cursor:pointer; border-radius:12px; overflow:hidden; border:2px solid transparent;
             transition:all 0.2s; aspect-ratio:1;
           ">
-            <img src="/avatars/${a}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
+            <img src="./avatars/${a}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
           </div>
         `).join('')}
       </div>
@@ -373,7 +370,7 @@
         options.forEach(o => o.classList.remove('selected'));
         opt.classList.add('selected');
         selectedSrc = opt.dataset.src;
-        updateAvatar(agentId, `https://ai-wego.top${selectedSrc}`, imgElement);
+        updateAvatar(agentId, selectedSrc, imgElement);
       });
     });
 
@@ -415,7 +412,7 @@
       if (imgElement) {
         imgElement.src = url;
         imgElement.onerror = function() {
-          imgElement.src = '/pets/avatar_1.png';
+          imgElement.src = './pets/huaxianzi.png';
         };
       }
 
