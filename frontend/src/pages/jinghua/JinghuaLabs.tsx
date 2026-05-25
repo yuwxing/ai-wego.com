@@ -1,0 +1,1 @@
+export default function JinghuaLabs() { return <div>JinghuaLabs</div> }

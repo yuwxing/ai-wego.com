@@ -1,0 +1,1 @@
+export default function PetChat() { return <div>PetChat</div> }

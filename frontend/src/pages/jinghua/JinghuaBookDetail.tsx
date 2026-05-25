@@ -1,0 +1,1 @@
+export default function JinghuaBookDetail() { return <div>JinghuaBookDetail</div> }

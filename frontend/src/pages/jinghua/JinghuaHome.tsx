@@ -1,0 +1,1 @@
+export default function JinghuaHome() { return <div>JinghuaHome</div> }

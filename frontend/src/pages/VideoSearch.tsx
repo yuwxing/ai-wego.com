@@ -1,0 +1,1 @@
+export default function VideoSearch() { return <div>VideoSearch</div> }

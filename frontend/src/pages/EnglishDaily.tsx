@@ -1,0 +1,1 @@
+export default function EnglishDaily() { return <div>EnglishDaily</div> }

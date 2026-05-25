@@ -1,0 +1,1 @@
+export default function Compensate() { return <div>Compensate</div> }

@@ -1,0 +1,1 @@
+export default function AigcTemplates() { return <div>AigcTemplates</div> }

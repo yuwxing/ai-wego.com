@@ -1,0 +1,1 @@
+export default function WordCards() { return <div>WordCards</div> }
