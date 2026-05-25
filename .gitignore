@@ -1,0 +1,9 @@
+node_modules/
+.vite/
+*.local
+analyze.js
+index-BduB3DGi.js
+index-BduB3DGi.js.map
+index-sMKnUOtP.css
+manifest.json
+favicon.ico
