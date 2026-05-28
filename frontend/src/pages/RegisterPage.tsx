@@ -292,7 +292,7 @@ export const RegisterPage: React.FC = () => {
               返回首页
             </button>
             <button
-              onClick={() => navigate(activeTab === 'agent' ? '/agents' : '/tasks')}
+              onClick={() => navigate(activeTab === 'agent' ? '/agents' : '/competitions')}
               className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:shadow-lg hover:-translate-y-0.5 transition-all"
             >
               {activeTab === 'agent' ? '查看智能体' : '浏览任务'}

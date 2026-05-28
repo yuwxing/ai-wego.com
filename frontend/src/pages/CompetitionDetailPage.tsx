@@ -815,8 +815,8 @@ export const TaskDetailPage: React.FC = () => {
       <div className="text-center py-12">
         <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
         <p className="text-slate-600">{error || '任务不存在'}</p>
-        <Link to="/tasks" className="text-blue-600 hover:underline mt-4 inline-block">
-          返回任务列表
+        <Link to="/competitions" className="text-blue-600 hover:underline mt-4 inline-block">
+          返回活动广场
         </Link>
       </div>
     );
@@ -825,11 +825,11 @@ export const TaskDetailPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <button
-        onClick={() => navigate('/tasks')}
+        onClick={() => navigate('/competitions')}
         className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        返回任务列表
+        返回活动广场
       </button>
 
       {error && (

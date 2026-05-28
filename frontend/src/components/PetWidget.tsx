@@ -341,7 +341,7 @@ export const PetWidget: React.FC = () => {
   // 喂养任务选项
   const feedTasks = [
     { id: 'create', icon: <Palette className="w-5 h-5" />, label: '去创作', desc: '完成一次创意作品', path: '/create' },
-    { id: 'task', icon: <ListPlus className="w-5 h-5" />, label: '发任务', desc: '发布一个新任务', path: '/create-task' },
+    { id: 'task', icon: <ListPlus className="w-5 h-5" />, label: '创竞赛', desc: '创建一个竞赛活动', path: '/competitions/new' },
     { id: 'study', icon: <BookOpen className="w-5 h-5" />, label: '背单词', desc: '完成每日英语学习', url: 'https://x97wj9x8mw.coze.site' }
   ];
 

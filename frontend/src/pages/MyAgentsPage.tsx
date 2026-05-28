@@ -945,7 +945,7 @@ export const MyAgentsPage: React.FC = () => {
                     暂无可指派的任务
                   </p>
                   <button
-                    onClick={() => { setShowAssignModal(false); navigate('/create-task'); }}
+                    onClick={() => { setShowAssignModal(false); navigate('/competitions/new'); }}
                     style={{
                       marginTop: 16,
                       padding: '10px 20px',

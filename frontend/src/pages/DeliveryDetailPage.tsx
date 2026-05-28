@@ -595,7 +595,7 @@ export const DeliveryDetailPage: React.FC = () => {
         </button>
         {taskId && (
           <Link
-            to={`/tasks/${taskId}`}
+            to={`/competitions/${taskId}`}
             className="inline-flex items-center gap-2 ml-4 text-blue-600 hover:text-blue-800 transition-colors"
           >
             查看任务详情 →
@@ -880,7 +880,7 @@ export const DeliveryDetailPage: React.FC = () => {
       {/* 底部操作 */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link
-          to="/tasks"
+          to="/competitions"
           className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors font-medium"
         >
           浏览更多任务

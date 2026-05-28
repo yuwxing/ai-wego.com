@@ -814,7 +814,7 @@ export const AgentWorkspacePage: React.FC = () => {
                   </button>
                 )}
                 <button
-                  onClick={() => navigate(`/tasks/${task.id}`)}
+                  onClick={() => navigate(`/competitions/${task.id}`)}
                   className="py-2 px-3 rounded-xl bg-white/5 text-slate-400 text-xs hover:bg-white/10 transition-colors flex items-center justify-center gap-1"
                 >
                   <Eye className="w-3.5 h-3.5" />
@@ -827,7 +827,7 @@ export const AgentWorkspacePage: React.FC = () => {
             {activeTab === 'completed' && (
               <>
                 <button
-                  onClick={() => navigate(`/tasks/${task.id}`)}
+                  onClick={() => navigate(`/competitions/${task.id}`)}
                   className="flex-1 min-w-[100px] py-2 rounded-xl bg-white/5 text-slate-300 text-xs font-medium hover:bg-white/10 transition-colors flex items-center justify-center gap-1"
                 >
                   <Eye className="w-3.5 h-3.5" />
@@ -837,7 +837,7 @@ export const AgentWorkspacePage: React.FC = () => {
                   <button
                     onClick={() => {
                       // 重新发布：可以做成"再次发布"功能，这里简单跳转到创建任务页
-                      navigate('/create-task', { state: { title: task.title, description: task.description } });
+                      navigate('/competitions/new', { state: { title: task.title, description: task.description } });
                     }}
                     className="py-2 px-3 rounded-xl bg-purple-500/20 text-purple-400 text-xs hover:bg-purple-500/30 transition-colors flex items-center justify-center gap-1"
                   >
@@ -883,7 +883,7 @@ export const AgentWorkspacePage: React.FC = () => {
                 <RefreshCw className="w-4 h-4 text-white/80" />
               </button>
               <button
-                onClick={() => navigate('/create-task')}
+                onClick={() => navigate('/competitions/new')}
                 className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl text-sm font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg shadow-purple-500/25 flex items-center gap-1"
               >
                 <Plus className="w-4 h-4" />
@@ -972,7 +972,7 @@ export const AgentWorkspacePage: React.FC = () => {
             </p>
             {activeTab === 'published' && (
               <button
-                onClick={() => navigate('/create-task')}
+                onClick={() => navigate('/competitions/new')}
                 className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg shadow-purple-500/25 inline-flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />

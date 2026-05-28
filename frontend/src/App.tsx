@@ -3,11 +3,11 @@ import Layout from './components/Layout'
 import Home from './pages/Home'
 import AgentMarket from './pages/AgentMarket'
 import AgentDetail from './pages/AgentDetail'
-import TaskHall from './pages/TaskHall'
-import TaskDetail from './pages/TaskDetail'
+import CompetitionHallPage from './pages/CompetitionHallPage'
+import CompetitionDetailPage from './pages/CompetitionDetailPage'
+import CreateCompetitionPage from './pages/CreateCompetitionPage'
 import Workspace from './pages/Workspace'
 import MyAgents from './pages/MyAgents'
-import CreateTask from './pages/CreateTask'
 import CreateAgent from './pages/CreateAgent'
 import Register from './pages/Register'
 import Create from './pages/Create'
@@ -50,11 +50,11 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/agents" element={<AgentMarket />} />
       <Route path="/agents/:id" element={<AgentDetail />} />
-      <Route path="/tasks" element={<TaskHall />} />
-      <Route path="/tasks/:id" element={<TaskDetail />} />
+      <Route path="/competitions" element={<CompetitionHallPage />} />
+      <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
+      <Route path="/competitions/new" element={<CreateCompetitionPage />} />
       <Route path="/workspace/:taskId" element={<Workspace />} />
       <Route path="/my-agents" element={<MyAgents />} />
-      <Route path="/create-task" element={<CreateTask />} />
       <Route path="/create-agent" element={<CreateAgent />} />
       <Route path="/register" element={<Register />} />
       <Route path="/create" element={<Create />} />

@@ -43,7 +43,7 @@ const aiCapabilities = [
     description: '发布需求→智能匹配→自动执行→交付验收，全闭环',
     gradient: 'from-amber-400 via-orange-400 to-pink-400',
     highlight: '全自动化',
-    link: '/create-task',
+    link: '/competitions/new',
     agentId: 29
   },
 
@@ -240,7 +240,7 @@ export const HomePage: React.FC = () => {
         organization: extractOrganization(task.description || task.title || ''),
         deadline: task.deadline ? formatDeadline(task.deadline) : '长期有效',
         description: task.description ? task.description.slice(0, 100) + '...' : '',
-        url: `/tasks/${task.id}`
+        url: `/competitions/${task.id}`
       }));
       
       setTalentAnnouncements(announcements);
@@ -332,9 +332,8 @@ export const HomePage: React.FC = () => {
         <div className="absolute bottom-4 left-0 right-0 z-10">
           <div className="flex flex-wrap justify-center gap-3 px-4">
             <Link
-              to="/create-task"
+              to="/competitions/new"
               className="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-400 hover:to-pink-400 transition-all duration-300 font-semibold text-sm shadow-lg shadow-purple-500/30 hover:shadow-xl hover:-translate-y-0.5 btn-gradient-primary"
-            >
               发布需求
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -556,7 +555,7 @@ export const HomePage: React.FC = () => {
                     </div>
 
                     <Link
-                      to={`/tasks/${job.id}`}
+                      to={`/competitions/${job.id}`}
                       className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-400 hover:to-pink-400 transition-all font-medium text-sm shadow-sm hover:shadow-md btn-gradient-primary"
                     >
                       查看详情
@@ -585,11 +584,11 @@ export const HomePage: React.FC = () => {
               </p>
               
               <Link 
-                to="/create-task"
+                to="/competitions/new"
                 className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-400 hover:to-pink-400 transition-all font-bold text-lg shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-pink-500/40 hover:-translate-y-1 btn-gradient-primary"
               >
                 <Zap className="w-5 h-5" />
-                发布第一个任务
+                发布第一个竞赛活动
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               
@@ -604,10 +603,10 @@ export const HomePage: React.FC = () => {
               数据由AI智能体每日筛选更新 · 更新日期：{new Date().toLocaleDateString('zh-CN')}
             </p>
             <Link 
-              to="/tasks"
+              to="/competitions"
               className="flex items-center gap-2 px-4 py-2 text-purple-600 hover:text-purple-700 font-medium text-sm"
             >
-              查看全部任务
+              查看全部竞赛
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

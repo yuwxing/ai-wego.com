@@ -13,6 +13,7 @@ import {
 import { Card } from '../components/ui';
 import toast from 'react-hot-toast';
 import { tasksAPI, usersAPI, transactionsAPI, supabaseFetch, workerTokenAPI, agentsAPI, storageAPI, getFileType } from '../utils/supabase';
+import { saveCompetition } from '../services/competitionService';
 import type { User } from '../types';
 
 // 任务类型 - 突出平台差异化：多智能体协作、自动执行闭环、专业场景
@@ -615,7 +616,23 @@ export const CreateTaskPage: React.FC = () => {
           }
         }, 3000);
         
-        navigate('/my-agents', { replace: true });
+        saveCompetition({
+          id: String(taskId),
+          title: submitData.title,
+          subtitle: submitData.description?.slice(0, 80),
+          category: 'AI',
+          type: '每日挑战',
+          difficulty: '青铜',
+          description: submitData.description,
+          organizer: user?.username || 'AI-WEGO',
+          startTime: new Date().toISOString(),
+          endTime: submitData.deadline || new Date(Date.now() + 7*86400000).toISOString(),
+          rewardWEG: submitData.reward || 0,
+          participants: 0,
+          status: 'running',
+          createdAt: new Date().toISOString(),
+        });
+        navigate('/competitions', { replace: true });
         return;
       } catch (err) {
         console.error('发布任务失败:', err);
@@ -651,7 +668,7 @@ export const CreateTaskPage: React.FC = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* 返回按钮 */}
       <button
-        onClick={() => navigate('/tasks')}
+        onClick={() => navigate('/competitions')}
         className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -664,7 +681,7 @@ export const CreateTaskPage: React.FC = () => {
           <List className="w-7 h-7 text-white" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">发布新任务</h1>
+          <h1 className="text-3xl font-bold text-slate-900">创建竞赛活动</h1>
           <p className="text-slate-500 mt-1">填写任务信息，吸引合适的智能体来接取</p>
         </div>
       </div>
@@ -1205,7 +1222,7 @@ export const CreateTaskPage: React.FC = () => {
             <div className="flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => navigate('/tasks')}
+                onClick={() => navigate('/competitions')}
                 className="px-6 py-3 text-slate-600 hover:text-slate-900 font-medium"
               >
                 取消

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BookOpen, Cpu, Users, Star, ChevronRight, Award, Target, Sparkles, CheckCircle, Shield, Lightbulb, TrendingUp, Heart, GraduationCap, FileText, MessageCircle, Zap, Globe, BarChart3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { BookOpen, Cpu, Users, Star, ChevronRight, Award, Target, Sparkles, CheckCircle, Shield, Lightbulb, TrendingUp, Heart, GraduationCap, FileText, MessageCircle, Zap, Globe, BarChart3, Clock, Trophy, User } from 'lucide-react';
+import { getCompetitions } from '../services/competitionService';
+import type { Competition } from '../services/competitionService';
 
 const CATEGORIES = [
   {
@@ -117,9 +119,10 @@ const BENEFITS = [
   { icon: <TrendingUp className="w-6 h-6" />, title: '提升核心能力', desc: '锻炼表达、组织、创新等综合能力' },
 ];
 
-export default function TasksPage() {
+export default function CompetitionHallPage() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [competitions] = useState<Competition[]>(() => getCompetitions());
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-indigo-50 pb-20">
@@ -128,13 +131,10 @@ export default function TasksPage() {
         <div className="max-w-4xl mx-auto px-5 pt-10 pb-12">
           <div className="flex items-center gap-2 text-white/70 text-sm mb-3">
             <Award className="w-4 h-4" />
-            <span>竞赛活动大厅</span>
+            <span>竞赛活动广场</span>
           </div>
-          <h1 className="text-3xl font-bold mb-2">普通学生竞赛路线</h1>
-          <p className="text-white/80 text-lg">稳 + 易参与 + 有经历</p>
-          <p className="text-white/60 text-sm mt-3 max-w-xl">
-            核心不是拿奖，而是让履历好看、提升能力、不掉队
-          </p>
+          <h1 className="text-3xl font-bold mb-2">竞赛活动广场</h1>
+          <p className="text-white/80 text-lg">浏览竞赛 · 查看奖励 · 参加活动</p>
           {/* 特点标签 */}
           <div className="flex flex-wrap gap-2 mt-5">
             {FEATURES.map((f, i) => (
@@ -146,6 +146,41 @@ export default function TasksPage() {
           </div>
         </div>
       </div>
+
+      {/* 最新竞赛活动 */}
+      {competitions.length > 0 && (
+        <div className="max-w-4xl mx-auto mt-6 px-4">
+          <h2 className="text-lg font-bold text-[#1E293B] mb-4 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-500" />
+            最新竞赛活动
+          </h2>
+          <div className="space-y-3">
+            {competitions.slice(0, 5).map((comp) => (
+              <Link
+                key={comp.id}
+                to={`/competitions/${comp.id}`}
+                className="block bg-white rounded-2xl border border-slate-200 p-4 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white flex-shrink-0">
+                    <Trophy className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-[#1E293B]">{comp.title}</h3>
+                    {comp.subtitle && <p className="text-[#94A3B8] text-xs mt-0.5">{comp.subtitle}</p>}
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-[#94A3B8]">
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{comp.type}</span>
+                      <span className="flex items-center gap-1"><User className="w-3 h-3" />{comp.difficulty}</span>
+                      <span className="flex items-center gap-1 text-amber-600 font-medium">+{comp.rewardWEG} WEG</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-[#CBD5E1] flex-shrink-0 mt-1" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 适合人群 */}
       <div className="max-w-4xl mx-auto -mt-6 px-4">
