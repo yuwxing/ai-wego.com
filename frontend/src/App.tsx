@@ -20,6 +20,7 @@ import AdminApplications from './pages/admin/Applications'
 import AdminFeedback from './pages/admin/Feedback'
 import AdminCompensate from './pages/admin/Compensate'
 import AdminInspections from './pages/admin/Inspections'
+import ListeningSpeakingAdmin from './pages/admin/ListeningSpeakingAdmin'
 import Delivery from './pages/Delivery'
 import Classroom from './pages/Classroom'
 import WordCardPage from './pages/WordCardPage'
@@ -86,7 +87,8 @@ export default function App() {
       <Route path="/admin/applications" element={<AdminApplications />} />
       <Route path="/admin/feedback" element={<AdminFeedback />} />
       <Route path="/admin/compensate" element={<AdminCompensate />} />
-      <Route path="/admin/inspections" element={<AdminInspections />} />
+       <Route path="/admin/inspections" element={<AdminInspections />} />
+       <Route path="/admin/listening-speaking" element={<ListeningSpeakingAdmin />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
