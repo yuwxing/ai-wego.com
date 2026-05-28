@@ -28,158 +28,183 @@ interface VocabProgress {
 const GRADE_LABELS: Record<Grade, string> = { 7: '七年级', 8: '八年级', 9: '九年级' };
 
 const UNIT_LABELS: Record<number, string> = {
-  0: 'Starter', 1: 'Unit 1', 2: 'Unit 2', 3: 'Unit 3', 4: 'Unit 4', 5: 'Unit 5', 6: 'Unit 6', 7: 'Unit 7',
+  0: 'Starter U1', 1: 'Starter U2', 2: 'Starter U3',
+  3: 'Unit 1', 4: 'Unit 2', 5: 'Unit 3', 6: 'Unit 4', 7: 'Unit 5', 8: 'Unit 6', 9: 'Unit 7',
 };
 
 const WORD_DATA: Record<Grade, Word[]> = {
   7: [
-    // Starter
-    { word: 'good', meaning: '好的', phonetic: '/ɡʊd/', example: 'Good morning!', exampleCn: '早上好！', options: ['好的', '坏的', '大的', '小的'], unit: 0 },
-    { word: 'morning', meaning: '早晨', phonetic: '/ˈmɔːnɪŋ/', example: 'I get up in the morning.', exampleCn: '我早上起床。', options: ['早晨', '下午', '晚上', '中午'], unit: 0 },
-    { word: 'afternoon', meaning: '下午', phonetic: '/ˌɑːftəˈnuːn/', example: 'Good afternoon!', exampleCn: '下午好！', options: ['早晨', '下午', '晚上', '中午'], unit: 0 },
-    { word: 'evening', meaning: '傍晚', phonetic: '/ˈiːvnɪŋ/', example: 'Good evening!', exampleCn: '晚上好！', options: ['早晨', '下午', '晚上', '中午'], unit: 0 },
-    { word: 'hello', meaning: '你好', phonetic: '/həˈləʊ/', example: 'Hello, I\'m Li Ming.', exampleCn: '你好，我是李明。', options: ['你好', '再见', '谢谢', '对不起'], unit: 0 },
-    { word: 'yes', meaning: '是的', phonetic: '/jes/', example: 'Yes, I can.', exampleCn: '是的，我能。', options: ['是的', '不是', '好的', '也许'], unit: 0 },
-    { word: 'no', meaning: '不', phonetic: '/nəʊ/', example: 'No, I can\'t.', exampleCn: '不，我不能。', options: ['是的', '不', '好的', '也许'], unit: 0 },
-    { word: 'please', meaning: '请', phonetic: '/pliːz/', example: 'Please sit down.', exampleCn: '请坐下。', options: ['请', '谢谢', '对不起', '不客气'], unit: 0 },
-    { word: 'thanks', meaning: '谢谢', phonetic: '/θæŋks/', example: 'Thanks for your help.', exampleCn: '谢谢你的帮助。', options: ['请', '谢谢', '对不起', '不客气'], unit: 0 },
-    { word: 'fine', meaning: '好的；健康的', phonetic: '/faɪn/', example: 'I\'m fine, thank you.', exampleCn: '我很好，谢谢。', options: ['好的', '坏的', '累的', '生病的'], unit: 0 },
-    { word: 'OK', meaning: '好；行', phonetic: '/ˌəʊˈkeɪ/', example: 'OK, let\'s go.', exampleCn: '好的，我们走吧。', options: ['好', '不好', '也许', '当然'], unit: 0 },
-    // Unit 1: My name's Gina (自我介绍)
-    { word: 'name', meaning: '名字', phonetic: '/neɪm/', example: 'My name is Tom.', exampleCn: '我的名字是汤姆。', options: ['名字', '年龄', '学校', '班级'], unit: 1 },
-    { word: 'meet', meaning: '遇见', phonetic: '/miːt/', example: 'Nice to meet you!', exampleCn: '很高兴见到你！', options: ['遇见', '告别', '欢迎', '感谢'], unit: 1 },
-    { word: 'friend', meaning: '朋友', phonetic: '/frend/', example: 'She is my new friend.', exampleCn: '她是我的新朋友。', options: ['老师', '同学', '朋友', '家人'], unit: 1 },
-    { word: 'classmate', meaning: '同学', phonetic: '/ˈklɑːsmeɪt/', example: 'We are classmates.', exampleCn: '我们是同学。', options: ['老师', '同学', '朋友', '邻居'], unit: 1 },
-    { word: 'teacher', meaning: '老师', phonetic: '/ˈtiːtʃə(r)/', example: 'Mr. Wang is our English teacher.', exampleCn: '王老师是我们的英语老师。', options: ['医生', '老师', '学生', '工人'], unit: 1 },
-    { word: 'student', meaning: '学生', phonetic: '/ˈstjuːdnt/', example: 'I am a middle school student.', exampleCn: '我是一名中学生。', options: ['老师', '学生', '医生', '警察'], unit: 1 },
-    { word: 'China', meaning: '中国', phonetic: '/ˈtʃaɪnə/', example: 'I\'m from China.', exampleCn: '我来自中国。', options: ['中国', '日本', '美国', '英国'], unit: 1 },
-    { word: 'English', meaning: '英语；英国的', phonetic: '/ˈɪŋɡlɪʃ/', example: 'I like English.', exampleCn: '我喜欢英语。', options: ['英语', '数学', '语文', '历史'], unit: 1 },
-    { word: 'first', meaning: '第一', phonetic: '/fɜːst/', example: 'This is my first lesson.', exampleCn: '这是我的第一节课。', options: ['第一', '第二', '第三', '最后'], unit: 1 },
-    { word: 'last', meaning: '最后的', phonetic: '/lɑːst/', example: 'This is the last one.', exampleCn: '这是最后一个。', options: ['第一', '最后', '下一个', '之前的'], unit: 1 },
-    { word: 'telephone', meaning: '电话', phonetic: '/ˈtelɪfəʊn/', example: 'What\'s your telephone number?', exampleCn: '你的电话号码是多少？', options: ['电话', '手机', '电脑', '邮件'], unit: 1 },
-    { word: 'number', meaning: '号码；数字', phonetic: '/ˈnʌmbə(r)/', example: 'My lucky number is 7.', exampleCn: '我的幸运数字是7。', options: ['号码', '字母', '颜色', '名字'], unit: 1 },
-    { word: 'zero', meaning: '零', phonetic: '/ˈzɪərəʊ/', example: 'My number ends with zero.', exampleCn: '我的号码末尾是零。', options: ['零', '一', '百', '十'], unit: 1 },
-    { word: 'one', meaning: '一', phonetic: '/wʌn/', example: 'I have one book.', exampleCn: '我有一本书。', options: ['一', '二', '三', '四'], unit: 1 },
-    { word: 'two', meaning: '二', phonetic: '/tuː/', example: 'I have two sisters.', exampleCn: '我有两个姐妹。', options: ['一', '二', '三', '四'], unit: 1 },
-    { word: 'three', meaning: '三', phonetic: '/θriː/', example: 'There are three apples.', exampleCn: '有三个苹果。', options: ['一', '二', '三', '四'], unit: 1 },
-    { word: 'four', meaning: '四', phonetic: '/fɔː(r)/', example: 'Four students are here.', exampleCn: '四个学生在这里。', options: ['四', '五', '六', '七'], unit: 1 },
-    { word: 'five', meaning: '五', phonetic: '/faɪv/', example: 'I have five fingers.', exampleCn: '我有五根手指。', options: ['五', '六', '七', '八'], unit: 1 },
-    // Unit 2: This is my sister (家庭)
-    { word: 'family', meaning: '家庭', phonetic: '/ˈfæməli/', example: 'I have a big family.', exampleCn: '我有一个大家庭。', options: ['朋友', '家庭', '学校', '教室'], unit: 2 },
-    { word: 'mother', meaning: '母亲', phonetic: '/ˈmʌðə(r)/', example: 'My mother is a doctor.', exampleCn: '我的母亲是一名医生。', options: ['父亲', '母亲', '姐妹', '兄弟'], unit: 2 },
-    { word: 'father', meaning: '父亲', phonetic: '/ˈfɑːðə(r)/', example: 'My father is tall.', exampleCn: '我的父亲很高。', options: ['母亲', '父亲', '老师', '医生'], unit: 2 },
-    { word: 'brother', meaning: '兄弟', phonetic: '/ˈbrʌðə(r)/', example: 'I have a younger brother.', exampleCn: '我有一个弟弟。', options: ['姐妹', '兄弟', '朋友', '同学'], unit: 2 },
-    { word: 'sister', meaning: '姐妹', phonetic: '/ˈsɪstə(r)/', example: 'My sister is eight.', exampleCn: '我的妹妹八岁。', options: ['兄弟', '姐妹', '母亲', '阿姨'], unit: 2 },
-    { word: 'grandparent', meaning: '祖父母', phonetic: '/ˈɡrænpeərənt/', example: 'My grandparents live with us.', exampleCn: '我的祖父母和我们住在一起。', options: ['祖父母', '父母', '亲戚', '邻居'], unit: 2 },
-    { word: 'grandma', meaning: '奶奶；外婆', phonetic: '/ˈɡrænmɑː/', example: 'I love my grandma.', exampleCn: '我爱我的奶奶。', options: ['奶奶', '爷爷', '妈妈', '阿姨'], unit: 2 },
-    { word: 'grandpa', meaning: '爷爷；外公', phonetic: '/ˈɡrænpɑː/', example: 'My grandpa tells stories.', exampleCn: '我的爷爷讲故事。', options: ['奶奶', '爷爷', '爸爸', '叔叔'], unit: 2 },
-    { word: 'uncle', meaning: '叔叔；舅舅', phonetic: '/ˈʌŋkl/', example: 'My uncle is a teacher.', exampleCn: '我的叔叔是一名老师。', options: ['叔叔', '阿姨', '堂兄', '邻居'], unit: 2 },
-    { word: 'aunt', meaning: '阿姨；姑姑', phonetic: '/ɑːnt/', example: 'My aunt lives in Beijing.', exampleCn: '我的阿姨住在北京。', options: ['叔叔', '阿姨', '堂兄', '邻居'], unit: 2 },
-    { word: 'cousin', meaning: '堂（表）兄弟姐妹', phonetic: '/ˈkʌzn/', example: 'My cousin is my good friend.', exampleCn: '我的表弟是我的好朋友。', options: ['堂兄弟', '叔叔', '阿姨', '邻居'], unit: 2 },
-    { word: 'parent', meaning: '父亲或母亲', phonetic: '/ˈpeərənt/', example: 'My parents love me.', exampleCn: '我的父母爱我。', options: ['父母', '祖父母', '老师', '亲戚'], unit: 2 },
-    { word: 'people', meaning: '人们', phonetic: '/ˈpiːpl/', example: 'There are five people in my family.', exampleCn: '我家有五口人。', options: ['人们', '家庭', '朋友', '邻居'], unit: 2 },
-    { word: 'who', meaning: '谁', phonetic: '/huː/', example: 'Who is she?', exampleCn: '她是谁？', options: ['谁', '什么', '哪里', '何时'], unit: 2 },
-    { word: 'these', meaning: '这些', phonetic: '/ðiːz/', example: 'These are my books.', exampleCn: '这些是我的书。', options: ['这些', '那些', '这个', '那个'], unit: 2 },
-    { word: 'those', meaning: '那些', phonetic: '/ðəʊz/', example: 'Those are my pens.', exampleCn: '那些是我的钢笔。', options: ['这些', '那些', '这个', '那个'], unit: 2 },
-    // Unit 3: Is this your pencil? (教室物品)
-    { word: 'pencil', meaning: '铅笔', phonetic: '/ˈpensl/', example: 'Is this your pencil?', exampleCn: '这是你的铅笔吗？', options: ['铅笔', '钢笔', '尺子', '橡皮'], unit: 3 },
-    { word: 'pen', meaning: '钢笔', phonetic: '/pen/', example: 'This is my pen.', exampleCn: '这是我的钢笔。', options: ['铅笔', '钢笔', '尺子', '橡皮'], unit: 3 },
-    { word: 'book', meaning: '书', phonetic: '/bʊk/', example: 'I have a new book.', exampleCn: '我有一本新书。', options: ['书', '笔', '本子', '尺子'], unit: 3 },
-    { word: 'ruler', meaning: '尺子', phonetic: '/ˈruːlə(r)/', example: 'My ruler is long.', exampleCn: '我的尺子很长。', options: ['铅笔', '钢笔', '尺子', '橡皮'], unit: 3 },
-    { word: 'eraser', meaning: '橡皮', phonetic: '/ɪˈreɪzə(r)/', example: 'I need an eraser.', exampleCn: '我需要一块橡皮。', options: ['铅笔', '钢笔', '尺子', '橡皮'], unit: 3 },
-    { word: 'schoolbag', meaning: '书包', phonetic: '/ˈskuːlbæɡ/', example: 'My schoolbag is heavy.', exampleCn: '我的书包很重。', options: ['书包', '铅笔盒', '书本', '词典'], unit: 3 },
-    { word: 'dictionary', meaning: '词典', phonetic: '/ˈdɪkʃənri/', example: 'Look it up in the dictionary.', exampleCn: '在词典里查一下。', options: ['词典', '课本', '笔记本', '练习册'], unit: 3 },
-    { word: 'notebook', meaning: '笔记本', phonetic: '/ˈnəʊtbʊk/', example: 'Write it in your notebook.', exampleCn: '把它写在笔记本上。', options: ['课本', '笔记本', '作业本', '练习册'], unit: 3 },
-    { word: 'classroom', meaning: '教室', phonetic: '/ˈklɑːsruːm/', example: 'Our classroom is clean.', exampleCn: '我们的教室很干净。', options: ['图书馆', '教室', '办公室', '食堂'], unit: 3 },
-    { word: 'school', meaning: '学校', phonetic: '/skuːl/', example: 'Our school is beautiful.', exampleCn: '我们的学校很漂亮。', options: ['家庭', '公园', '学校', '医院'], unit: 3 },
-    { word: 'library', meaning: '图书馆', phonetic: '/ˈlaɪbrəri/', example: 'I read in the library.', exampleCn: '我在图书馆读书。', options: ['教室', '体育馆', '图书馆', '食堂'], unit: 3 },
-    { word: 'teacher', meaning: '老师', phonetic: '/ˈtiːtʃə(r)/', example: 'The teacher is kind.', exampleCn: '老师很和蔼。', options: ['医生', '老师', '学生', '工人'], unit: 3 },
-    { word: 'student', meaning: '学生', phonetic: '/ˈstjuːdnt/', example: 'Good students study hard.', exampleCn: '好学生努力学习。', options: ['老师', '学生', '医生', '警察'], unit: 3 },
-    { word: 'help', meaning: '帮助', phonetic: '/help/', example: 'Can you help me?', exampleCn: '你能帮我吗？', options: ['帮助', '学习', '工作', '玩耍'], unit: 3 },
-    { word: 'thank', meaning: '感谢', phonetic: '/θæŋk/', example: 'Thank you for your help.', exampleCn: '谢谢你的帮助。', options: ['感谢', '抱歉', '请求', '欢迎'], unit: 3 },
-    // Unit 4: Where's my schoolbag? (物品位置)
-    { word: 'where', meaning: '在哪里', phonetic: '/weə(r)/', example: 'Where is my pen?', exampleCn: '我的钢笔在哪里？', options: ['在哪里', '是什么', '是谁', '为什么'], unit: 4 },
-    { word: 'on', meaning: '在…上', phonetic: '/ɒn/', example: 'The book is on the desk.', exampleCn: '书在书桌上。', options: ['在…上', '在…里', '在…下', '在…旁边'], unit: 4 },
-    { word: 'in', meaning: '在…里', phonetic: '/ɪn/', example: 'My pencil is in the bag.', exampleCn: '我的铅笔在书包里。', options: ['在…上', '在…里', '在…下', '在…旁边'], unit: 4 },
-    { word: 'under', meaning: '在…下', phonetic: '/ˈʌndə(r)/', example: 'The cat is under the chair.', exampleCn: '猫在椅子下面。', options: ['在…上', '在…里', '在…下', '在…旁边'], unit: 4 },
-    { word: 'desk', meaning: '书桌', phonetic: '/desk/', example: 'There is a lamp on the desk.', exampleCn: '书桌上有一盏台灯。', options: ['书桌', '椅子', '床', '书架'], unit: 4 },
-    { word: 'chair', meaning: '椅子', phonetic: '/tʃeə(r)/', example: 'Sit on the chair.', exampleCn: '坐在椅子上。', options: ['书桌', '椅子', '床', '书架'], unit: 4 },
-    { word: 'bed', meaning: '床', phonetic: '/bed/', example: 'My bed is comfortable.', exampleCn: '我的床很舒服。', options: ['书桌', '椅子', '床', '沙发'], unit: 4 },
-    { word: 'room', meaning: '房间', phonetic: '/ruːm/', example: 'My room is tidy.', exampleCn: '我的房间很整洁。', options: ['房间', '房子', '教室', '花园'], unit: 4 },
-    { word: 'table', meaning: '桌子', phonetic: '/ˈteɪbl/', example: 'The flowers are on the table.', exampleCn: '花在桌子上。', options: ['桌子', '椅子', '床', '柜子'], unit: 4 },
-    { word: 'bookcase', meaning: '书架', phonetic: '/ˈbʊkkeɪs/', example: 'Books are in the bookcase.', exampleCn: '书在书架上。', options: ['书架', '书桌', '书包', '铅笔盒'], unit: 4 },
-    { word: 'sofa', meaning: '沙发', phonetic: '/ˈsəʊfə/', example: 'My father sits on the sofa.', exampleCn: '我爸爸坐在沙发上。', options: ['沙发', '椅子', '床', '桌子'], unit: 4 },
-    { word: 'think', meaning: '认为；想', phonetic: '/θɪŋk/', example: 'I think it\'s a good idea.', exampleCn: '我认为这是个好主意。', options: ['认为', '知道', '相信', '希望'], unit: 4 },
-    { word: 'know', meaning: '知道', phonetic: '/nəʊ/', example: 'I know the answer.', exampleCn: '我知道答案。', options: ['知道', '认为', '相信', '学习'], unit: 4 },
-    { word: 'come', meaning: '来', phonetic: '/kʌm/', example: 'Come here, please.', exampleCn: '请过来。', options: ['来', '去', '走', '跑'], unit: 4 },
-    { word: 'go', meaning: '去', phonetic: '/ɡəʊ/', example: 'Let\'s go to school.', exampleCn: '我们去学校吧。', options: ['来', '去', '走', '跑'], unit: 4 },
-    // Unit 5: Do you have a soccer ball? (体育用品)
-    { word: 'have', meaning: '有', phonetic: '/hæv/', example: 'I have a basketball.', exampleCn: '我有一个篮球。', options: ['有', '没有', '想要', '喜欢'], unit: 5 },
-    { word: 'ball', meaning: '球', phonetic: '/bɔːl/', example: 'The ball is red.', exampleCn: '球是红色的。', options: ['球', '玩具', '礼物', '奖品'], unit: 5 },
-    { word: 'soccer', meaning: '英式足球', phonetic: '/ˈsɒkə(r)/', example: 'We play soccer after school.', exampleCn: '我们放学后踢足球。', options: ['足球', '篮球', '排球', '网球'], unit: 5 },
-    { word: 'basketball', meaning: '篮球', phonetic: '/ˈbɑːskɪtbɔːl/', example: 'I like playing basketball.', exampleCn: '我喜欢打篮球。', options: ['足球', '篮球', '排球', '网球'], unit: 5 },
-    { word: 'volleyball', meaning: '排球', phonetic: '/ˈvɒlibɔːl/', example: 'She plays volleyball well.', exampleCn: '她排球打得很好。', options: ['足球', '篮球', '排球', '网球'], unit: 5 },
-    { word: 'tennis', meaning: '网球', phonetic: '/ˈtenɪs/', example: 'Tennis is interesting.', exampleCn: '网球很有趣。', options: ['足球', '篮球', '排球', '网球'], unit: 5 },
-    { word: 'baseball', meaning: '棒球', phonetic: '/ˈbeɪsbɔːl/', example: 'Baseball is popular in America.', exampleCn: '棒球在美国很流行。', options: ['棒球', '篮球', '排球', '网球'], unit: 5 },
-    { word: 'bat', meaning: '球拍', phonetic: '/bæt/', example: 'I need a baseball bat.', exampleCn: '我需要一个棒球球拍。', options: ['球拍', '球', '手套', '球鞋'], unit: 5 },
-    { word: 'game', meaning: '比赛；游戏', phonetic: '/ɡeɪm/', example: 'We watch a basketball game.', exampleCn: '我们看了一场篮球赛。', options: ['比赛', '课程', '活动', '练习'], unit: 5 },
-    { word: 'play', meaning: '玩；打（球）', phonetic: '/pleɪ/', example: 'Let\'s play soccer!', exampleCn: '我们踢足球吧！', options: ['玩', '看', '听', '做'], unit: 5 },
-    { word: 'sport', meaning: '体育运动', phonetic: '/spɔːt/', example: 'My favourite sport is basketball.', exampleCn: '我最喜欢的运动是篮球。', options: ['运动', '游戏', '科目', '爱好'], unit: 5 },
-    { word: 'great', meaning: '很棒的', phonetic: '/ɡreɪt/', example: 'That sounds great!', exampleCn: '那听起来很棒！', options: ['很棒的', '有趣的', '无聊的', '困难的'], unit: 5 },
-    { word: 'fun', meaning: '有趣的', phonetic: '/fʌn/', example: 'The game is fun.', exampleCn: '比赛很有趣。', options: ['有趣的', '无聊的', '困难的', '容易的'], unit: 5 },
-    { word: 'boring', meaning: '无聊的', phonetic: '/ˈbɔːrɪŋ/', example: 'This movie is boring.', exampleCn: '这部电影很无聊。', options: ['有趣的', '无聊的', '精彩的', '轻松的'], unit: 5 },
-    { word: 'difficult', meaning: '困难的', phonetic: '/ˈdɪfɪkəlt/', example: 'Math is difficult for me.', exampleCn: '数学对我来说很难。', options: ['困难的', '容易的', '有趣的', '重要的'], unit: 5 },
-    { word: 'easy', meaning: '容易的', phonetic: '/ˈiːzi/', example: 'This problem is easy.', exampleCn: '这个问题很容易。', options: ['困难的', '容易的', '有趣的', '重要的'], unit: 5 },
-    { word: 'relaxing', meaning: '令人放松的', phonetic: '/rɪˈlæksɪŋ/', example: 'Music is relaxing.', exampleCn: '音乐令人放松。', options: ['令人放松的', '令人兴奋的', '令人疲惫的', '令人担忧的'], unit: 5 },
-    // Unit 6: Do you like bananas? (食物)
-    { word: 'like', meaning: '喜欢', phonetic: '/laɪk/', example: 'I like apples.', exampleCn: '我喜欢苹果。', options: ['喜欢', '讨厌', '想要', '需要'], unit: 6 },
-    { word: 'banana', meaning: '香蕉', phonetic: '/bəˈnɑːnə/', example: 'I eat a banana every day.', exampleCn: '我每天吃一根香蕉。', options: ['香蕉', '苹果', '橙子', '梨'], unit: 6 },
-    { word: 'apple', meaning: '苹果', phonetic: '/ˈæpl/', example: 'An apple a day keeps the doctor away.', exampleCn: '一天一苹果，医生远离我。', options: ['香蕉', '苹果', '葡萄', '草莓'], unit: 6 },
-    { word: 'orange', meaning: '橙子', phonetic: '/ˈɒrɪndʒ/', example: 'This orange is sweet.', exampleCn: '这个橙子很甜。', options: ['苹果', '香蕉', '橙子', '梨'], unit: 6 },
-    { word: 'pear', meaning: '梨', phonetic: '/peə(r)/', example: 'The pear is juicy.', exampleCn: '这个梨很多汁。', options: ['苹果', '香蕉', '橙子', '梨'], unit: 6 },
-    { word: 'strawberry', meaning: '草莓', phonetic: '/ˈstrɔːbəri/', example: 'I love strawberries.', exampleCn: '我喜欢草莓。', options: ['草莓', '蓝莓', '葡萄', '樱桃'], unit: 6 },
-    { word: 'fruit', meaning: '水果', phonetic: '/fruːt/', example: 'Fruit is good for health.', exampleCn: '水果对健康有益。', options: ['水果', '蔬菜', '肉类', '甜点'], unit: 6 },
-    { word: 'vegetable', meaning: '蔬菜', phonetic: '/ˈvedʒtəbl/', example: 'Eat more vegetables.', exampleCn: '多吃蔬菜。', options: ['水果', '蔬菜', '肉类', '甜点'], unit: 6 },
-    { word: 'tomato', meaning: '西红柿', phonetic: '/təˈmɑːtəʊ/', example: 'I like tomato soup.', exampleCn: '我喜欢西红柿汤。', options: ['西红柿', '土豆', '胡萝卜', '洋葱'], unit: 6 },
-    { word: 'egg', meaning: '鸡蛋', phonetic: '/eɡ/', example: 'I have an egg for breakfast.', exampleCn: '我早餐吃一个鸡蛋。', options: ['鸡蛋', '牛奶', '面包', '米饭'], unit: 6 },
-    { word: 'bread', meaning: '面包', phonetic: '/bred/', example: 'I like bread and milk.', exampleCn: '我喜欢面包和牛奶。', options: ['面包', '米饭', '面条', '蛋糕'], unit: 6 },
-    { word: 'rice', meaning: '米饭', phonetic: '/raɪs/', example: 'We eat rice for lunch.', exampleCn: '我们午餐吃米饭。', options: ['面包', '米饭', '面条', '饺子'], unit: 6 },
-    { word: 'chicken', meaning: '鸡肉', phonetic: '/ˈtʃɪkɪn/', example: 'Fried chicken is delicious.', exampleCn: '炸鸡很美味。', options: ['鸡肉', '鱼肉', '牛肉', '猪肉'], unit: 6 },
-    { word: 'hamburger', meaning: '汉堡包', phonetic: '/ˈhæmbɜːɡə(r)/', example: 'I like hamburgers.', exampleCn: '我喜欢汉堡包。', options: ['汉堡包', '三明治', '热狗', '比萨'], unit: 6 },
-    { word: 'salad', meaning: '沙拉', phonetic: '/ˈsæləd/', example: 'I make a fruit salad.', exampleCn: '我做了一份水果沙拉。', options: ['沙拉', '汤', '果汁', '甜点'], unit: 6 },
-    { word: 'milk', meaning: '牛奶', phonetic: '/mɪlk/', example: 'I drink milk every day.', exampleCn: '我每天喝牛奶。', options: ['牛奶', '水', '果汁', '茶'], unit: 6 },
-    { word: 'water', meaning: '水', phonetic: '/ˈwɔːtə(r)/', example: 'Drink more water.', exampleCn: '多喝水。', options: ['牛奶', '水', '果汁', '咖啡'], unit: 6 },
-    { word: 'food', meaning: '食物', phonetic: '/fuːd/', example: 'Chinese food is great.', exampleCn: '中国食物很棒。', options: ['食物', '饮料', '水果', '蔬菜'], unit: 6 },
-    { word: 'breakfast', meaning: '早餐', phonetic: '/ˈbrekfəst/', example: 'I have breakfast at 7.', exampleCn: '我七点吃早餐。', options: ['早餐', '午餐', '晚餐', '甜点'], unit: 6 },
-    { word: 'lunch', meaning: '午餐', phonetic: '/lʌntʃ/', example: 'We have lunch at school.', exampleCn: '我们在学校吃午餐。', options: ['早餐', '午餐', '晚餐', '甜点'], unit: 6 },
-    { word: 'dinner', meaning: '晚餐', phonetic: '/ˈdɪnə(r)/', example: 'We have dinner together.', exampleCn: '我们一起吃晚餐。', options: ['早餐', '午餐', '晚餐', '甜点'], unit: 6 },
-    // Unit 7: How much are these socks? (购物、衣服)
-    { word: 'much', meaning: '多；大量', phonetic: '/mʌtʃ/', example: 'How much is it?', exampleCn: '多少钱？', options: ['多', '少', '很多', '很少'], unit: 7 },
-    { word: 'price', meaning: '价格', phonetic: '/praɪs/', example: 'The price is low.', exampleCn: '价格很低。', options: ['价格', '大小', '颜色', '款式'], unit: 7 },
-    { word: 'buy', meaning: '买', phonetic: '/baɪ/', example: 'I want to buy a gift.', exampleCn: '我想买个礼物。', options: ['买', '卖', '付', '花'], unit: 7 },
-    { word: 'sell', meaning: '卖', phonetic: '/sel/', example: 'The store sells clothes.', exampleCn: '这家店卖衣服。', options: ['买', '卖', '付', '花'], unit: 7 },
-    { word: 'clothes', meaning: '衣服', phonetic: '/kləʊðz/', example: 'I like these clothes.', exampleCn: '我喜欢这些衣服。', options: ['衣服', '鞋子', '帽子', '袜子'], unit: 7 },
-    { word: 'shirt', meaning: '衬衫', phonetic: '/ʃɜːt/', example: 'My shirt is white.', exampleCn: '我的衬衫是白色的。', options: ['衬衫', 'T恤', '外套', '毛衣'], unit: 7 },
-    { word: 'T-shirt', meaning: 'T恤衫', phonetic: '/ˈtiːʃɜːt/', example: 'I wear a T-shirt in summer.', exampleCn: '我夏天穿T恤。', options: ['衬衫', 'T恤', '外套', '毛衣'], unit: 7 },
-    { word: 'sweater', meaning: '毛衣', phonetic: '/ˈswetə(r)/', example: 'Put on your sweater.', exampleCn: '穿上你的毛衣。', options: ['衬衫', 'T恤', '外套', '毛衣'], unit: 7 },
-    { word: 'jacket', meaning: '夹克', phonetic: '/ˈdʒækɪt/', example: 'This jacket is cool.', exampleCn: '这件夹克很酷。', options: ['夹克', '裙子', '裤子', '短裤'], unit: 7 },
-    { word: 'skirt', meaning: '裙子', phonetic: '/skɜːt/', example: 'She wears a red skirt.', exampleCn: '她穿了一条红裙子。', options: ['夹克', '裙子', '裤子', '短裤'], unit: 7 },
-    { word: 'pants', meaning: '裤子', phonetic: '/pænts/', example: 'These pants are too long.', exampleCn: '这条裤子太长了。', options: ['夹克', '裙子', '裤子', '短裤'], unit: 7 },
-    { word: 'shoes', meaning: '鞋子', phonetic: '/ʃuːz/', example: 'My shoes are new.', exampleCn: '我的鞋子是新的。', options: ['鞋子', '袜子', '帽子', '手套'], unit: 7 },
-    { word: 'socks', meaning: '袜子', phonetic: '/sɒks/', example: 'I need a pair of socks.', exampleCn: '我需要一双袜子。', options: ['鞋子', '袜子', '帽子', '手套'], unit: 7 },
-    { word: 'color', meaning: '颜色', phonetic: '/ˈkʌlə(r)/', example: 'What color is it?', exampleCn: '它是什么颜色？', options: ['颜色', '大小', '形状', '款式'], unit: 7 },
-    { word: 'white', meaning: '白色的', phonetic: '/waɪt/', example: 'Snow is white.', exampleCn: '雪是白色的。', options: ['白色的', '黑色的', '红色的', '蓝色的'], unit: 7 },
-    { word: 'black', meaning: '黑色的', phonetic: '/blæk/', example: 'My bag is black.', exampleCn: '我的书包是黑色的。', options: ['白色的', '黑色的', '红色的', '蓝色的'], unit: 7 },
-    { word: 'red', meaning: '红色的', phonetic: '/red/', example: 'The rose is red.', exampleCn: '玫瑰是红色的。', options: ['红色的', '黑色的', '白色的', '绿色的'], unit: 7 },
-    { word: 'blue', meaning: '蓝色的', phonetic: '/bluː/', example: 'The sky is blue.', exampleCn: '天空是蓝色的。', options: ['红色的', '黄色的', '蓝色的', '绿色的'], unit: 7 },
-    { word: 'green', meaning: '绿色的', phonetic: '/ɡriːn/', example: 'The grass is green.', exampleCn: '草是绿色的。', options: ['红色的', '黄色的', '蓝色的', '绿色的'], unit: 7 },
-    { word: 'big', meaning: '大的', phonetic: '/bɪɡ/', example: 'This is a big apple.', exampleCn: '这是一个大苹果。', options: ['大的', '小的', '长的', '短的'], unit: 7 },
-    { word: 'small', meaning: '小的', phonetic: '/smɔːl/', example: 'The cat is small.', exampleCn: '猫很小。', options: ['大的', '小的', '长的', '短的'], unit: 7 },
-    { word: 'long', meaning: '长的', phonetic: '/lɒŋ/', example: 'This ruler is long.', exampleCn: '这把尺子很长。', options: ['大的', '小的', '长的', '短的'], unit: 7 },
-    { word: 'short', meaning: '短的', phonetic: '/ʃɔːt/', example: 'My hair is short.', exampleCn: '我的头发很短。', options: ['大的', '小的', '长的', '短的'], unit: 7 },
-    { word: 'birthday', meaning: '生日', phonetic: '/ˈbɜːθdeɪ/', example: 'Happy birthday to you!', exampleCn: '祝你生日快乐！', options: ['生日', '节日', '假日', '周末'], unit: 7 },
-    { word: 'present', meaning: '礼物', phonetic: '/ˈpreznt/', example: 'This is a birthday present.', exampleCn: '这是生日礼物。', options: ['礼物', '蛋糕', '卡片', '花朵'], unit: 7 },
-    { word: 'party', meaning: '聚会', phonetic: '/ˈpɑːti/', example: 'We have a birthday party.', exampleCn: '我们举办了生日聚会。', options: ['聚会', '会议', '比赛', '演出'], unit: 7 },
+    // Starter Unit 1: Hello (打招呼问候)
+    { word: 'unit', meaning: '单元', phonetic: '/ˈjuːnɪt/', example: 'We are in Unit 1.', exampleCn: '我们在第一单元。', options: ['单元', '部分', '章节', '课程'], unit: 0 },
+    { word: 'section', meaning: '部分', phonetic: '/ˈsekʃn/', example: 'Read Section A.', exampleCn: '阅读A部分。', options: ['部分', '全部', '章节', '单元'], unit: 0 },
+    { word: 'greet', meaning: '问候', phonetic: '/ɡriːt/', example: 'We greet each other.', exampleCn: '我们互相问候。', options: ['问候', '告别', '欢迎', '感谢'], unit: 0 },
+    { word: 'each', meaning: '每个', phonetic: '/iːtʃ/', example: 'Each student has a book.', exampleCn: '每个学生有一本书。', options: ['每个', '一些', '所有', '许多'], unit: 0 },
+    { word: 'other', meaning: '其他的', phonetic: '/ˈʌðə(r)/', example: 'I like the other one.', exampleCn: '我喜欢另一个。', options: ['其他的', '相同的', '不同的', '特别的'], unit: 0 },
+    { word: 'everyone', meaning: '每个人', phonetic: '/ˈevriwʌn/', example: 'Hello everyone!', exampleCn: '大家好！', options: ['每个人', '某人', '任何人', '没有人'], unit: 0 },
+    { word: 'start', meaning: '开始', phonetic: '/stɑːt/', example: 'Let\'s start the class.', exampleCn: '我们开始上课吧。', options: ['开始', '结束', '继续', '停止'], unit: 0 },
+    { word: 'conversation', meaning: '交谈', phonetic: '/ˌkɒnvəˈseɪʃn/', example: 'We have a conversation.', exampleCn: '我们进行了一次交谈。', options: ['交谈', '演讲', '讨论', '辩论'], unit: 0 },
+    { word: 'spell', meaning: '拼写', phonetic: '/spel/', example: 'How do you spell your name?', exampleCn: '你怎么拼写你的名字？', options: ['拼写', '阅读', '写作', '发音'], unit: 0 },
+    { word: 'bell', meaning: '铃', phonetic: '/bel/', example: 'The bell rings at 8.', exampleCn: '八点铃响。', options: ['铃', '钟', '哨', '鼓'], unit: 0 },
+    // Starter Unit 2: Keep Tidy (保持整洁)
+    { word: 'bottle', meaning: '瓶子', phonetic: '/ˈbɒtl/', example: 'The bottle is on the desk.', exampleCn: '瓶子在书桌上。', options: ['瓶子', '杯子', '碗', '盒子'], unit: 1 },
+    { word: 'eraser', meaning: '橡皮', phonetic: '/ɪˈreɪzə(r)/', example: 'I need an eraser.', exampleCn: '我需要一块橡皮。', options: ['橡皮', '铅笔', '钢笔', '尺子'], unit: 1 },
+    { word: 'key', meaning: '钥匙', phonetic: '/kiː/', example: 'This is my key.', exampleCn: '这是我的钥匙。', options: ['钥匙', '锁', '门', '窗户'], unit: 1 },
+    { word: 'thing', meaning: '东西', phonetic: '/θɪŋ/', example: 'Put your things away.', exampleCn: '把你的东西收好。', options: ['东西', '地方', '时间', '方式'], unit: 1 },
+    { word: 'need', meaning: '需要', phonetic: '/niːd/', example: 'I need a pen.', exampleCn: '我需要一支钢笔。', options: ['需要', '想要', '拥有', '使用'], unit: 1 },
+    // Starter Unit 3: Welcome (欢迎)
+    { word: 'fun', meaning: '乐趣', phonetic: '/fʌn/', example: 'We have fun at school.', exampleCn: '我们在学校很开心。', options: ['乐趣', '工作', '学习', '练习'], unit: 2 },
+    { word: 'yard', meaning: '院子', phonetic: '/jɑːd/', example: 'The cat is in the yard.', exampleCn: '猫在院子里。', options: ['院子', '花园', '公园', '操场'], unit: 2 },
+    { word: 'carrot', meaning: '胡萝卜', phonetic: '/ˈkærət/', example: 'Rabbits like carrots.', exampleCn: '兔子喜欢胡萝卜。', options: ['胡萝卜', '土豆', '西红柿', '洋葱'], unit: 2 },
+    { word: 'goose', meaning: '鹅', phonetic: '/ɡuːs/', example: 'The goose is on the farm.', exampleCn: '鹅在农场里。', options: ['鹅', '鸭子', '鸡', '鸟'], unit: 2 },
+    { word: 'count', meaning: '数数', phonetic: '/kaʊnt/', example: 'Count from one to ten.', exampleCn: '从一数到十。', options: ['数数', '计算', '测量', '比较'], unit: 2 },
+    { word: 'another', meaning: '另一个', phonetic: '/əˈnʌðə(r)/', example: 'I want another one.', exampleCn: '我想要另一个。', options: ['另一个', '相同的', '不同的', '特别的'], unit: 2 },
+    { word: 'else', meaning: '其他的', phonetic: '/els/', example: 'What else do you need?', exampleCn: '你还需要什么？', options: ['其他的', '另外的', '相同的', '全部的'], unit: 2 },
+    { word: 'circle', meaning: '圈出', phonetic: '/ˈsɜːkl/', example: 'Circle the correct answer.', exampleCn: '圈出正确答案。', options: ['圈出', '划掉', '写下', '读出'], unit: 2 },
+    // Unit 1: You and Me (你和我)
+    { word: 'full', meaning: '完整的', phonetic: '/fʊl/', example: 'Write your full name.', exampleCn: '写下你的全名。', options: ['完整的', '部分的', '空的', '简短的'], unit: 3 },
+    { word: 'grade', meaning: '年级', phonetic: '/ɡreɪd/', example: 'I am in Grade 7.', exampleCn: '我在七年级。', options: ['年级', '班级', '学校', '分数'], unit: 3 },
+    { word: 'classmate', meaning: '同班同学', phonetic: '/ˈklɑːsmeɪt/', example: 'She is my classmate.', exampleCn: '她是我的同班同学。', options: ['同班同学', '老师', '朋友', '邻居'], unit: 3 },
+    { word: 'mistake', meaning: '错误', phonetic: '/mɪˈsteɪk/', example: 'Don\'t be afraid of mistakes.', exampleCn: '不要害怕犯错误。', options: ['错误', '成功', '挑战', '机会'], unit: 3 },
+    { word: 'country', meaning: '国家', phonetic: '/ˈkʌntri/', example: 'China is a big country.', exampleCn: '中国是一个大国。', options: ['国家', '城市', '村庄', '岛屿'], unit: 3 },
+    { word: 'same', meaning: '相同的', phonetic: '/seɪm/', example: 'We are in the same class.', exampleCn: '我们在同一个班。', options: ['相同的', '不同的', '相似的', '相反的'], unit: 3 },
+    { word: 'twin', meaning: '双胞胎', phonetic: '/twɪn/', example: 'They are twin sisters.', exampleCn: '她们是双胞胎姐妹。', options: ['双胞胎', '兄弟', '姐妹', '朋友'], unit: 3 },
+    { word: 'both', meaning: '两者都', phonetic: '/bəʊθ/', example: 'We both like music.', exampleCn: '我们俩都喜欢音乐。', options: ['两者都', '全部', '每个', '没有一个'], unit: 3 },
+    { word: 'band', meaning: '乐队', phonetic: '/bænd/', example: 'He is in a rock band.', exampleCn: '他在一个摇滚乐队里。', options: ['乐队', '合唱团', '小组', '团队'], unit: 3 },
+    { word: 'a lot', meaning: '非常', phonetic: '/ə lɒt/', example: 'Thanks a lot!', exampleCn: '非常感谢！', options: ['非常', '有点', '几乎', '几乎不'], unit: 3 },
+    { word: 'tofu', meaning: '豆腐', phonetic: '/ˈtəʊfuː/', example: 'I like tofu.', exampleCn: '我喜欢豆腐。', options: ['豆腐', '面条', '米饭', '饺子'], unit: 3 },
+    { word: 'parrot', meaning: '鹦鹉', phonetic: '/ˈpærət/', example: 'The parrot can talk.', exampleCn: '鹦鹉会说话。', options: ['鹦鹉', '鸽子', '麻雀', '老鹰'], unit: 3 },
+    { word: 'guitar', meaning: '吉他', phonetic: '/ɡɪˈtɑː(r)/', example: 'He plays the guitar well.', exampleCn: '他吉他弹得很好。', options: ['吉他', '钢琴', '小提琴', '鼓'], unit: 3 },
+    { word: 'information', meaning: '信息', phonetic: '/ˌɪnfəˈmeɪʃn/', example: 'Read the information.', exampleCn: '阅读信息。', options: ['信息', '知识', '新闻', '数据'], unit: 3 },
+    { word: 'hobby', meaning: '爱好', phonetic: '/ˈhɒbi/', example: 'My hobby is reading.', exampleCn: '我的爱好是阅读。', options: ['爱好', '工作', '课程', '作业'], unit: 3 },
+    // Unit 2: We're Family (家庭)
+    { word: 'mean', meaning: '意思是', phonetic: '/miːn/', example: 'What does this word mean?', exampleCn: '这个词是什么意思？', options: ['意思是', '想要', '需要', '知道'], unit: 4 },
+    { word: 'husband', meaning: '丈夫', phonetic: '/ˈhʌzbənd/', example: 'Her husband is a doctor.', exampleCn: '她的丈夫是一名医生。', options: ['丈夫', '妻子', '父亲', '兄弟'], unit: 4 },
+    { word: 'together', meaning: '一起', phonetic: '/təˈɡeðə(r)/', example: 'We play together.', exampleCn: '我们一起玩。', options: ['一起', '分开', '单独', '轮流'], unit: 4 },
+    { word: 'spend', meaning: '花费', phonetic: '/spend/', example: 'I spend time with family.', exampleCn: '我花时间和家人在一起。', options: ['花费', '节省', '浪费', '使用'], unit: 4 },
+    { word: 'really', meaning: '非常', phonetic: '/ˈriːəli/', example: 'I really like it.', exampleCn: '我真的很喜欢它。', options: ['非常', '有点', '几乎', '几乎不'], unit: 4 },
+    { word: 'member', meaning: '成员', phonetic: '/ˈmembə(r)/', example: 'She is a family member.', exampleCn: '她是家庭的一员。', options: ['成员', '领袖', '客人', '朋友'], unit: 4 },
+    { word: 'activity', meaning: '活动', phonetic: '/ækˈtɪvəti/', example: 'We have many activities.', exampleCn: '我们有很多活动。', options: ['活动', '课程', '作业', '比赛'], unit: 4 },
+    { word: 'chess', meaning: '国际象棋', phonetic: '/tʃes/', example: 'He likes playing chess.', exampleCn: '他喜欢下棋。', options: ['国际象棋', '围棋', '跳棋', '扑克'], unit: 4 },
+    { word: 'grandparent', meaning: '祖父母', phonetic: '/ˈɡrænpeərənt/', example: 'My grandparents are kind.', exampleCn: '我的祖父母很和蔼。', options: ['祖父母', '父母', '亲戚', '邻居'], unit: 4 },
+    { word: 'funny', meaning: '有趣的', phonetic: '/ˈfʌni/', example: 'He is a funny boy.', exampleCn: '他是一个有趣的男孩。', options: ['有趣的', '严肃的', '无聊的', '安静的'], unit: 4 },
+    { word: 'laugh', meaning: '笑', phonetic: '/lɑːf/', example: 'We laugh together.', exampleCn: '我们一起笑。', options: ['笑', '哭', '喊', '唱'], unit: 4 },
+    { word: 'different', meaning: '不同的', phonetic: '/ˈdɪfrənt/', example: 'We are different.', exampleCn: '我们是不同的。', options: ['不同的', '相同的', '相似的', '特别的'], unit: 4 },
+    { word: 'violin', meaning: '小提琴', phonetic: '/ˌvaɪəˈlɪn/', example: 'She plays the violin.', exampleCn: '她拉小提琴。', options: ['小提琴', '吉他', '钢琴', '大提琴'], unit: 4 },
+    { word: 'handsome', meaning: '英俊的', phonetic: '/ˈhænsəm/', example: 'He is tall and handsome.', exampleCn: '他又高又英俊。', options: ['英俊的', '美丽的', '可爱的', '聪明的'], unit: 4 },
+    { word: 'son', meaning: '儿子', phonetic: '/sʌn/', example: 'They have a son.', exampleCn: '他们有一个儿子。', options: ['儿子', '女儿', '侄子', '孙子'], unit: 4 },
+    { word: 'hike', meaning: '远足', phonetic: '/haɪk/', example: 'We go hiking on Sunday.', exampleCn: '我们周日去远足。', options: ['远足', '跑步', '游泳', '骑行'], unit: 4 },
+    // Unit 3: My School (我的学校)
+    { word: 'hall', meaning: '大厅', phonetic: '/hɔːl/', example: 'The hall is big.', exampleCn: '大厅很大。', options: ['大厅', '教室', '办公室', '图书馆'], unit: 5 },
+    { word: 'building', meaning: '建筑物', phonetic: '/ˈbɪldɪŋ/', example: 'Our school has tall buildings.', exampleCn: '我们学校有高楼。', options: ['建筑物', '房间', '教室', '操场'], unit: 5 },
+    { word: 'across', meaning: '穿过', phonetic: '/əˈkrɒs/', example: 'Walk across the street.', exampleCn: '穿过街道。', options: ['穿过', '沿着', '围绕', '经过'], unit: 5 },
+    { word: 'centre', meaning: '中心', phonetic: '/ˈsentə(r)/', example: 'There is a library in the centre.', exampleCn: '中心有一个图书馆。', options: ['中心', '角落', '边缘', '外面'], unit: 5 },
+    { word: 'gym', meaning: '体育馆', phonetic: '/dʒɪm/', example: 'We play basketball in the gym.', exampleCn: '我们在体育馆打篮球。', options: ['体育馆', '教室', '图书馆', '食堂'], unit: 5 },
+    { word: 'field', meaning: '场地', phonetic: '/fiːld/', example: 'The sports field is large.', exampleCn: '运动场很大。', options: ['场地', '教室', '房间', '建筑'], unit: 5 },
+    { word: 'office', meaning: '办公室', phonetic: '/ˈɒfɪs/', example: 'The teacher is in the office.', exampleCn: '老师在办公室。', options: ['办公室', '教室', '图书馆', '实验室'], unit: 5 },
+    { word: 'large', meaning: '大的', phonetic: '/lɑːdʒ/', example: 'We have a large playground.', exampleCn: '我们有一个大操场。', options: ['大的', '小的', '高的', '矮的'], unit: 5 },
+    { word: 'special', meaning: '特别的', phonetic: '/ˈspeʃl/', example: 'Today is a special day.', exampleCn: '今天是特别的一天。', options: ['特别的', '普通的', '重要的', '有趣的'], unit: 5 },
+    { word: 'smart', meaning: '智能的', phonetic: '/smɑːt/', example: 'We use a smart board.', exampleCn: '我们使用智能白板。', options: ['智能的', '传统的', '简单的', '复杂的'], unit: 5 },
+    { word: 'important', meaning: '重要的', phonetic: '/ɪmˈpɔːtnt/', example: 'English is important.', exampleCn: '英语很重要。', options: ['重要的', '有趣的', '困难的', '简单的'], unit: 5 },
+    { word: 'notice', meaning: '通知', phonetic: '/ˈnəʊtɪs/', example: 'Read the notice on the board.', exampleCn: '阅读板上的通知。', options: ['通知', '作业', '考试', '新闻'], unit: 5 },
+    { word: 'locker', meaning: '储物柜', phonetic: '/ˈlɒkə(r)/', example: 'Put your bag in the locker.', exampleCn: '把你的包放到储物柜里。', options: ['储物柜', '书桌', '书架', '抽屉'], unit: 5 },
+    { word: 'bookcase', meaning: '书架', phonetic: '/ˈbʊkkeɪs/', example: 'Books are in the bookcase.', exampleCn: '书在书架上。', options: ['书架', '书桌', '书包', '抽屉'], unit: 5 },
+    { word: 'modern', meaning: '现代的', phonetic: '/ˈmɒdn/', example: 'Our school is very modern.', exampleCn: '我们学校很现代。', options: ['现代的', '传统的', '古老的', '简单的'], unit: 5 },
+    { word: 'amazing', meaning: '令人惊叹的', phonetic: '/əˈmeɪzɪŋ/', example: 'The view is amazing!', exampleCn: '风景令人惊叹！', options: ['令人惊叹的', '普通的', '无聊的', '糟糕的'], unit: 5 },
+    { word: 'raise', meaning: '升起', phonetic: '/reɪz/', example: 'We raise the flag.', exampleCn: '我们升国旗。', options: ['升起', '放下', '举起', '放下'], unit: 5 },
+    { word: 'flag', meaning: '旗帜', phonetic: '/flæɡ/', example: 'The national flag is red.', exampleCn: '国旗是红色的。', options: ['旗帜', '徽章', '符号', '标志'], unit: 5 },
+    { word: 'change', meaning: '改变', phonetic: '/tʃeɪndʒ/', example: 'The school has changed.', exampleCn: '学校已经变了。', options: ['改变', '保持', '开始', '结束'], unit: 5 },
+    { word: 'seat', meaning: '座位', phonetic: '/siːt/', example: 'Please take your seat.', exampleCn: '请就座。', options: ['座位', '桌子', '房间', '位置'], unit: 5 },
+    { word: 'delicious', meaning: '美味的', phonetic: '/dɪˈlɪʃəs/', example: 'The food is delicious.', exampleCn: '食物很美味。', options: ['美味的', '健康的', '简单的', '特别的'], unit: 5 },
+    { word: 'similar', meaning: '相似的', phonetic: '/ˈsɪmələ(r)/', example: 'Our schools are similar.', exampleCn: '我们的学校相似。', options: ['相似的', '不同的', '相同的', '相反的'], unit: 5 },
+    // Unit 4: My Favourite Subject (我最喜欢的科目)
+    { word: 'biology', meaning: '生物学', phonetic: '/baɪˈɒlədʒi/', example: 'We study biology in Grade 7.', exampleCn: '我们在七年级学生物。', options: ['生物学', '地理学', '历史学', '物理学'], unit: 6 },
+    { word: 'geography', meaning: '地理', phonetic: '/dʒiˈɒɡrəfi/', example: 'I like geography class.', exampleCn: '我喜欢地理课。', options: ['地理', '历史', '生物', '化学'], unit: 6 },
+    { word: 'history', meaning: '历史', phonetic: '/ˈhɪstri/', example: 'History is interesting.', exampleCn: '历史很有趣。', options: ['历史', '地理', '科学', '数学'], unit: 6 },
+    { word: 'boring', meaning: '乏味的', phonetic: '/ˈbɔːrɪŋ/', example: 'Some lessons are boring.', exampleCn: '有些课很乏味。', options: ['乏味的', '有趣的', '令人兴奋的', '轻松的'], unit: 6 },
+    { word: 'useful', meaning: '有用的', phonetic: '/ˈjuːsfl/', example: 'English is very useful.', exampleCn: '英语很有用。', options: ['有用的', '有趣的', '困难的', '重要的'], unit: 6 },
+    { word: 'exciting', meaning: '令人激动的', phonetic: '/ɪkˈsaɪtɪŋ/', example: 'The news is exciting.', exampleCn: '这个消息令人激动。', options: ['令人激动的', '令人放松的', '令人疲惫的', '令人担忧的'], unit: 6 },
+    { word: 'reason', meaning: '原因', phonetic: '/ˈriːzn/', example: 'Tell me the reason.', exampleCn: '告诉我原因。', options: ['原因', '结果', '方式', '时间'], unit: 6 },
+    { word: 'remember', meaning: '记住', phonetic: '/rɪˈmembə(r)/', example: 'Remember the new words.', exampleCn: '记住生词。', options: ['记住', '忘记', '学习', '理解'], unit: 6 },
+    { word: 'excellent', meaning: '优秀的', phonetic: '/ˈeksələnt/', example: 'You did an excellent job!', exampleCn: '你做得非常棒！', options: ['优秀的', '普通的', '良好的', '糟糕的'], unit: 6 },
+    { word: 'instrument', meaning: '工具', phonetic: '/ˈɪnstrəmənt/', example: 'Music is fun with instruments.', exampleCn: '用乐器演奏音乐很有趣。', options: ['工具', '乐器', '设备', '机器'], unit: 6 },
+    { word: 'future', meaning: '未来', phonetic: '/ˈfjuːtʃə(r)/', example: 'What do you want in the future?', exampleCn: '你未来想要什么？', options: ['未来', '过去', '现在', '永远'], unit: 6 },
+    { word: 'problem', meaning: '难题', phonetic: '/ˈprɒbləm/', example: 'Let\'s solve the problem.', exampleCn: '让我们解决这个难题。', options: ['难题', '答案', '问题', '方法'], unit: 6 },
+    { word: 'magic', meaning: '魔法', phonetic: '/ˈmædʒɪk/', example: 'The show has magic tricks.', exampleCn: '表演有魔术。', options: ['魔法', '科学', '游戏', '音乐'], unit: 6 },
+    { word: 'life', meaning: '生活', phonetic: '/laɪf/', example: 'School life is wonderful.', exampleCn: '学校生活很精彩。', options: ['生活', '学习', '工作', '游戏'], unit: 6 },
+    { word: 'scientist', meaning: '科学家', phonetic: '/ˈsaɪəntɪst/', example: 'I want to be a scientist.', exampleCn: '我想成为科学家。', options: ['科学家', '医生', '老师', '工程师'], unit: 6 },
+    // Unit 5: Fun Clubs (有趣的社团)
+    { word: 'club', meaning: '社团', phonetic: '/klʌb/', example: 'I join the music club.', exampleCn: '我加入音乐社团。', options: ['社团', '课程', '比赛', '活动'], unit: 7 },
+    { word: 'join', meaning: '加入', phonetic: '/dʒɔɪn/', example: 'Come and join us!', exampleCn: '来加入我们吧！', options: ['加入', '离开', '开始', '结束'], unit: 7 },
+    { word: 'choose', meaning: '选择', phonetic: '/tʃuːz/', example: 'Choose your favourite club.', exampleCn: '选择你最喜欢的社团。', options: ['选择', '加入', '参加', '放弃'], unit: 7 },
+    { word: 'drama', meaning: '戏剧', phonetic: '/ˈdrɑːmə/', example: 'She likes drama club.', exampleCn: '她喜欢戏剧社。', options: ['戏剧', '音乐', '舞蹈', '绘画'], unit: 7 },
+    { word: 'feeling', meaning: '感觉', phonetic: '/ˈfiːlɪŋ/', example: 'I have a good feeling.', exampleCn: '我有一种好的感觉。', options: ['感觉', '想法', '意见', '建议'], unit: 7 },
+    { word: 'news', meaning: '新闻', phonetic: '/njuːz/', example: 'I watch the news every day.', exampleCn: '我每天看新闻。', options: ['新闻', '故事', '消息', '信息'], unit: 7 },
+    { word: 'musical', meaning: '音乐的', phonetic: '/ˈmjuːzɪkl/', example: 'He has musical talent.', exampleCn: '他有音乐天赋。', options: ['音乐的', '艺术的', '体育的', '科学的'], unit: 7 },
+    { word: 'exactly', meaning: '准确地', phonetic: '/ɪɡˈzæktli/', example: 'Tell me exactly what happened.', exampleCn: '准确地告诉我发生了什么。', options: ['准确地', '大致地', '快速地', '慢慢地'], unit: 7 },
+    { word: 'drum', meaning: '鼓', phonetic: '/drʌm/', example: 'He plays the drums.', exampleCn: '他打鼓。', options: ['鼓', '吉他', '钢琴', '小提琴'], unit: 7 },
+    { word: 'ability', meaning: '能力', phonetic: '/əˈbɪləti/', example: 'Everyone has different abilities.', exampleCn: '每个人都有不同的能力。', options: ['能力', '技能', '天赋', '知识'], unit: 7 },
+    { word: 'paint', meaning: '绘画', phonetic: '/peɪnt/', example: 'I like to paint pictures.', exampleCn: '我喜欢画画。', options: ['绘画', '书写', '阅读', '唱歌'], unit: 7 },
+    { word: 'climb', meaning: '攀登', phonetic: '/klaɪm/', example: 'We climb the mountain.', exampleCn: '我们爬山。', options: ['攀登', '跑步', '跳跃', '行走'], unit: 7 },
+    { word: 'interested', meaning: '感兴趣的', phonetic: '/ˈɪntrəstɪd/', example: 'I am interested in science.', exampleCn: '我对科学感兴趣。', options: ['感兴趣的', '无聊的', '兴奋的', '担忧的'], unit: 7 },
+    { word: 'nature', meaning: '自然', phonetic: '/ˈneɪtʃə(r)/', example: 'I love nature.', exampleCn: '我爱大自然。', options: ['自然', '城市', '乡村', '海洋'], unit: 7 },
+    { word: 'collect', meaning: '收集', phonetic: '/kəˈlekt/', example: 'I collect stamps.', exampleCn: '我收集邮票。', options: ['收集', '丢弃', '分享', '交换'], unit: 7 },
+    { word: 'insect', meaning: '昆虫', phonetic: '/ˈɪnsekt/', example: 'There are many insects.', exampleCn: '有很多昆虫。', options: ['昆虫', '动物', '植物', '鸟类'], unit: 7 },
+    { word: 'discover', meaning: '发现', phonetic: '/dɪˈskʌvə(r)/', example: 'I discover new things.', exampleCn: '我发现新东西。', options: ['发现', '发明', '创造', '探索'], unit: 7 },
+    { word: 'wildlife', meaning: '野生动物', phonetic: '/ˈwaɪldlaɪf/', example: 'We should protect wildlife.', exampleCn: '我们应该保护野生动物。', options: ['野生动物', '宠物', '家畜', '植物'], unit: 7 },
+    // Unit 6: A Day in the Life (日常生活)
+    { word: 'quarter', meaning: '一刻钟', phonetic: '/ˈkwɔːtə(r)/', example: 'It\'s a quarter past seven.', exampleCn: '七点一刻。', options: ['一刻钟', '半小时', '一小时', '十分钟'], unit: 8 },
+    { word: 'shower', meaning: '淋浴', phonetic: '/ˈʃaʊə(r)/', example: 'I take a shower at 7.', exampleCn: '我七点淋浴。', options: ['淋浴', '洗澡', '游泳', '洗脸'], unit: 8 },
+    { word: 'brush', meaning: '刷', phonetic: '/brʌʃ/', example: 'I brush my teeth.', exampleCn: '我刷牙。', options: ['刷', '洗', '梳', '擦'], unit: 8 },
+    { word: 'duty', meaning: '值班', phonetic: '/ˈdjuːti/', example: 'Who is on duty today?', exampleCn: '今天谁值日？', options: ['值班', '工作', '任务', '责任'], unit: 8 },
+    { word: 'usually', meaning: '通常', phonetic: '/ˈjuːʒuəli/', example: 'I usually get up at 6.', exampleCn: '我通常六点起床。', options: ['通常', '有时', '总是', '从不'], unit: 8 },
+    { word: 'reporter', meaning: '记者', phonetic: '/rɪˈpɔːtə(r)/', example: 'She is a TV reporter.', exampleCn: '她是一名电视台记者。', options: ['记者', '作家', '编辑', '摄影师'], unit: 8 },
+    { word: 'around', meaning: '大约', phonetic: '/əˈraʊnd/', example: 'I get up around 6.', exampleCn: '我大约六点起床。', options: ['大约', '正好', '总是', '有时'], unit: 8 },
+    { word: 'homework', meaning: '家庭作业', phonetic: '/ˈhəʊmwɜːk/', example: 'I do homework after school.', exampleCn: '我放学后做作业。', options: ['家庭作业', '家务', '工作', '练习'], unit: 8 },
+    { word: 'saying', meaning: '谚语', phonetic: '/ˈseɪɪŋ/', example: '"Early to bed" is a saying.', exampleCn: '"早睡"是一句谚语。', options: ['谚语', '故事', '诗歌', '歌曲'], unit: 8 },
+    { word: 'rise', meaning: '起床', phonetic: '/raɪz/', example: 'I rise at 6 every day.', exampleCn: '我每天六点起床。', options: ['起床', '睡觉', '休息', '锻炼'], unit: 8 },
+    { word: 'stay', meaning: '停留', phonetic: '/steɪ/', example: 'I stay at home today.', exampleCn: '我今天待在家里。', options: ['停留', '离开', '去', '来'], unit: 8 },
+    { word: 'routine', meaning: '常规', phonetic: '/ruːˈtiːn/', example: 'This is my daily routine.', exampleCn: '这是我的日常。', options: ['常规', '习惯', '计划', '安排'], unit: 8 },
+    { word: 'restaurant', meaning: '餐厅', phonetic: '/ˈrestrɒnt/', example: 'We eat at a restaurant.', exampleCn: '我们在餐厅吃饭。', options: ['餐厅', '食堂', '厨房', '超市'], unit: 8 },
+    { word: 'housework', meaning: '家务', phonetic: '/ˈhaʊswɜːk/', example: 'I help with housework.', exampleCn: '我帮忙做家务。', options: ['家务', '家庭作业', '工作', '项目'], unit: 8 },
+    { word: 'weekend', meaning: '周末', phonetic: '/ˌwiːkˈend/', example: 'I relax at the weekend.', exampleCn: '我周末休息。', options: ['周末', '工作日', '假期', '节日'], unit: 8 },
+    { word: 'daily', meaning: '日常的', phonetic: '/ˈdeɪli/', example: 'This is my daily life.', exampleCn: '这是我的日常生活。', options: ['日常的', '每周的', '每月的', '每年的'], unit: 8 },
+    { word: 'only', meaning: '仅仅', phonetic: '/ˈəʊnli/', example: 'I only have one sister.', exampleCn: '我只有一个妹妹。', options: ['仅仅', '总是', '经常', '从不'], unit: 8 },
+    { word: 'break', meaning: '休息', phonetic: '/breɪk/', example: 'We have a break at 10.', exampleCn: '我们十点休息。', options: ['休息', '开始', '结束', '继续'], unit: 8 },
+    { word: 'finish', meaning: '完成', phonetic: '/ˈfɪnɪʃ/', example: 'I finish homework at 8.', exampleCn: '我八点完成作业。', options: ['完成', '开始', '继续', '暂停'], unit: 8 },
+    { word: 'already', meaning: '已经', phonetic: '/ɔːlˈredi/', example: 'I already finished it.', exampleCn: '我已经完成了。', options: ['已经', '刚刚', '将要', '曾经'], unit: 8 },
+    { word: 'outside', meaning: '在外面', phonetic: '/ˌaʊtˈsaɪd/', example: 'We play outside.', exampleCn: '我们在外面玩。', options: ['在外面', '在里面', '在上面', '在下面'], unit: 8 },
+    { word: 'part', meaning: '部分', phonetic: '/pɑːt/', example: 'Part of my day is reading.', exampleCn: '我一天中的一部分是阅读。', options: ['部分', '全部', '一半', '大多数'], unit: 8 },
+    { word: 'prepare', meaning: '准备', phonetic: '/prɪˈpeə(r)/', example: 'I prepare for school.', exampleCn: '我为上学做准备。', options: ['准备', '开始', '完成', '计划'], unit: 8 },
+    // Unit 7: Happy Birthday! (生日快乐)
+    { word: 'celebrate', meaning: '庆祝', phonetic: '/ˈselɪbreɪt/', example: 'We celebrate birthdays.', exampleCn: '我们庆祝生日。', options: ['庆祝', '纪念', '感谢', '欢迎'], unit: 9 },
+    { word: 'surprise', meaning: '惊喜', phonetic: '/səˈpraɪz/', example: 'What a nice surprise!', exampleCn: '多么好的惊喜！', options: ['惊喜', '惊讶', '快乐', '感动'], unit: 9 },
+    { word: 'something', meaning: '某事', phonetic: '/ˈsʌmθɪŋ/', example: 'I have something for you.', exampleCn: '我有东西给你。', options: ['某事', '任何事', '每件事', '没有事'], unit: 9 },
+    { word: 'sale', meaning: '出售', phonetic: '/seɪl/', example: 'The store has a sale.', exampleCn: '商店在打折。', options: ['出售', '购买', '价格', '优惠'], unit: 9 },
+    { word: 'kilo', meaning: '千克', phonetic: '/ˈkiːləʊ/', example: 'I buy a kilo of apples.', exampleCn: '我买了一千克苹果。', options: ['千克', '克', '吨', '磅'], unit: 9 },
+    { word: 'yogurt', meaning: '酸奶', phonetic: '/ˈjɒɡət/', example: 'I like yogurt for breakfast.', exampleCn: '我喜欢早餐喝酸奶。', options: ['酸奶', '牛奶', '果汁', '咖啡'], unit: 9 },
+    { word: 'total', meaning: '总数', phonetic: '/ˈtəʊtl/', example: 'The total is 50 yuan.', exampleCn: '总共是50元。', options: ['总数', '价格', '数量', '金额'], unit: 9 },
+    { word: 'price', meaning: '价格', phonetic: '/praɪs/', example: 'The price is low.', exampleCn: '价格很低。', options: ['价格', '价值', '费用', '成本'], unit: 9 },
+    { word: 'balloon', meaning: '气球', phonetic: '/bəˈluːn/', example: 'The balloon is red.', exampleCn: '气球是红色的。', options: ['气球', '风筝', '彩带', '灯笼'], unit: 9 },
+    { word: 'chocolate', meaning: '巧克力', phonetic: '/ˈtʃɒklət/', example: 'I love chocolate.', exampleCn: '我喜欢巧克力。', options: ['巧克力', '糖果', '蛋糕', '饼干'], unit: 9 },
+    { word: 'pizza', meaning: '比萨饼', phonetic: '/ˈpiːtsə/', example: 'We have pizza for dinner.', exampleCn: '我们晚餐吃比萨。', options: ['比萨饼', '汉堡', '三明治', '面条'], unit: 9 },
+    { word: 'list', meaning: '列表', phonetic: '/lɪst/', example: 'Make a shopping list.', exampleCn: '列一个购物清单。', options: ['列表', '笔记', '计划', '安排'], unit: 9 },
+    { word: 'own', meaning: '自己的', phonetic: '/əʊn/', example: 'I have my own room.', exampleCn: '我有自己的房间。', options: ['自己的', '别人的', '公共的', '共享的'], unit: 9 },
+    { word: 'example', meaning: '例子', phonetic: '/ɪɡˈzɑːmpl/', example: 'Give me an example.', exampleCn: '给我一个例子。', options: ['例子', '答案', '问题', '方法'], unit: 9 },
+    { word: 'language', meaning: '语言', phonetic: '/ˈlæŋɡwɪdʒ/', example: 'English is a world language.', exampleCn: '英语是一门世界语言。', options: ['语言', '文化', '国家', '文字'], unit: 9 },
+    { word: 'international', meaning: '国际的', phonetic: '/ˌɪntəˈnæʃnəl/', example: 'It is an international school.', exampleCn: '这是一所国际学校。', options: ['国际的', '国家的', '当地的', '外国的'], unit: 9 },
+    { word: 'mark', meaning: '标记', phonetic: '/mɑːk/', example: 'Mark the important words.', exampleCn: '标记重要单词。', options: ['标记', '写下', '画出', '圈出'], unit: 9 },
+    { word: 'national', meaning: '国家的', phonetic: '/ˈnæʃnəl/', example: 'The National Day is coming.', exampleCn: '国庆节快到了。', options: ['国家的', '国际的', '当地的', '民族的'], unit: 9 },
+    { word: 'found', meaning: '创建', phonetic: '/faʊnd/', example: 'The school was founded in 2000.', exampleCn: '这所学校创建于2000年。', options: ['创建', '结束', '改变', '发现'], unit: 9 },
+    { word: 'meaningful', meaning: '有意义的', phonetic: '/ˈmiːnɪŋfl/', example: 'It is a meaningful day.', exampleCn: '这是有意义的一天。', options: ['有意义的', '重要的', '特别的', '难忘的'], unit: 9 },
+    { word: 'celebration', meaning: '庆典', phonetic: '/ˌselɪˈbreɪʃn/', example: 'We have a big celebration.', exampleCn: '我们有一个盛大的庆典。', options: ['庆典', '会议', '活动', '演出'], unit: 9 },
+    { word: 'post', meaning: '发布', phonetic: '/pəʊst/', example: 'Post your ideas on the board.', exampleCn: '把你的想法发布到板上。', options: ['发布', '写下', '分享', '保存'], unit: 9 },
+    { word: 'contact', meaning: '联系', phonetic: '/ˈkɒntækt/', example: 'Keep in contact with friends.', exampleCn: '和朋友保持联系。', options: ['联系', '见面', '通话', '写信'], unit: 9 },
+    { word: 'symbol', meaning: '象征', phonetic: '/ˈsɪmbl/', example: 'Doves are a symbol of peace.', exampleCn: '鸽子是和平的象征。', options: ['象征', '标志', '图标', '记号'], unit: 9 },
+    { word: 'village', meaning: '村庄', phonetic: '/ˈvɪlɪdʒ/', example: 'He lives in a small village.', exampleCn: '他住在一个小村庄。', options: ['村庄', '城市', '小镇', '郊区'], unit: 9 },
+    { word: 'grow', meaning: '成长', phonetic: '/ɡrəʊ/', example: 'The plants grow fast.', exampleCn: '植物长得很快。', options: ['成长', '变化', '开始', '继续'], unit: 9 },
+    { word: 'enjoy', meaning: '享受', phonetic: '/ɪnˈdʒɔɪ/', example: 'I enjoy reading books.', exampleCn: '我享受读书的乐趣。', options: ['享受', '喜欢', '热爱', '欣赏'], unit: 9 },
+    { word: 'height', meaning: '身高', phonetic: '/haɪt/', example: 'My height is 150 cm.', exampleCn: '我的身高是150厘米。', options: ['身高', '体重', '年龄', '长度'], unit: 9 },
+    { word: 'later', meaning: '以后', phonetic: '/ˈleɪtə(r)', example: 'See you later!', exampleCn: '待会儿见！', options: ['以后', '现在', '之前', '马上'], unit: 9 },
   ],
   8: [
     { word: 'volunteer', meaning: '志愿者', phonetic: '/ˌvɒlənˈtɪə(r)/', example: 'I want to be a volunteer.', exampleCn: '我想成为一名志愿者。', options: ['老师', '志愿者', '医生', '司机'] },
@@ -296,11 +321,21 @@ export default function WordCardPage() {
     setShuffled(shuffleOptions(words[index % words.length]));
   }, [index, grade]);
 
-  // Load progress: try Supabase first (registered users), then localStorage as fallback
-  const [loadedFromRemote, setLoadedFromRemote] = useState(false);
+  // Load progress on mount: localStorage for all, Supabase overrides for registered users
+  useEffect(() => {
+    const saved = localStorage.getItem('vocab_progress');
+    if (saved) {
+      try {
+        const p: VocabProgress = JSON.parse(saved);
+        setGrade(p.grade); setIndex(p.index); setCorrect(p.correct); setTotal(p.total);
+        setLearned(new Set(p.learned));
+        if (p.wrongWords?.length) setWrongWords(p.wrongWords.map(w => ({ ...w, phonetic: '', example: '', exampleCn: '', options: [] })));
+      } catch {}
+    }
+  }, []);
 
   useEffect(() => {
-    if (!user?.id) { setLoadedFromRemote(false); return; }
+    if (!user?.id) return;
     fetch(`${SUPABASE_URL}token_transactions?user_id=eq.${user.id}&type=eq.vocab_progress&order=created_at.desc&limit=1`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
     }).then(r => r.json()).then(data => {
@@ -313,23 +348,8 @@ export default function WordCardPage() {
           toast.success('已恢复上次学习进度');
         } catch {}
       }
-      setLoadedFromRemote(true);
-    }).catch(() => setLoadedFromRemote(true));
+    }).catch(() => {});
   }, [user?.id]);
-
-  // Fallback to localStorage if no Supabase data (guest users)
-  useEffect(() => {
-    if (!loadedFromRemote || (user?.id)) return;
-    const saved = localStorage.getItem('vocab_progress');
-    if (saved) {
-      try {
-        const p: VocabProgress = JSON.parse(saved);
-        setGrade(p.grade); setIndex(p.index); setCorrect(p.correct); setTotal(p.total);
-        setLearned(new Set(p.learned));
-        if (p.wrongWords?.length) setWrongWords(p.wrongWords.map(w => ({ ...w, phonetic: '', example: '', exampleCn: '', options: [] })));
-      } catch {}
-    }
-  }, [loadedFromRemote, user?.id]);
 
   // Save progress to localStorage on every change
   useEffect(() => {
@@ -341,7 +361,7 @@ export default function WordCardPage() {
     localStorage.setItem('vocab_progress', JSON.stringify(p));
   }, [grade, index, correct, total, learned, wrongWords]);
 
-  // Sync to Supabase on every change (debounced)
+  // Debounced sync to Supabase for registered users
   useEffect(() => {
     if (!user?.id) return;
     const timer = setTimeout(() => {

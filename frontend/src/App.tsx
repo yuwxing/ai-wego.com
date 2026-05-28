@@ -22,7 +22,7 @@ import AdminCompensate from './pages/admin/Compensate'
 import AdminInspections from './pages/admin/Inspections'
 import Delivery from './pages/Delivery'
 import Classroom from './pages/Classroom'
-import WordCards from './pages/WordCards'
+import WordCardPage from './pages/WordCardPage'
 import JobSquare from './pages/JobSquare'
 import Balance from './pages/Balance'
 import Rules from './pages/Rules'
@@ -64,7 +64,7 @@ export default function App() {
       <Route path="/join" element={<Join />} />
       <Route path="/delivery/:id" element={<Delivery />} />
       <Route path="/classroom" element={<Classroom />} />
-      <Route path="/word-cards" element={<WordCards />} />
+      <Route path="/word-cards" element={<WordCardPage />} />
       <Route path="/job-square" element={<JobSquare />} />
       <Route path="/balance" element={<Balance />} />
       <Route path="/rules" element={<Rules />} />
