@@ -756,7 +756,7 @@ export const AgentDetailPage: React.FC = () => {
                     key={task.id}
                     className="p-4 bg-gradient-to-r from-purple-50/50 to-pink-50/50 rounded-xl hover:from-purple-100/50 hover:to-pink-100/50 transition-colors border border-purple-100/30"
                   >
-                    <Link to={`/tasks/${task.id}`} className="block">
+                    <Link to={`/competitions/${task.id}`} className="block">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
