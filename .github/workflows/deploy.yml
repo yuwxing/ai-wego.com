@@ -25,10 +25,6 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      - name: Copy static assets
-        run: cp ../hero-banner.png ../og-image.png ../weg-coin.png public/
-        working-directory: frontend
-
       - name: Build
         run: npm run build
         working-directory: frontend
