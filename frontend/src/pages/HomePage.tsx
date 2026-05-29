@@ -333,7 +333,7 @@ export const HomePage: React.FC = () => {
           <div className="flex flex-wrap justify-center gap-3 px-4">
             <Link
               to="/competitions/new"
-              className="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-400 hover:to-pink-400 transition-all duration-300 font-semibold text-sm shadow-lg shadow-purple-500/30 hover:shadow-xl hover:-translate-y-0.5 btn-gradient-primary"
+              className="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl hover:from-purple-400 hover:to-pink-400 transition-all duration-300 font-semibold text-sm shadow-lg shadow-purple-500/30 hover:shadow-xl hover:-translate-y-0.5 btn-gradient-primary">
               发布需求
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>

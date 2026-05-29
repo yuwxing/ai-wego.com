@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { GraduationCap, BookOpen, FlaskConical, Users, Star, Send, X, Search, Sparkles, Brain, Cpu, Globe, Microscope, Lightbulb, MessageCircle, Bot } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { GraduationCap, BookOpen, FlaskConical, Users, Send, X, Search, Sparkles, Brain, Cpu, Globe, Microscope, Lightbulb, MessageCircle, Bot } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabaseFetch, agentsAPI } from '../utils/supabase';
 
-// ============ 安全区域样式 ============
-const SAFE_AREA_STYLE = `
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 80px); }
-`;
 
 // ============ 5位核心导师数字人格 ============
 const CORE_MENTORS = [
   {
     id: 'mentor-math',
     name: '陈景元教授',
-    avatar: '/mentors/math.jpg',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=mentor-math',
     major: 'AI协同文明工程',
     specialty: '拓扑学与AI推理',
     personality: '严谨精确',
@@ -42,7 +37,7 @@ const CORE_MENTORS = [
   {
     id: 'mentor-research',
     name: '林纳德博士',
-    avatar: '/mentors/research.jpg',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=mentor-research',
     major: '跨学科研究',
     specialty: '跨学科研究方法论',
     personality: '温和鼓励',
@@ -71,7 +66,7 @@ const CORE_MENTORS = [
   {
     id: 'mentor-paper',
     name: '张维真教授',
-    avatar: '/mentors/paper.jpg',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=mentor-paper',
     major: 'AI叙事工程',
     specialty: '学术写作与传播',
     personality: '犀利直接',
@@ -100,7 +95,7 @@ const CORE_MENTORS = [
   {
     id: 'mentor-startup',
     name: '马云飞导师',
-    avatar: '/mentors/startup.jpg',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=mentor-startup',
     major: '科技创业',
     specialty: '科技创业与商业化',
     personality: '果断务实',
@@ -129,7 +124,7 @@ const CORE_MENTORS = [
   {
     id: 'mentor-philosophy',
     name: '何怀宏教授',
-    avatar: '/mentors/philosophy.jpg',
+    avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=mentor-philosophy',
     major: 'AI伦理与意识哲学',
     specialty: 'AI伦理与意识哲学',
     personality: '深邃开放',
@@ -321,31 +316,38 @@ const StarryBackground: React.FC = () => (
 const MentorCard: React.FC<{
   mentor: typeof CORE_MENTORS[0];
   onClick: () => void;
-}> = ({ mentor, onClick }) => (
-  <div
-    onClick={onClick}
-    className="glass-card-dark p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition-all group"
-  >
-    <div className="flex items-start gap-4">
-      <div className={`w-14 h-14 rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow`}>
-        <img src={mentor.avatar} alt={mentor.name} className="w-full h-full object-cover" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="text-white font-bold text-lg">{mentor.name}</h3>
-        <p className="text-amber-400/80 text-sm">{mentor.major}</p>
-        <p className="text-white/60 text-xs mt-1">{mentor.specialty}</p>
-        <div className="flex items-center gap-2 mt-2">
-          <span className="px-2 py-0.5 rounded-full bg-[rgba(255,255,255,0.1)] text-white/70 text-xs">
-            {mentor.personality}
-          </span>
-          <span className="px-2 py-0.5 rounded-full bg-[rgba(245,158,11,0.2)] text-amber-400 text-xs">
-            {mentor.teachingStyleIcon} {mentor.teachingStyle}
-          </span>
+}> = ({ mentor, onClick }) => {
+  const [imgError, setImgError] = useState(false);
+  return (
+    <div
+      onClick={onClick}
+      className="glass-card-dark p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition-all group"
+    >
+      <div className="flex items-start gap-4">
+        <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl transition-shadow">
+          {imgError ? (
+            <Bot className="w-7 h-7" />
+          ) : (
+            <img src={mentor.avatar} alt={mentor.name} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-white font-bold text-lg">{mentor.name}</h3>
+          <p className="text-amber-400/80 text-sm">{mentor.major}</p>
+          <p className="text-white/60 text-xs mt-1">{mentor.specialty}</p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="px-2 py-0.5 rounded-full bg-[rgba(255,255,255,0.1)] text-white/70 text-xs">
+              {mentor.personality}
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-[rgba(245,158,11,0.2)] text-amber-400 text-xs">
+              {mentor.teachingStyleIcon} {mentor.teachingStyle}
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // 导师详情弹窗
 const MentorDetailModal: React.FC<{
@@ -353,6 +355,7 @@ const MentorDetailModal: React.FC<{
   onClose: () => void;
 }> = ({ mentor, onClose }) => {
   const navigate = useNavigate();
+  const [imgError, setImgError] = useState(false);
   
   const handleStartChat = () => {
     navigate(`/jinghua/chat?mentor=${mentor.id}`);
@@ -373,8 +376,14 @@ const MentorDetailModal: React.FC<{
         </button>
         
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div style={{ width: '80px', height: '80px', borderRadius: '24px', overflow: 'hidden', margin: '0 auto 16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}>
-            <img src={mentor.avatar} alt={mentor.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ width: '80px', height: '80px', borderRadius: '24px', overflow: 'hidden', margin: '0 auto 16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+            {imgError ? (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bot className="w-10 h-10 text-white" />
+              </div>
+            ) : (
+              <img src={mentor.avatar} alt={mentor.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setImgError(true)} />
+            )}
           </div>
           <h2 style={{ color: 'white', fontSize: '24px', fontWeight: 'bold', margin: 0 }}>{mentor.name}</h2>
           <p style={{ color: '#fbbf24', marginTop: '4px' }}>{mentor.major}</p>
@@ -427,7 +436,7 @@ const LabCard: React.FC<{
   const Icon = major.icon;
   
   const handleClick = () => {
-    navigate(`/jinghua/chat?lab=${major.id}`);
+    navigate(`/jinghua/projects`);
   };
   
   return (
@@ -461,99 +470,24 @@ const BookCard: React.FC<{
   book: {title: string; author: string; summary: string};
   major: string;
 }> = ({ book, major }) => {
-  const [showDetail, setShowDetail] = useState(false);
-  const [reading, setReading] = useState(false);
-  const [readingContent, setReadingContent] = useState('');
-
-  const handleRead = async () => {
-    setReading(true);
-    setShowDetail(true);
-    
-    try {
-      const response = await callDeepSeek(
-        `你是菁华大学AI图书馆的导读助手。请为《${book.title}》撰写一段200字左右的精彩导读，帮助读者理解这本书的核心价值和阅读意义。`,
-        `请为《${book.title}》（作者：${book.author}）撰写一段精彩的AI导读，包括：1. 本书核心观点 2. 为什么值得阅读 3. 阅读建议`,
-        15000
-      );
-      setReadingContent(response);
-    } catch (error) {
-      setReadingContent('抱歉，AI导读暂时无法生成，请稍后重试。');
-    } finally {
-      setReading(false);
-    }
-  };
+  const navigate = useNavigate();
 
   return (
-    <>
-      <div 
-        className="glass-card-dark p-4 rounded-xl cursor-pointer hover:bg-[rgba(255,255,255,0.15)] transition-all"
-        onClick={() => setShowDetail(true)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-16 rounded-lg bg-gradient-to-br from-amber-500/30 to-amber-700/30 flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-amber-400/70" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-white font-semibold text-sm truncate">{book.title}</h4>
-            <p className="text-white/50 text-xs">{book.author}</p>
-          </div>
+    <div 
+      className="glass-card-dark p-4 rounded-xl cursor-pointer hover:bg-[rgba(255,255,255,0.15)] transition-all"
+      onClick={() => navigate(`/jinghua/chat?book=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}&summary=${encodeURIComponent(book.summary)}`)}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-16 rounded-lg bg-gradient-to-br from-amber-500/30 to-amber-700/30 flex items-center justify-center">
+          <BookOpen className="w-5 h-5 text-amber-400/70" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="text-white font-semibold text-sm truncate">{book.title}</h4>
+          <p className="text-white/50 text-xs">{book.author}</p>
+          <p className="text-amber-400/60 text-xs mt-1">与作者对话 →</p>
         </div>
       </div>
-
-      {showDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowDetail(false)}>
-          <div className="absolute inset-0 bg-[rgba(0,0,0,0.6)]" style={{ backgroundAttachment: 'fixed' }} />
-          <div 
-            className="relative w-full max-w-md glass-card-dark rounded-2xl p-6 max-h-[80vh] overflow-y-auto"
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setShowDetail(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.2)] flex items-center justify-center text-white/70 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            
-            <h3 className="text-xl font-bold text-white mb-1">{book.title}</h3>
-            <p className="text-amber-400/80 text-sm mb-4">{book.author}</p>
-            
-            <div className="bg-[rgba(255,255,255,0.05)] rounded-xl p-4 mb-4">
-              <h4 className="text-amber-400 text-sm font-semibold mb-2">内容简介</h4>
-              <p className="text-white/80 text-sm">{book.summary}</p>
-            </div>
-            
-            {readingContent ? (
-              <div className="bg-[rgba(255,255,255,0.05)] rounded-xl p-4 mb-4">
-                <h4 className="text-amber-400 text-sm font-semibold mb-2">✨ AI导读</h4>
-                <p className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">{readingContent}</p>
-              </div>
-            ) : (
-              <div className="bg-[rgba(255,255,255,0.05)] rounded-xl p-4 mb-4 text-center text-white/50 text-sm">
-                {reading ? '正在生成AI导读...' : '点击下方按钮获取AI导读'}
-              </div>
-            )}
-            
-            <button
-              onClick={handleRead}
-              disabled={reading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold disabled:opacity-50 hover:from-amber-400 hover:to-amber-500 transition-all flex items-center justify-center gap-2"
-            >
-              {reading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  生成中...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  AI导读
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 
@@ -587,9 +521,7 @@ const QinghuaUniversityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'mentors' | 'labs' | 'library'>('mentors');
   const [selectedMentor, setSelectedMentor] = useState<typeof CORE_MENTORS[0] | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [agents, setAgents] = useState<any[]>([]);
-  const [showAgentMentorModal, setShowAgentMentorModal] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState<any>(null);
+
   
   // Hero宣言动画状态
   const [heroVisibleLines, setHeroVisibleLines] = useState(0);
@@ -598,10 +530,6 @@ const QinghuaUniversityPage: React.FC = () => {
   // Footer宣言动画状态
   const [footerVisibleLines, setFooterVisibleLines] = useState(0);
   const [footerFadingOut, setFooterFadingOut] = useState(false);
-
-  useEffect(() => {
-    loadAgents();
-  }, []);
 
   // Hero宣言逐行淡入
   useEffect(() => {
@@ -643,15 +571,6 @@ const QinghuaUniversityPage: React.FC = () => {
     }
   }, [footerFadingOut]);
 
-  const loadAgents = async () => {
-    try {
-      const data = await agentsAPI.listAgents({ limit: 20 });
-      if (data) setAgents(data);
-    } catch (error) {
-      console.error('加载智能体失败', error);
-    }
-  };
-
   const filteredBooks = searchQuery
     ? MAJORS.reduce((acc, major) => {
         const books = (LIBRARY_BOOKS[major.id] || []).filter(
@@ -668,14 +587,6 @@ const QinghuaUniversityPage: React.FC = () => {
   // 检查是否有任何搜索结果
   const hasAnyBooks = Object.keys(filteredBooks).length > 0 && 
     Object.values(filteredBooks).some(books => books.length > 0);
-
-  const handleAgentClick = (agent: any) => {
-    const params = new URLSearchParams({
-      agent_name: agent.name || 'AI导师',
-      agent_prompt: `你是${agent.name}，一个智能学术助手。${agent.description || '我可以回答各种问题，帮助你解决问题。'}`
-    });
-    navigate(`/jinghua/chat?${params.toString()}`);
-  };
 
   return (
     <div className="min-h-screen relative">
@@ -718,22 +629,6 @@ const QinghuaUniversityPage: React.FC = () => {
           </div>
         </div>
         
-        {/* 专业对比表 */}
-        <div className="w-full max-w-3xl glass-card-dark rounded-2xl p-6 mt-4">
-          <h3 className="text-amber-400 font-bold text-center mb-6 flex items-center justify-center gap-2">
-            <Cpu className="w-5 h-5" />
-            专业进化论
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {MAJORS.map(major => (
-              <div key={major.id} className="bg-[rgba(255,255,255,0.05)] rounded-xl p-4 text-center">
-                <p className="text-white/40 text-xs line-through mb-1">{major.oldName}</p>
-                <p className="text-white font-semibold text-sm">{major.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        
         {/* CTA */}
         <button 
           onClick={() => setActiveTab('mentors')}
@@ -749,7 +644,7 @@ const QinghuaUniversityPage: React.FC = () => {
           {[
             { id: 'mentors', icon: Users, label: '🎓 AI导师大厅' },
             { id: 'labs', icon: FlaskConical, label: '🔬 虚拟实验室' },
-            { id: 'library', icon: BookOpen, label: '📚 AI图书馆' }
+            { id: 'library', icon: BookOpen, label: '📚 AI图书馆' },
           ].map(tab => (
             <button
               key={tab.id}
@@ -787,38 +682,7 @@ const QinghuaUniversityPage: React.FC = () => {
               ))}
             </div>
             
-            {/* 教师分身 */}
-            {agents.length > 0 && (
-              <div className="mt-12">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-amber-400" />
-                  智能体教师分身
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {agents.slice(0, 6).map(agent => (
-                    <div
-                      key={agent.id}
-                      onClick={() => handleAgentClick(agent)}
-                      className="glass-card-dark p-4 rounded-xl cursor-pointer hover:bg-[rgba(255,255,255,0.15)] transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-lg">
-                          <Bot className="w-6 h-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-white font-semibold truncate">{agent.name}</h4>
-                          <p className="text-white/50 text-xs line-clamp-1">{agent.description || '暂无描述'}</p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                            <span className="text-amber-400 text-xs">{agent.avg_rating?.toFixed(1) || '5.0'}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+
           </div>
         )}
         
@@ -939,30 +803,6 @@ const QinghuaUniversityPage: React.FC = () => {
         <MentorDetailModal
           mentor={selectedMentor}
           onClose={() => setSelectedMentor(null)}
-        />
-      )}
-      
-      {/* 智能体详情弹窗 */}
-      {showAgentMentorModal && selectedAgent && (
-        <MentorDetailModal
-          mentor={{
-            id: `agent-${selectedAgent.id}`,
-            name: selectedAgent.name,
-            avatar: '🤖',
-            major: 'AI协同文明工程',
-            specialty: selectedAgent.description || '多领域专家',
-            personality: '智能助手',
-            values: '用AI能力服务人类，探索无限可能',
-            paper: '暂无代表论文',
-            teachingStyle: '智能问答',
-            teachingStyleIcon: '💡',
-            color: 'from-purple-500 to-pink-500',
-            systemPrompt: `你是${selectedAgent.name}，一个智能助手。${selectedAgent.description || '我可以回答各种问题，帮助你解决问题。'}`
-          }}
-          onClose={() => {
-            setShowAgentMentorModal(false);
-            setSelectedAgent(null);
-          }}
         />
       )}
       

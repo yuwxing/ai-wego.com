@@ -1,8 +1,23 @@
-/**
- * DeepSeek API 调用工具
- */
+const DEFAULT_KEY = 'sk-17df56ac8d1b4544914816f45c3c7064';
+
+export function getApiKey(): string {
+  return localStorage.getItem('deepseek_api_key') || DEFAULT_KEY;
+}
+
+export function setApiKey(key: string): void {
+  localStorage.setItem('deepseek_api_key', key);
+}
+
+export function getApiBaseUrl(): string {
+  return 'https://api.deepseek.com';
+}
+
+function getKey() {
+  return getApiKey();
+}
+
 export const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
-export const DEEPSEEK_API_KEY = 'sk-17df56ac8d1b4544914816f45c3c7064';
+export const DEEPSEEK_API_KEY = DEFAULT_KEY;
 export const DEEPSEEK_MODEL = 'deepseek-chat';
 
 export interface Message {
@@ -27,9 +42,6 @@ export interface DeepSeekResponse {
   };
 }
 
-/**
- * 发送消息到 DeepSeek API
- */
 export async function sendToDeepSeek(
   messages: { role: string; content: string }[],
   onChunk?: (text: string) => void,
@@ -39,7 +51,7 @@ export async function sendToDeepSeek(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+      'Authorization': `Bearer ${getKey()}`,
     },
     body: JSON.stringify({
       model: DEEPSEEK_MODEL,
@@ -91,9 +103,6 @@ export async function sendToDeepSeek(
   return fullContent;
 }
 
-/**
- * 发送消息到 DeepSeek API（非流式）
- */
 export async function sendToDeepSeekSync(
   messages: { role: string; content: string }[],
   signal?: AbortSignal
@@ -102,7 +111,7 @@ export async function sendToDeepSeekSync(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+      'Authorization': `Bearer ${getKey()}`,
     },
     body: JSON.stringify({
       model: DEEPSEEK_MODEL,

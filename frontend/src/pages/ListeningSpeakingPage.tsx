@@ -222,6 +222,7 @@ export default function ListeningSpeakingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [expandedAnswers, setExpandedAnswers] = useState<number[]>([]);
   const [showSample, setShowSample] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
   const [playing, setPlaying] = useState<string | null>(null); // 'passage' | 'conv-0' | 'conv-1' etc.
   const [speaking, setSpeaking] = useState<string | null>(null); // 正在朗读的参考答案key
   
@@ -379,8 +380,29 @@ export default function ListeningSpeakingPage() {
       const rows = await resp.json();
       
       if (rows.length > 0) {
-        const content = JSON.parse(rows[0].description);
-        setData(content);
+        const apiData = JSON.parse(rows[0].description);
+        // Deep merge with defaults
+        const merged: LSData = {
+          ...DEFAULT_LS_DATA,
+          ...apiData,
+          part_a: { ...DEFAULT_LS_DATA.part_a, ...(apiData.part_a || {}) },
+          part_b: {
+            ...DEFAULT_LS_DATA.part_b,
+            ...(apiData.part_b || {}),
+            conversations: apiData.part_b?.conversations?.every((c: any) => c?.dialogue)
+              ? apiData.part_b.conversations
+              : DEFAULT_LS_DATA.part_b.conversations
+          },
+          part_c: {
+            ...DEFAULT_LS_DATA.part_c,
+            ...(apiData.part_c || {}),
+            questions: apiData.part_c?.questions?.every((q: any) => q?.question)
+              ? apiData.part_c.questions
+              : DEFAULT_LS_DATA.part_c.questions
+          },
+          part_d: { ...DEFAULT_LS_DATA.part_d, ...(apiData.part_d || {}) },
+        };
+        setData(merged);
       } else {
         setData(DEFAULT_LS_DATA);
       }
@@ -884,7 +906,6 @@ export default function ListeningSpeakingPage() {
   const renderPartC = () => {
     if (!data) return null;
     const { part_c } = data;
-    const [showTranscript, setShowTranscript] = useState(false);
 
     return (
       <div style={{ padding: '16px' }}>
@@ -917,65 +938,90 @@ export default function ListeningSpeakingPage() {
           </div>
           
           {/* 音频控制 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
             <button
               onClick={() => {
-                const key = 'part-c';
-                if (playing === key) { window.speechSynthesis.cancel(); setPlaying(null); }
-                else {
-                  setPlaying(key);
-                  speak(part_c.passage, 0.8, () => setPlaying(null));
+                const passage = data?.part_c?.passage || DEFAULT_LS_DATA.part_c.passage;
+                if (playing === 'part-c') {
+                  window.speechSynthesis.cancel();
+                  setPlaying(null);
+                } else {
+                  setPlaying('part-c');
+                  if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+                  window.speechSynthesis.cancel();
+                  const u = new SpeechSynthesisUtterance(passage);
+                  u.lang = 'en-US';
+                  u.rate = 0.85;
+                  u.onend = () => setPlaying(null);
+                  u.onerror = () => setPlaying(null);
+                  window.speechSynthesis.speak(u);
                 }
               }}
               style={{
-                padding: '8px 20px',
+                flex: 1,
+                padding: '12px',
                 background: playing === 'part-c' ? '#e53935' : '#7b1fa2',
                 color: '#fff',
                 border: 'none',
-                borderRadius: '20px',
-                fontSize: '13px',
+                borderRadius: '8px',
+                fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px'
               }}
             >
-              {playing === 'part-c' ? '⏹ 停止' : '🔊 播放录音'}
+              {playing === 'part-c' ? '⏹️ 停止播放' : '🔊 听范读'}
             </button>
-            <span style={{ fontSize: '11px', color: '#999' }}>播放两遍</span>
-          </div>
-
-          {/* 听力原文（可展开） */}
-          <div style={{ marginTop: '10px' }}>
             <button
-              onClick={() => setShowTranscript(!showTranscript)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#7b1fa2',
-                fontSize: '13px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                padding: '4px 0'
+              onClick={() => {
+                setPlaying('part-c-slow');
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(DEFAULT_LS_DATA.part_c.passage);
+                u.lang = 'en-US';
+                u.rate = 0.6;
+                u.onend = () => setPlaying(null);
+                window.speechSynthesis.speak(u);
               }}
-            >
-              {showTranscript ? '▲ 收起原文' : '▼ 听力原文'}
-            </button>
-            {showTranscript && (
-              <div style={{
-                marginTop: '8px',
-                padding: '12px',
-                background: '#f3e5f5',
+              style={{
+                padding: '12px 16px',
+                background: '#ff9800',
+                color: '#fff',
+                border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
-                lineHeight: '1.6',
-                color: '#333'
-              }}>
-                {part_c.passage}
-              </div>
-            )}
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              🐢 慢速
+            </button>
           </div>
+
+          {/* 听力原文 */}
+          <div style={{
+            marginTop: '10px',
+            padding: '12px',
+            background: playing === 'part-c' ? '#fff9c4' : '#f3e5f5',
+            borderRadius: '8px',
+            fontSize: '14px',
+            lineHeight: '1.8',
+            color: '#333',
+            transition: 'background 0.3s'
+          }}>
+            <div style={{ fontSize: '12px', color: '#7b1fa2', marginBottom: '6px', fontWeight: 500 }}>
+              📖 听力原文
+            </div>
+            {part_c.passage}
+          </div>
+          {!speechSupported && (
+            <div style={{ marginTop: '8px', fontSize: '12px', color: '#e53935', textAlign: 'center' }}>
+              ⚠️ 当前浏览器不支持语音功能，请使用Chrome浏览器
+            </div>
+          )}
         </div>
 
         {/* 题目列表 */}

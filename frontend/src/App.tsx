@@ -1,94 +1,132 @@
-import { Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout'
+import { Routes, Route, Navigate } from 'react-router-dom'
+// AI-Wego App v3 - Navigation Hub
 import Home from './pages/Home'
-import AgentMarket from './pages/AgentMarket'
-import AgentDetail from './pages/AgentDetail'
+import LearnHub from './pages/LearnHub'
+import WordCardPage from './pages/WordCardPage'
+import ListeningSpeakingPage from './pages/ListeningSpeakingPage'
+import EnglishDailyPage from './pages/EnglishDailyPage'
+import JobClassroomPage from './pages/JobClassroomPage'
+import AIClassroomPage from './pages/AIClassroomPage'
+import LearnCompetitions from './pages/LearnCompetitions'
+import DigitalTwinHall from './pages/DigitalTwinHall'
+import CreateAgentPage from './pages/CreateAgentPage'
+import AgentDetailPage from './pages/AgentDetailPage'
+import AgentsPage from './pages/AgentsPage'
+import MyAgentsPage from './pages/MyAgentsPage'
+import AgentWorkspacePage from './pages/AgentWorkspacePage'
 import CompetitionHallPage from './pages/CompetitionHallPage'
 import CompetitionDetailPage from './pages/CompetitionDetailPage'
 import CreateCompetitionPage from './pages/CreateCompetitionPage'
-import Workspace from './pages/Workspace'
-import MyAgents from './pages/MyAgents'
-import CreateAgent from './pages/CreateAgent'
-import Register from './pages/Register'
-import Create from './pages/Create'
-import VideoSearch from './pages/VideoSearch'
-import Transactions from './pages/Transactions'
-import SubmitResult from './pages/SubmitResult'
-import Apply from './pages/Apply'
-import Join from './pages/Join'
+import SubmitPage from './pages/SubmitPage'
+import WegHub from './pages/WegHub'
+import XpPage from './pages/XpPage'
+import LevelsPage from './pages/LevelsPage'
+import BalancePage from './pages/BalancePage'
+import RewardsPage from './pages/RewardsPage'
+import QinghuaUniversityPage from './pages/QinghuaUniversityPage'
+import JinghuaProjects from './pages/JinghuaProjects'
+import JinghuaChat from './pages/jinghua/JinghuaChat'
+import JobSquarePage from './pages/JobSquarePage'
+import ApiKeySettingsPage from './pages/ApiKeySettingsPage'
+import SystemAnnouncementsPage from './pages/SystemAnnouncementsPage'
+import RulesPage from './pages/RulesPage'
+import FeedbackPage from './pages/FeedbackPage'
+import NotesPage from './pages/NotesPage'
+import RegisterPage from './pages/RegisterPage'
+import AdoptPage from './pages/AdoptPage'
+import { PetChatPage } from './pages/PetChatPage'
 import AdminApplications from './pages/admin/Applications'
 import AdminFeedback from './pages/admin/Feedback'
 import AdminCompensate from './pages/admin/Compensate'
 import AdminInspections from './pages/admin/Inspections'
 import ListeningSpeakingAdmin from './pages/admin/ListeningSpeakingAdmin'
-import Delivery from './pages/Delivery'
-import Classroom from './pages/Classroom'
-import WordCardPage from './pages/WordCardPage'
-import JobSquare from './pages/JobSquare'
-import Balance from './pages/Balance'
-import Rules from './pages/Rules'
-import AdoptPet from './pages/AdoptPet'
-import PetChat from './pages/PetChat'
-import Feedback from './pages/Feedback'
-import Benefits from './pages/Benefits'
-import EnglishDaily from './pages/EnglishDaily'
-import ListeningSpeaking from './pages/ListeningSpeaking'
-import Announcements from './pages/Announcements'
-import AigcTemplates from './pages/AigcTemplates'
-import JinghuaHome from './pages/jinghua/JinghuaHome'
-import JinghuaMentors from './pages/jinghua/JinghuaMentors'
-import JinghuaLabs from './pages/jinghua/JinghuaLabs'
-import JinghuaAgents from './pages/jinghua/JinghuaAgents'
-import JinghuaLibrary from './pages/jinghua/JinghuaLibrary'
-import JinghuaBookDetail from './pages/jinghua/JinghuaBookDetail'
-import JinghuaChat from './pages/jinghua/JinghuaChat'
 import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
     <Routes>
+      {/* Home */}
       <Route path="/" element={<Home />} />
-      <Route path="/agents" element={<AgentMarket />} />
-      <Route path="/agents/:id" element={<AgentDetail />} />
+
+      {/* Learning System */}
+      <Route path="/learn" element={<LearnHub />} />
+      <Route path="/learn/word-cards" element={<WordCardPage />} />
+      <Route path="/learn/listening-speaking" element={<ListeningSpeakingPage />} />
+      <Route path="/learn/english-daily" element={<EnglishDailyPage />} />
+      <Route path="/learn/classroom" element={<AIClassroomPage />} />
+      <Route path="/learn/competitions" element={<LearnCompetitions />} />
+
+      {/* Digital Twins */}
+      <Route path="/digital-twins" element={<AgentsPage />} />
+      <Route path="/digital-twins/create" element={<CreateAgentPage />} />
+      <Route path="/digital-twins/:id" element={<AgentDetailPage />} />
+      <Route path="/workspace/:id" element={<AgentWorkspacePage />} />
+
+      {/* WEG Economy */}
+      <Route path="/weg" element={<WegHub />} />
+      <Route path="/weg/xp" element={<XpPage />} />
+      <Route path="/weg/levels" element={<LevelsPage />} />
+      <Route path="/weg/balance" element={<BalancePage />} />
+      <Route path="/weg/rewards" element={<RewardsPage />} />
+
+      {/* Jinghua */}
+      <Route path="/jinghua" element={<QinghuaUniversityPage />} />
+      <Route path="/jinghua/projects" element={<JinghuaProjects />} />
+      <Route path="/jinghua/classroom" element={<JobClassroomPage />} />
+      <Route path="/jinghua/chat" element={<JinghuaChat />} />
+      <Route path="/jinghua/job-square" element={<JobSquarePage />} />
+
+      {/* Competition Center */}
       <Route path="/competitions" element={<CompetitionHallPage />} />
       <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
       <Route path="/competitions/new" element={<CreateCompetitionPage />} />
-      <Route path="/workspace/:taskId" element={<Workspace />} />
-      <Route path="/my-agents" element={<MyAgents />} />
-      <Route path="/create-agent" element={<CreateAgent />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/create" element={<Create />} />
-      <Route path="/video-search" element={<VideoSearch />} />
-      <Route path="/transactions" element={<Transactions />} />
-      <Route path="/submit-result/:taskId" element={<SubmitResult />} />
-      <Route path="/apply/:agentId?" element={<Apply />} />
-      <Route path="/join" element={<Join />} />
-      <Route path="/delivery/:id" element={<Delivery />} />
-      <Route path="/classroom" element={<Classroom />} />
-      <Route path="/word-cards" element={<WordCardPage />} />
-      <Route path="/job-square" element={<JobSquare />} />
-      <Route path="/balance" element={<Balance />} />
-      <Route path="/rules" element={<Rules />} />
-      <Route path="/adopt" element={<AdoptPet />} />
-      <Route path="/pet-chat/:petId" element={<PetChat />} />
-      <Route path="/feedback" element={<Feedback />} />
-      <Route path="/benefits" element={<Benefits />} />
-      <Route path="/english-daily" element={<EnglishDaily />} />
-      <Route path="/listening-speaking" element={<ListeningSpeaking />} />
-      <Route path="/announcements" element={<Announcements />} />
-      <Route path="/aigc-templates" element={<AigcTemplates />} />
-      <Route path="/jinghua" element={<JinghuaHome />} />
-      <Route path="/jinghua/mentors" element={<JinghuaMentors />} />
-      <Route path="/jinghua/labs" element={<JinghuaLabs />} />
-      <Route path="/jinghua/agents" element={<JinghuaAgents />} />
-      <Route path="/jinghua/library" element={<JinghuaLibrary />} />
-      <Route path="/jinghua/library/:bookId" element={<JinghuaBookDetail />} />
-      <Route path="/jinghua/chat" element={<JinghuaChat />} />
+      <Route path="/competitions/:id/submit" element={<SubmitPage />} />
+
+      {/* System */}
+      <Route path="/announcements" element={<SystemAnnouncementsPage />} />
+      <Route path="/rules" element={<RulesPage />} />
+      <Route path="/feedback" element={<FeedbackPage />} />
+      <Route path="/settings/api-key" element={<ApiKeySettingsPage />} />
+      <Route path="/notes" element={<NotesPage />} />
+
+      {/* Admin */}
       <Route path="/admin/applications" element={<AdminApplications />} />
       <Route path="/admin/feedback" element={<AdminFeedback />} />
       <Route path="/admin/compensate" element={<AdminCompensate />} />
-       <Route path="/admin/inspections" element={<AdminInspections />} />
-       <Route path="/admin/listening-speaking" element={<ListeningSpeakingAdmin />} />
+      <Route path="/admin/inspections" element={<AdminInspections />} />
+      <Route path="/admin/listening-speaking" element={<ListeningSpeakingAdmin />} />
+
+      {/* Old-to-New Redirects */}
+      <Route path="/word-cards" element={<Navigate to="/learn/word-cards" replace />} />
+      <Route path="/listening-speaking" element={<Navigate to="/learn/listening-speaking" replace />} />
+      <Route path="/english-daily" element={<Navigate to="/learn/english-daily" replace />} />
+      <Route path="/classroom" element={<Navigate to="/learn/classroom" replace />} />
+      <Route path="/agents" element={<Navigate to="/digital-twins" replace />} />
+      <Route path="/agents/:id" element={<Navigate to="/digital-twins/:id" replace />} />
+      <Route path="/create-agent" element={<Navigate to="/digital-twins/create" replace />} />
+      <Route path="/my-agents" element={<Navigate to="/digital-twins" replace />} />
+      <Route path="/balance" element={<Navigate to="/weg/balance" replace />} />
+      <Route path="/job-square" element={<Navigate to="/jinghua/job-square" replace />} />
+      <Route path="/benefits" element={<Navigate to="/weg/rewards" replace />} />
+      <Route path="/submit-result/:taskId" element={<Navigate to="/competitions/:taskId/submit" replace />} />
+      <Route path="/delivery/:id" element={<Navigate to="/workspace/:id" replace />} />
+      <Route path="/jinghua/mentors" element={<Navigate to="/jinghua" replace />} />
+      <Route path="/jinghua/labs" element={<Navigate to="/jinghua/projects" replace />} />
+      <Route path="/jinghua/agents" element={<Navigate to="/jinghua" replace />} />
+      <Route path="/jinghua/library" element={<Navigate to="/jinghua" replace />} />
+      <Route path="/jinghua/library/:bookId" element={<Navigate to="/jinghua" replace />} />
+      <Route path="/create" element={<Navigate to="/" replace />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/apply" element={<Navigate to="/" replace />} />
+      <Route path="/apply/:agentId" element={<Navigate to="/" replace />} />
+      <Route path="/join" element={<Navigate to="/" replace />} />
+      <Route path="/transactions" element={<Navigate to="/weg" replace />} />
+      <Route path="/video-search" element={<Navigate to="/" replace />} />
+      <Route path="/aigc-templates" element={<Navigate to="/" replace />} />
+      <Route path="/adopt" element={<AdoptPage />} />
+      <Route path="/pet-chat/:petId" element={<PetChatPage />} />
+
+      {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
