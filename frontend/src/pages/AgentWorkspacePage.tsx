@@ -71,7 +71,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   cancelled: { label: '已取消', color: 'text-slate-400', bg: 'bg-slate-500/10', border: 'border-slate-500/30' },
 };
 
-const getStatusConfig = (status: string) => STATUS_CONFIG[status] || { label: status, color: 'text-slate-400', bg: 'bg-slate-500/10', border: 'border-slate-500/30' };
+
 
 // ============ 格式化工具 ============
 const formatTime = (date: Date): string => {
