@@ -716,3 +716,42 @@ export const getFileName = (url: string): string => {
     return '文件';
   }
 };
+
+// ============ XP 系统 ============
+
+const XP_TYPES: Record<string, string> = {
+  wordcard: '完成单词练习',
+  listening: '听说训练',
+  daily_english: '完成每日英语',
+  streak: '连续签到',
+};
+
+export const xpAPI = {
+  award: async (userId: number, type: string, amount: number) => {
+    const desc = XP_TYPES[type] || type;
+    return supabaseFetch('transactions', {
+      method: 'POST',
+      body: JSON.stringify({
+        from_id: userId,
+        from_type: 'user',
+        to_id: userId,
+        to_type: 'user',
+        amount,
+        type: `xp_${type}`,
+        description: desc,
+        created_at: new Date().toISOString(),
+      }),
+    });
+  },
+
+  getTotal: async (userId: number): Promise<number> => {
+    const data = await supabaseFetch(`transactions?from_id=eq.${userId}&from_type=eq.user&type=like.xp_*&select=amount`);
+    if (!data || !Array.isArray(data)) return 0;
+    return data.reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
+  },
+
+  getHistory: async (userId: number) => {
+    const data = await supabaseFetch(`transactions?from_id=eq.${userId}&from_type=eq.user&type=like.xp_*&order=created_at.desc&limit=50`);
+    return data || [];
+  },
+};

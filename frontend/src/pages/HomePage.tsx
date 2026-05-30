@@ -627,7 +627,7 @@ export const HomePage: React.FC = () => {
               </div>
               <div className="flex-1 text-left">
                 <h3 className="font-bold text-slate-900 mb-1">宠物英语角</h3>
-                <p className="text-sm text-slate-500">领养宠物，背单词赚省钱币</p>
+                <p className="text-sm text-slate-500">领养宠物，背单词赚积分</p>
               </div>
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
                 <ArrowRight className="w-4 h-4 text-green-600" />

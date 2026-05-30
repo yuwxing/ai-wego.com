@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import toast from 'react-hot-toast';
+import { xpAPI } from '../utils/supabase';
 
 // 文本相似度计算函数（Jaccard相似度）
 const calculateSimilarity = (text1: string, text2: string): number => {
@@ -458,6 +459,8 @@ export default function ListeningSpeakingPage() {
     // 记录完成状态到 localStorage
     const key = `ls_completed_${data?.date}`;
     localStorage.setItem(key, 'true');
+    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+    if (userId) xpAPI.award(userId, 'listening', 20);
     toast.success('已完成今日听说训练！');
     navigate('/benefits');
   };

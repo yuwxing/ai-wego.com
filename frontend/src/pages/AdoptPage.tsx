@@ -185,8 +185,8 @@ export const AdoptPage: React.FC = () => {
       return;
     }
 
-    if (balance < 100) {
-      setBalanceWarning('省钱币不足，无法领养！需要100省钱币，请先去完成任务赚取');
+    if (balance < 30) {
+      setBalanceWarning('积分不足，无法领养！需要30积分，请先去完成任务赚取');
       setShowConfirmModal(false);
       setTimeout(() => setBalanceWarning(null), 4000);
       return;
@@ -208,15 +208,15 @@ export const AdoptPage: React.FC = () => {
         const balData = await balResp.json();
         const currentBalance = balData[0]?.token_balance || 0;
         
-        if (currentBalance < 100) {
-          setBalanceWarning('省钱币不足，无法领养！需要100省钱币，请先去完成任务赚取');
+        if (currentBalance < 30) {
+          setBalanceWarning('积分不足，无法领养！需要30积分，请先去完成任务赚取');
           setShowConfirmModal(false);
           setIsAdopting(false);
           return;
         }
         
-        // 扣除100 WEG
-        newBalance = currentBalance - 100;
+        // 扣除30 积分
+        newBalance = currentBalance - 30;
         const updateResp = await fetch(`${SUPABASE_URL}users?id=eq.${user.id}`, {
           method: 'PATCH',
           headers: { 
@@ -231,13 +231,13 @@ export const AdoptPage: React.FC = () => {
         if (!updateResp.ok) throw new Error('扣费失败');
       } catch (apiErr) {
         console.warn('Supabase扣费失败，降级使用前端扣费:', apiErr);
-        if (balance < 100) {
-          setBalanceWarning('省钱币不足，无法领养！需要100省钱币，请先去完成任务赚取');
+        if (balance < 30) {
+          setBalanceWarning('积分不足，无法领养！需要30积分，请先去完成任务赚取');
           setShowConfirmModal(false);
           setIsAdopting(false);
           return;
         }
-        newBalance = balance - 100;
+        newBalance = balance - 30;
       }
 
       // 更新本地状态
@@ -456,7 +456,7 @@ export const AdoptPage: React.FC = () => {
           <div className="mb-4 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-purple-600" />
             <span className="text-sm text-purple-700">
-              领养需消耗 <strong>100 <img src="/weg-coin.png" alt="积分" style={{ width: 14, height: 14, borderRadius: "50%", display: "inline-block", verticalAlign: "middle" }} /></strong>，完成英语学习即可喂养
+              领养需消耗 <strong>30 <img src="/weg-coin.png" alt="积分" style={{ width: 14, height: 14, borderRadius: "50%", display: "inline-block", verticalAlign: "middle" }} /></strong>，完成英语学习即可喂养
             </span>
           </div>
         )}

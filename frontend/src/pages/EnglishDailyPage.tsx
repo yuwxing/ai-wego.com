@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import toast from 'react-hot-toast';
+import { xpAPI } from '../utils/supabase';
 
 // Types
 interface Vocabulary {
@@ -121,22 +122,7 @@ export default function EnglishDailyPage() {
     
     setClaimLoading(true);
     try {
-      // 检查是否已领养宠物
-      const petResp = await fetch(`https://mzjmfyoemcsoqzoooiej.supabase.co/rest/v1/pets?user_id=eq.${user.id}&select=id`, {
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16am1meW9lbWNzb3F6b29vaWVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ5MDgwMCwiZXhwIjoyMDkzMDY2ODAwfQ.BaovYmOpmOANyo6fmSPKV1FwNwLWlkVVSa7r8KsaMtM',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16am1meW9lbWNzb3F6b29vaWVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ5MDgwMCwiZXhwIjoyMDkzMDY2ODAwfQ.BaovYmOpmOANyo6fmSPKV1FwNwLWlkVVSa7r8KsaMtM'
-        }
-      });
-      const pets = await petResp.json();
-      
-      if (!pets || pets.length === 0) {
-        toast.error('请先领养宠物再领取奖励');
-        navigate('/adopt');
-        return;
-      }
-
-      // 奖励 30 <WegCoin size={14} />
+      // 奖励 30 积分
       const rewardResp = await fetch(`https://mzjmfyoemcsoqzoooiej.supabase.co/rest/v1/rpc/add_balance`, {
         method: 'POST',
         headers: {
@@ -152,7 +138,8 @@ export default function EnglishDailyPage() {
       });
 
       if (rewardResp.ok) {
-        toast.success('获得 30 <WegCoin size={14} /> 奖励！');
+        toast.success('获得 30 积分奖励！');
+        if (user?.id) xpAPI.award(user.id, 'daily_english', 15);
       } else {
         toast.error('奖励发放失败');
       }

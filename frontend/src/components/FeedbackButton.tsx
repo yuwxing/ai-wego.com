@@ -158,7 +158,7 @@ export const FeedbackButton: React.FC = () => {
           console.error('[反馈赔付] 自动赔付失败:', rewardErr);
         }
       } else if (type === 'bug' && currentUser?.id && !claimEnabled) {
-        // Bug反馈默认奖励500省钱币（不申请赔付时）
+        // Bug反馈默认奖励500积分（不申请赔付时）
         try {
           // 1. 更新用户token_balance
           const userRes = await fetch(`${SUPABASE_URL}users?id=eq.${currentUser.id}&select=token_balance`, {
@@ -198,7 +198,7 @@ export const FeedbackButton: React.FC = () => {
             })
           });
           
-          console.log(`[反馈赔付] 已向用户 ${currentUser.id} 发放500省钱币`);
+          console.log(`[反馈赔付] 已向用户 ${currentUser.id} 发放500积分`);
         } catch (rewardErr) {
           console.error('[反馈赔付] 自动赔付失败:', rewardErr);
         }

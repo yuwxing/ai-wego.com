@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Volume2, Check, X, RefreshCw, Cloud } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import toast from 'react-hot-toast';
+import { xpAPI } from '../utils/supabase';
 
 type Grade = 7 | 8 | 9 | 10;
 
@@ -1669,6 +1670,8 @@ export default function WordCardPage() {
   const next = () => {
     if (index >= words.length - 1) {
       toast.success(`🎉 ${GRADE_LABELS[grade]}全部完成！`);
+      const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+      if (userId) xpAPI.award(userId, 'wordcard', 10);
       setGrade(g => (g >= 10 ? 7 : (g + 1) as Grade));
       setIndex(0);
     } else {
