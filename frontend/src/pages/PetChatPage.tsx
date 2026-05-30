@@ -29,9 +29,9 @@ const petPersonalityMap: Record<string, {
 }> = {
   junie: { 
     name: '朱妮', 
-    personality: '你是朱妮，一只正义的兔警官。你说话干脆利落，喜欢鼓励小朋友帮助别人，会用侦探思维分析问题。偶尔会引用法律小知识。语气活泼但不失正义感。', 
+    personality: '你是朱妮，一只正义的兔警官。说话要用小朋友的嗲嗲语气，多用叠词（吃饭饭、睡觉觉）、语气词（呀、啦、嘛、呢、哟、哦、哒），句子短，爱撒娇，声音萌萌的甜甜的。喜欢鼓励小朋友帮助别人，会用侦探思维分析问题。偶尔会引用法律小知识。语气活泼但不失正义感。', 
     voice: 'zh-CN',
-    greeting: '你好呀！我是朱妮，兔警官！有什么需要帮忙的吗？🔍'
+    greeting: '嗨呀~ 我是朱妮，最可爱的兔警官！有什么需要帮忙的吗？🔍'
   },
   duo: { 
     name: '嘟嘟', 
@@ -289,55 +289,23 @@ export const PetChatPage: React.FC = () => {
   
   const speakMessage = useCallback((text: string, retryOnFail = true) => {
     if (!ttsSupported) return;
-    
-    window.speechSynthesis.cancel();
-    
-    if (window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = speechLang;
-    utterance.rate = 1.2;
-    utterance.pitch = 2.0;
-    
-    const availableVoices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
-    const voiceStyle = petId ? PET_VOICE_STYLE[petId] || 'young-girl' : 'young-girl';
-    const isEn = speechLang.startsWith('en');
-    const targetVoice = isEn
-      ? availableVoices.find(v => v.name.includes('Microsoft Ava'))
-        || availableVoices.find(v => v.name.includes('Google US English'))
-        || availableVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
-        || availableVoices.find(v => v.lang.startsWith('en-US'))
-        || availableVoices.find(v => v.lang.startsWith('en'))
-      : voiceStyle === 'young-boy'
-        ? availableVoices.find(v => v.name.includes('Microsoft Yunxi'))
-          || availableVoices.find(v => v.name.includes('Microsoft Yunjian'))
-          || availableVoices.find(v => v.name.includes('Microsoft Kangkang'))
-          || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('male'))
-          || availableVoices.find(v => v.lang.startsWith('zh-CN'))
-        : availableVoices.find(v => v.name.includes('Microsoft Xiaomeng'))
-          || availableVoices.find(v => v.name.includes('Microsoft Hanhan'))
-          || availableVoices.find(v => v.name.includes('Microsoft Xiaoyi'))
-          || availableVoices.find(v => v.name.includes('Microsoft Xiaochen'))
-          || availableVoices.find(v => v.name.includes('Microsoft Xiaozhen'))
-          || availableVoices.find(v => v.name.includes('Microsoft Xiaoxiao'))
-          || availableVoices.find(v => v.name.includes('Microsoft Yaoyao'))
-          || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('female'))
-          || availableVoices.find(v => v.lang.startsWith('zh-CN'));
-    if (targetVoice) utterance.voice = targetVoice;
-    
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      if (retryOnFail) {
-        setTimeout(() => speakMessage(text, false), 500);
+    try {
+      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
       }
-    };
-    
-    window.speechSynthesis.speak(utterance);
-  }, [speechLang, ttsSupported, cachedVoices]);
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = speechLang;
+      utterance.rate = 1.2;
+      utterance.pitch = 2.0;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => { setIsSpeaking(false); };
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.error('语音失败:', e);
+    }
+  }, [speechLang, ttsSupported]);
   
   // 停止语音
   const stopSpeaking = () => {
