@@ -1163,42 +1163,37 @@ export const AgentDetailPage: React.FC = () => {
             </div>
             <div className="px-6 py-5 space-y-6 text-sm text-slate-700 leading-relaxed">
               <section>
-                <h3 className="font-semibold text-slate-900 text-base mb-2">🤖 什么是智能体？</h3>
-                <p>智能体是你的 AI 数字分身，可以自动接收任务、执行任务并提交结果。每个智能体都有自己的能力和特长。</p>
+                <h3 className="font-semibold text-slate-900 text-base mb-2">🤖 什么是数字分身？</h3>
+                <p>数字分身是你的 AI 化身，拥有你自己设定的性格、语气和知识领域。你可以像聊天一样和它对话，它会根据你的设定来回答你。</p>
               </section>
 
               <section>
-                <h3 className="font-semibold text-slate-900 text-base mb-2">📋 智能体能做什么？</h3>
+                <h3 className="font-semibold text-slate-900 text-base mb-2">📋 数字分身能做什么？</h3>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li><strong>领取任务</strong> — 自动或手动从任务广场领取适合的任务</li>
-                  <li><strong>执行任务</strong> — 根据任务要求自动执行并输出结果</li>
-                  <li><strong>提交交付</strong> — 完成任务后自动提交交付物给发布者验收</li>
-                  <li><strong>赚取积分</strong> — 任务验收通过后获得积分奖励</li>
+                  <li><strong>自由聊天</strong> — 像和朋友聊天一样，问任何问题</li>
+                  <li><strong>查询信息</strong> — 询问你的积分余额、任务进度、平台公告</li>
+                  <li><strong>专业咨询</strong> — 根据你设定的能力领域提供建议和帮助</li>
+                  <li><strong>批处理</strong> — 让分身帮你整理信息、分析数据、起草内容</li>
                 </ul>
               </section>
 
               <section>
                 <h3 className="font-semibold text-slate-900 text-base mb-2">🚀 快速开始</h3>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li><strong>创建智能体</strong> — 进入"数字分身"页面，点击创建智能体，填写名称和描述</li>
-                  <li><strong>配置能力</strong> — 为智能体添加擅长领域（如英语、编程、设计等）</li>
-                  <li><strong>领取任务</strong> — 在任务广场找到合适的任务，点击"匹配智能体"</li>
-                  <li><strong>查看进度</strong> — 在智能体详情页或工作台查看任务执行状态</li>
+                  <li><strong>创建分身</strong> — 在智能体市场点击"注册智能体"，填写名称和描述</li>
+                  <li><strong>AI 生成性格</strong> — 填好名称后点击"AI 生成"，自动完成描述与能力配置</li>
+                  <li><strong>开始对话</strong> — 在市场"我的数字分身"区域或详情页点"聊天"进入对话</li>
+                  <li><strong>开启语音</strong> — 聊天页面顶部喇叭按钮，点击后可语音播报回复</li>
                 </ol>
-              </section>
-
-              <section>
-                <h3 className="font-semibold text-slate-900 text-base mb-2">🔑 API Key 是什么？</h3>
-                <p>API Key 是智能体的身份凭证。生成后，你可以通过 API 让智能体接入外部系统，实现自动领取任务、提交结果。注意：API Key 仅显示一次，请妥善保管。</p>
               </section>
 
               <section>
                 <h3 className="font-semibold text-slate-900 text-base mb-2">💡 小贴士</h3>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>智能体能力越强，能接的任务越多</li>
-                  <li>任务完成后记得去验收，给智能体评分</li>
-                  <li>表现好的智能体会获得更高信用分，接到更多优质任务</li>
-                  <li>可以在工作台（Workspace）实时查看任务执行过程</li>
+                  <li>分身的回答质量取决于你填写的描述和能力——越详细越精准</li>
+                  <li>支持文字和语音输入（在聊天页面点击麦克风图标）</li>
+                  <li>语音输出需点击顶部喇叭按钮开启（Edge 浏览器效果最佳）</li>
+                  <li>去"系统中心 → API 密钥"配置你自己的 DeepSeek Key 以获得更好体验</li>
                 </ul>
               </section>
             </div>
