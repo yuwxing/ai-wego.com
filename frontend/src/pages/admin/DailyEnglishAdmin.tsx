@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Save, Trash2, Edit3, Plus, Eye, Loader2, Check, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Sparkles, Save, Trash2, Edit3, Eye, Loader2, Check, AlertCircle, ChevronLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const SUPABASE_URL = 'https://mzjmfyoemcsoqzoooiej.supabase.co/rest/v1/';
@@ -9,51 +9,50 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
 const DEEPSEEK_KEY = 'sk-17df56ac8d1b4544914816f45c3c7064';
 
-const GRADE_OPTIONS = [
-  { value: '7a', label: '七年级上册（新人教2024版）' },
-  { value: '7b', label: '七年级下册（新人教2024版）' },
-  { value: '8a', label: '八年级上册' },
-  { value: '8b', label: '八年级下册' },
-  { value: '9', label: '九年级' },
+const TOPIC_CATEGORIES = [
+  {
+    name: '人与自我',
+    topics: ['个人情况与成长', '家庭与亲友', '学校生活', '兴趣爱好', '情感与压力调节', '计划与愿望', '健康与安全']
+  },
+  {
+    name: '人与社会',
+    topics: ['社会交往与公益', '文化习俗与节日', '历史人物与励志', '科技与AI', '家乡与环境保护', '文娱体育', '语言学习']
+  },
+  {
+    name: '人与自然',
+    topics: ['天气与季节', '动植物', '环保与低碳', '宇宙与太空探索', '自然灾害与防护', '可持续发展']
+  }
 ];
-
-const GRADE_UNITS: Record<string, string[]> = {
-  '7a': ['Unit 1 You and Me', 'Unit 2 We\'re Family!', 'Unit 3 My School', 'Unit 4 My Favourite Subject', 'Unit 5 Fun Clubs', 'Unit 6 A Day in the Life', 'Unit 7 Happy Birthday!'],
-  '7b': ['Unit 1 Animal Friends', 'Unit 2 No Rules, No Order', 'Unit 3 Keep Fit', 'Unit 4 Eat Well', 'Unit 5 Here and Now', 'Unit 6 Rain or Shine', 'Unit 7 A Trip to the Zoo', 'Unit 8 Once Upon a Time'],
-  '8a': ['Unit 1 Where did you go on vacation?', 'Unit 2 How often do you exercise?', 'Unit 3 I\'m more outgoing than my sister', 'Unit 4 What\'s the best movie theater?', 'Unit 5 Do you want to watch a game show?', 'Unit 6 I\'m going to study computer science', 'Unit 7 Will people have robots?', 'Unit 8 How do you make a banana milk shake?'],
-  '8b': ['Unit 1 What\'s the matter?', 'Unit 2 I\'ll help to clean up the city parks', 'Unit 3 Could you please clean your room?', 'Unit 4 Why don\'t you talk to your parents?', 'Unit 5 What were you doing when the rainstorm came?', 'Unit 6 An old man tried to move the mountains', 'Unit 7 What\'s the highest mountain in the world?', 'Unit 8 Have you read Treasure Island yet?', 'Unit 9 Have you ever been to a museum?', 'Unit 10 I\'ve had this bike for three years'],
-  '9': ['Unit 1 How can we become good learners?', 'Unit 2 I think that mooncakes are delicious!', 'Unit 3 Could you please tell me where the restrooms are?', 'Unit 4 I used to be afraid of the dark.', 'Unit 5 What are the shirts made of?', 'Unit 6 When was it invented?', 'Unit 7 Teenagers should be allowed to choose their own clothes.', 'Unit 8 It must belong to Carla.', 'Unit 9 I like music that I can dance to.', 'Unit 10 You\'re supposed to shake hands.'],
-};
 
 const DIFFICULTY_LEVELS = ['基础', '中等', '较难'];
 
-interface LSItem {
+interface DailyItem {
   id: number;
   title: string;
   description: string;
+  created_at: string;
 }
 
-export default function ListeningSpeakingAdmin() {
+export default function DailyEnglishAdmin() {
   const navigate = useNavigate();
-  const [items, setItems] = useState<LSItem[]>([]);
+  const [items, setItems] = useState<DailyItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [grade, setGrade] = useState('7a');
-  const [unit, setUnit] = useState(GRADE_UNITS['7a'][0]);
-  const [topic, setTopic] = useState('');
+  const [topicCategory, setTopicCategory] = useState('人与自我');
+  const [topic, setTopic] = useState('个人情况与成长');
   const [difficulty, setDifficulty] = useState('中等');
+  const [customTopic, setCustomTopic] = useState('');
 
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [editableContent, setEditableContent] = useState('');
-  const [editingId, setEditingId] = useState<number | null>(null);
 
   const loadItems = async () => {
     setLoading(true);
     try {
-      const resp = await fetch(`${SUPABASE_URL}tasks?status=eq.ls_daily&select=id,title,description&order=id.desc&limit=50`, {
+      const resp = await fetch(`${SUPABASE_URL}tasks?status=eq.english_daily_middle&select=id,title,description,created_at&order=id.desc&limit=50`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -69,65 +68,63 @@ export default function ListeningSpeakingAdmin() {
   useEffect(() => { loadItems(); }, []);
 
   const generateContent = async () => {
-    if (!unit && !topic) { toast.error('请选择单元或输入主题'); return; }
+    const finalTopic = customTopic || topic;
+    if (!finalTopic) { toast.error('请选择或输入主题'); return; }
     setGenerating(true);
     setGeneratedContent(null);
     try {
-      const gradeLabel = GRADE_OPTIONS.find(g => g.value === grade)?.label || grade;
-      const prompt = `你是一位广东省初中英语听说训练命题专家。请为${gradeLabel}的"${unit}"生成一套完整的英语听说训练题。
+      const prompt = `你是一名广东省初中英语教研员，精通中考命题。请以 China Daily / 21st Century 风格，为初中生生成一份"每日英语"学习材料。
 
-要求：
-1. 严格按照广东省新教材中考听说考试题型（Part A-D）
-2. 内容难度：${difficulty}
-3. 主题关键词：${topic || unit}
-4. 所有对话和短文用英文，题目说明用中文
+主题类别：${topicCategory}
+具体主题：${finalTopic}
+难度：${difficulty}
+话题范围：${topicCategory === '人与自我' ? '个人成长、家庭、学校、兴趣、情感、健康等' : topicCategory === '人与社会' ? '社会文化、科技、历史、环保、体育等' : '自然环境、生态保护、宇宙探索等'}
+素材风格：借鉴 China Daily 和 21st Century 的短篇新闻报道，语言地道、贴近中考阅读
 
-请输出严格的JSON格式，不要包含任何其他文字：
+请输出严格 JSON 格式，不要包含其他文字，确保内容适合广东省中考英语难度：
+
 \`\`\`json
 {
-  "date": "2026-05-27",
-  "title_cn": "${unit}",
-  "title_en": "${unit.replace('Unit ', 'Unit ')}",
-  "source": "${gradeLabel} 听说训练",
-  "part_a": {
-    "title": "模仿朗读",
-    "passage": "一段80-120词的英文短文（与单元主题相关）",
-    "pronunciation_tips": ["发音提示1", "发音提示2", "发音提示3", "发音提示4", "发音提示5"],
-    "pause_marks": "用/标注重音和停顿的文本"
+  "date": "${new Date().toISOString().slice(0, 10)}",
+  "title_cn": "中文标题（与${finalTopic}相关）",
+  "title_en": "English Title",
+  "source": "China Daily / 21st Century",
+  "article": "一篇180-250词的英语短文，与主题相关，语言地道，包含中考核心词汇",
+  "translation": "上述短文的中文翻译",
+  "vocabulary": [
+    { "word": "重点词汇1", "phonetic": "/音标/", "meaning": "中文释义", "example": "英文章句" },
+    { "word": "重点词汇2", "phonetic": "/音标/", "meaning": "中文释义", "example": "英文章句" },
+    { "word": "重点词汇3", "phonetic": "/音标/", "meaning": "中文释义", "example": "英文章句" },
+    { "word": "重点词汇4", "phonetic": "/音标/", "meaning": "中文释义", "example": "英文章句" },
+    { "word": "重点词汇5", "phonetic": "/音标/", "meaning": "中文释义", "example": "英文章句" },
+    { "word": "重点词汇6", "phonetic": "/音标/", "meaning": "中文释义", "example": "英文章句" }
+  ],
+  "grammar": {
+    "topic": "语法点名称（如：一般现在时）",
+    "rules": ["规则1", "规则2", "规则3"],
+    "examples": ["例句1", "例句2", "例句3"]
   },
-  "part_b": {
-    "title": "听选信息",
-    "conversations": [
-      {
-        "context": "对话场景说明（中文）",
-        "dialogue": "英文对话内容",
-        "questions": [
-          { "question": "英文问题?", "options": ["A选项", "B选项", "C选项", "D选项"], "answer": "A" }
-        ]
-      }
-    ]
-  },
-  "part_c": {
-    "title": "回答问题",
-    "description": "听下面一段独白，录音播放两遍。请根据所听内容回答下列问题。",
-    "passage": "一段80-120词的英文独白短文（包含所有问题的答案）",
-    "questions": [
-      { "question": "英文问题?", "en_answer": "英文参考答案" }
-    ]
-  },
-  "part_d": {
-    "title": "短文复述及询问信息",
-    "topic": "主题",
-    "key_points": ["要点1", "要点2", "要点3", "要点4"],
-    "sample_answer": "英文范文（80-100词）",
-    "scoring": { "pronunciation": 5, "fluency": 5, "content": 5, "grammar": 5, "total": 20 }
+  "reading_questions": [
+    { "question": "阅读理解题1？", "options": ["A选项", "B选项", "C选项", "D选项"], "answer": "A" },
+    { "question": "阅读理解题2？", "options": ["A选项", "B选项", "C选项", "D选项"], "answer": "B" },
+    { "question": "阅读理解题3？", "options": ["A选项", "B选项", "C选项", "D选项"], "answer": "C" },
+    { "question": "阅读理解题4？", "options": ["A选项", "B选项", "C选项", "D选项"], "answer": "D" }
+  ],
+  "writing": {
+    "topic": "写作题目（与主题相关）",
+    "requirements": ["要求1", "要求2", "要求3"],
+    "tips": ["写作提示1", "写作提示2", "写作提示3"],
+    "word_range": "80-100"
   }
 }
 \`\`\`
 
-注意：part_b 至少包含2段对话，每段对话至少3道题目。
-part_c 的passage是一段英文独白短文（包含所有问题的答案），questions为英文题目，至少4道题。
-part_d 范文要完整。`;
+要求：
+1. 文章内容积极向上，符合初中生认知水平
+2. 阅读理解4道题涵盖主旨大意、细节理解、推理判断、词义猜测
+3. 词汇选自广东中考高频词
+4. 语法讲解与文章中的语法点一致
+5. 写作题目与主题相关，贴近中考题型`;
 
       const resp = await fetch(DEEPSEEK_URL, {
         method: 'POST',
@@ -174,8 +171,7 @@ part_d 范文要完整。`;
     }
     setSaving(true);
     try {
-      const label = GRADE_OPTIONS.find(g => g.value === grade)?.label || grade;
-      const title = `${label} - ${unit}`;
+      const title = `每日英语 - ${topicCategory} - ${customTopic || topic}`;
       const resp = await fetch(`${SUPABASE_URL}tasks`, {
         method: 'POST',
         headers: {
@@ -187,7 +183,7 @@ part_d 范文要完整。`;
         body: JSON.stringify({
           title,
           description: JSON.stringify(parsed),
-          status: 'ls_daily',
+          status: 'english_daily_middle',
           publisher_id: 1,
           budget: 0,
           created_at: new Date().toISOString(),
@@ -226,72 +222,73 @@ part_d 范文要完整。`;
   const previewItem = (desc: string) => {
     try {
       const parsed = JSON.parse(desc);
-      const text = `Part A: ${parsed.part_a?.passage?.substring(0, 50)}...\nPart B: ${parsed.part_b?.conversations?.length || 0}段对话\nPart C: ${parsed.part_c?.questions?.length || 0}道题\nPart D: ${parsed.part_d?.topic || ''}`;
-      toast(text, { duration: 5000 });
+      toast(
+        `标题: ${parsed.title_cn}\n文章: ${parsed.article?.substring(0, 60)}...\n词汇: ${parsed.vocabulary?.length || 0}个\n阅读: ${parsed.reading_questions?.length || 0}题`,
+        { duration: 5000 }
+      );
     } catch {
       toast('无法预览');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white pb-20">
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* 头部 */}
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => navigate(-1)} className="text-[#64748B] hover:text-[#1E293B] transition-colors">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold text-[#1E293B]">听说训练内容管理</h1>
-          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">管理员</span>
+          <h1 className="text-xl font-bold text-[#1E293B]">每日英语内容管理</h1>
+          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">管理员</span>
           <div className="flex-1" />
           <button
-            onClick={() => navigate('/admin/daily-english')}
-            className="px-3 py-1.5 text-sm bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors font-medium"
+            onClick={() => navigate('/admin/listening-speaking')}
+            className="px-3 py-1.5 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium"
           >
-            每日英语管理 →
+            ← 听说训练管理
           </button>
         </div>
 
         {/* 生成区域 */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 mb-6">
+        <div className="bg-white rounded-2xl border border-emerald-200 p-5 mb-6">
           <h2 className="font-bold text-[#1E293B] mb-4 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-500" />
-            AI 自动生成听说训练题
+            <Sparkles className="w-5 h-5 text-emerald-500" />
+            AI 生成每日英语内容
           </h2>
 
-          <div className="grid grid-cols-4 gap-3 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             <div>
-              <label className="block text-xs font-medium text-[#64748B] mb-1.5">年级</label>
+              <label className="block text-xs font-medium text-[#64748B] mb-1.5">话题类别</label>
               <select
-                value={grade}
-                onChange={e => { setGrade(e.target.value); setUnit(GRADE_UNITS[e.target.value]?.[0] || ''); }}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-purple-300 bg-white"
+                value={topicCategory}
+                onChange={e => { setTopicCategory(e.target.value); setTopic(''); }}
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-emerald-300 bg-white"
               >
-                {GRADE_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                {TOPIC_CATEGORIES.map(c => (
+                  <option key={c.name} value={c.name}>{c.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#64748B] mb-1.5">单元</label>
+              <label className="block text-xs font-medium text-[#64748B] mb-1.5">具体话题</label>
               <select
-                value={unit}
-                onChange={e => setUnit(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-purple-300 bg-white"
-              >
-                {GRADE_UNITS[grade]?.map(u => (
-                  <option key={u} value={u}>{u}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[#64748B] mb-1.5">主题（可选）</label>
-              <input
-                type="text"
                 value={topic}
                 onChange={e => setTopic(e.target.value)}
-                placeholder="如：My Family"
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-purple-300"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-emerald-300 bg-white"
+              >
+                {TOPIC_CATEGORIES.find(c => c.name === topicCategory)?.topics.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#64748B] mb-1.5">自定义主题</label>
+              <input
+                type="text"
+                value={customTopic}
+                onChange={e => setCustomTopic(e.target.value)}
+                placeholder="留空则使用话题"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-emerald-300"
               />
             </div>
             <div>
@@ -299,7 +296,7 @@ part_d 范文要完整。`;
               <select
                 value={difficulty}
                 onChange={e => setDifficulty(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-purple-300 bg-white"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-emerald-300 bg-white"
               >
                 {DIFFICULTY_LEVELS.map(d => (
                   <option key={d} value={d}>{d}</option>
@@ -311,23 +308,23 @@ part_d 范文要完整。`;
           <button
             onClick={generateContent}
             disabled={generating}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
+            className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
           >
             {generating ? (
               <><Loader2 className="w-5 h-5 animate-spin" /> AI 生成中...</>
             ) : (
-              <><Sparkles className="w-5 h-5" /> 一键生成听说训练题</>
+              <><Sparkles className="w-5 h-5" /> 一键生成每日英语</>
             )}
           </button>
         </div>
 
         {/* 编辑区域 */}
         {editMode && (
-          <div className="bg-white rounded-2xl border border-purple-200 p-5 mb-6">
+          <div className="bg-white rounded-2xl border border-emerald-200 p-5 mb-6">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-[#1E293B] flex items-center gap-2">
-                <Edit3 className="w-4 h-4 text-purple-500" />
-                编辑内容（JSON）
+                <Edit3 className="w-4 h-4 text-emerald-500" />
+                编辑内容
               </h2>
               <div className="flex gap-2">
                 <button
@@ -339,7 +336,7 @@ part_d 范文要完整。`;
                 <button
                   onClick={saveContent}
                   disabled={saving}
-                  className="px-4 py-1.5 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-4 py-1.5 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   {saving ? '保存中...' : '保存到 Supabase'}
@@ -349,7 +346,7 @@ part_d 范文要完整。`;
             <textarea
               value={editableContent}
               onChange={e => setEditableContent(e.target.value)}
-              className="w-full h-80 px-4 py-3 border border-slate-200 rounded-xl text-sm font-mono outline-none focus:border-purple-300 resize-y"
+              className="w-full h-80 px-4 py-3 border border-slate-200 rounded-xl text-sm font-mono outline-none focus:border-emerald-300 resize-y"
             />
             {(() => {
               try { JSON.parse(editableContent); return <div className="mt-2 text-xs text-green-600 flex items-center gap-1"><Check className="w-3 h-3" /> JSON 格式正确</div>; }
@@ -366,18 +363,18 @@ part_d 范文要完整。`;
               已保存的内容
               <span className="text-xs text-[#94A3B8] font-normal">({items.length} 条)</span>
             </h2>
-            <button onClick={loadItems} disabled={loading} className="text-xs text-purple-600 hover:text-purple-700 disabled:opacity-50">
+            <button onClick={loadItems} disabled={loading} className="text-xs text-emerald-600 hover:text-emerald-700 disabled:opacity-50">
               {loading ? '刷新中...' : '刷新'}
             </button>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+              <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
             </div>
           ) : items.length === 0 ? (
             <div className="text-center py-12 text-[#94A3B8] text-sm">
-              暂无听说训练内容，点击上方按钮生成
+              暂无每日英语内容，点击上方按钮生成
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
@@ -385,7 +382,7 @@ part_d 范文要完整。`;
                 <div key={item.id} className="px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                   <div className="flex-1 min-w-0 mr-4">
                     <div className="font-medium text-[#1E293B] text-sm truncate">{item.title}</div>
-                    <div className="text-xs text-[#94A3B8] mt-0.5">ID: {item.id}</div>
+                    <div className="text-xs text-[#94A3B8] mt-0.5">ID: {item.id} · {item.created_at?.slice(0, 10)}</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button

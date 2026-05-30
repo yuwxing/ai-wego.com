@@ -42,6 +42,7 @@ import AdminFeedback from './pages/admin/Feedback'
 import AdminCompensate from './pages/admin/Compensate'
 import AdminInspections from './pages/admin/Inspections'
 import ListeningSpeakingAdmin from './pages/admin/ListeningSpeakingAdmin'
+import DailyEnglishAdmin from './pages/admin/DailyEnglishAdmin'
 import OnlineClassroom from './pages/OnlineClassroom'
 import NotFound from './pages/NotFound'
 
@@ -111,6 +112,7 @@ export default function App() {
       <Route path="/admin/compensate" element={<AdminCompensate />} />
       <Route path="/admin/inspections" element={<AdminInspections />} />
       <Route path="/admin/listening-speaking" element={<ListeningSpeakingAdmin />} />
+      <Route path="/admin/daily-english" element={<DailyEnglishAdmin />} />
 
       {/* Old-to-New Redirects */}
       <Route path="/word-cards" element={<Navigate to="/learn/word-cards" replace />} />
