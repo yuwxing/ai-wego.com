@@ -45,7 +45,8 @@ export interface DeepSeekResponse {
 export async function sendToDeepSeek(
   messages: { role: string; content: string }[],
   onChunk?: (text: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  maxTokens?: number
 ): Promise<string> {
   const response = await fetch(DEEPSEEK_API_URL, {
     method: 'POST',
@@ -58,7 +59,7 @@ export async function sendToDeepSeek(
       messages,
       stream: true,
       temperature: 0.7,
-      max_tokens: 1500,
+      max_tokens: maxTokens || 1500,
     }),
     signal,
   });

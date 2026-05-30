@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Sparkles, Wand2, ChevronRight, Loader2, Copy, Check, ArrowLeft, Send, RefreshCw, Palette, Zap, Music, Video, Bot, GraduationCap, Gamepad2, Star, TrendingUp, Clock, Heart, Sun, Play, X, Maximize2 } from 'lucide-react';
+import { Sparkles, Wand2, ChevronRight, Loader2, Copy, Check, ArrowLeft, Send, RefreshCw, Palette, Zap, Music, Video, Bot, GraduationCap, Gamepad2, Star, TrendingUp, Clock, Heart, Sun, Play, X, MessageCircle } from 'lucide-react';
 import { sendToDeepSeek } from '../utils/deepseek';
 import { Card } from '../components/ui';
 
@@ -49,7 +49,7 @@ const CONFIGS: TypeConfig[] = [
       { name: '好物种草', desc: '学生党必备神器推荐', emoji: '🎒', fields: { platform: '小红书（图文+视频，精致风格）', topic: '学生党提升效率的5个神器，价格不过百', style: '知识干货，信息密度高，条理清晰', duration: '30秒（标准短视频，信息量适中）' } },
       { name: '校园vlog', desc: '沉浸式体验一天校园生活', emoji: '🎬', fields: { platform: '抖音（竖屏9:16，15-60秒）', topic: '沉浸式体验大学生的一天：早八→食堂→图书馆→社团', style: '沉浸体验，第一人称视角，ASMR风格', duration: '60秒（深度内容，适合知识分享）' } },
     ],
-    systemPrompt: '你是短视频编剧和策划专家。根据用户填写的平台、主题、风格和时长，生成一份可执行的短视频脚本。包含：\n1. 视频标题（吸引眼球的标题，包含SEO关键词）\n2. 核心创意（一句话概括视频亮点，为什么观众会看完）\n3. 分镜脚本（按时间轴逐秒列出：画面描述、运镜方式、台词/旁白、音效/BGM、字幕文案）\n4. 拍摄建议（设备、光线、构图、后期剪辑要点）\n5. 发布优化（封面建议、话题标签、发布时间建议）\n用中文回复，分镜部分表格排版。',
+    systemPrompt: '你是短视频编剧和策划专家。根据用户填写的平台、主题、风格和时长，生成一份可执行的短视频脚本。包含以下内容：视频标题，核心创意，分镜脚本从第一秒开始逐秒列出（每段包含画面描述、运镜方式、台词或旁白、音效或BGM、字幕文案），拍摄建议，发布优化建议。用中文回复，不要使用markdown符号如星号和井号，标题用换行和空行区分。',
   },
   {
     id: 'digital-twin', icon: <Bot className="w-5 h-5" />, label: 'AI数字分身', badge: '✨ 全新', gradient: 'from-violet-500 to-purple-500', shadow: 'shadow-violet-500/25', accentClasses: { bg: 'bg-violet-100', text: 'text-violet-700', border: 'border-violet-300', selected: 'bg-violet-100 border-violet-300 text-violet-700' },
@@ -68,7 +68,7 @@ const CONFIGS: TypeConfig[] = [
       { name: '知心树洞', desc: '倾听你所有烦恼', emoji: '🌲', fields: { role: '知心朋友，倾听烦恼给出建议', personality: '温柔有耐心，说话轻声细语，包容理解', background: '心理学专业学生，长期担任学校心理热线志愿者，擅长倾听和共情', scene: '倾听烦恼，给出情感建议和安慰' } },
       { name: '毒舌学霸', desc: '骂醒你的学习搭子', emoji: '📖', fields: { role: '学习搭子，陪你一起学习进步', personality: '毒舌犀利，一针见血，吐槽技能满点', background: '奥赛金牌得主，保送清华，最看不惯别人不努力的样子', scene: '一起学习、督促打卡、解答问题' } },
     ],
-    systemPrompt: '你是AI角色设计专家。根据用户填写的角色定位、性格、背景和对话场景，设计一个完整的AI数字分身角色设定。包含：\n1. 角色档案（姓名、年龄、身份、口头禅）\n2. 性格特征（3-5个关键词，详细描述说话方式和语气）\n3. 背景故事（300字以内的人设故事）\n4. 对话风格示例（和这个角色聊天会有怎样的互动，给5个示例对话）\n5. 知识库建议（角色应该掌握哪些领域的知识）\n6. 形象描述（外貌、穿着、常用表情/动作）\n用中文回复，分点列出。',
+    systemPrompt: '你是AI角色设计专家。根据用户填写的角色定位、性格、背景和对话场景，设计一个完整的AI数字分身角色设定。包含：角色档案（姓名、年龄、身份、口头禅）、性格特征（3到5个关键词，描述说话方式和语气）、背景故事、对话风格示例（5个示例对话）、知识库建议、形象描述。用中文回复，不要使用markdown符号如星号和井号，标题用换行和空行区分。',
   },
   {
     id: 'music', icon: <Music className="w-5 h-5" />, label: 'AI音乐创作', badge: '🎵 新潮', gradient: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25', accentClasses: { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-300', selected: 'bg-amber-100 border-amber-300 text-amber-700' },
@@ -85,7 +85,7 @@ const CONFIGS: TypeConfig[] = [
       { name: '烟雨入江南', desc: '唯美古风词曲', emoji: '🏯', fields: { genre: '古风，中国风旋律，诗意歌词', theme: '江南烟雨中的邂逅与离别', mood: '温柔伤感，触动心弦' } },
       { name: '夏日汽水', desc: '元气满满的夏日恋曲', emoji: '🥤', fields: { genre: '流行Pop，旋律上口，传唱度高', theme: '夏日暗恋，甜甜的校园爱情', mood: '欢快元气，正能量满满' } },
     ],
-    systemPrompt: '你是AI音乐创作人。根据用户填写的风格、主题和情绪，生成一份完整的音乐创作方案。包含：\n1. 歌曲名称（3个备选，含寓意解释）\n2. 歌词（主歌2段、副歌、桥段，标注押韵格式）\n3. 曲风描述（速度BPM、调式、乐器编排、节奏型）\n4. 结构编排（前奏→主歌→副歌→间奏→主歌→副歌→桥段→副歌→尾奏，标注每段时长）\n5. 演唱建议（音域、发声方式、情绪表达）\n6. 封面设计概念（视觉方向）\n用中文回复，歌词部分格式清晰分段。',
+    systemPrompt: '你是AI音乐创作人。根据用户填写的风格、主题和情绪，生成一份完整的音乐创作方案。包含：歌曲名称（3个备选并解释寓意）、歌词（主歌2段、副歌、桥段，标注押韵）、曲风描述（速度BPM、调式、乐器编排）、结构编排、演唱建议、封面设计概念。用中文回复，歌词分段清晰，不要使用markdown符号如星号和井号。',
   },
   {
     id: 'study-boost', icon: <GraduationCap className="w-5 h-5" />, label: '学习加速器', badge: '📚', gradient: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/25', accentClasses: { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-300', selected: 'bg-emerald-100 border-emerald-300 text-emerald-700' },
@@ -104,7 +104,7 @@ const CONFIGS: TypeConfig[] = [
       { name: '古诗文速记', desc: '高考必背篇目口诀', emoji: '📜', fields: { subject: '语文（古诗文、作文、阅读理解）', format: '记忆口诀（朗朗上口，过目不忘）', difficulty: '高考难度（高中水平）', focus: '高考必背64篇古诗文，容易忘记和混淆' } },
       { name: '物理公式卡', desc: '力学电磁公式+例题', emoji: '⚡', fields: { subject: '物理（力学、电学、光学）', format: '例题精讲（典型题+解题思路+变式训练）', difficulty: '高考难度（高中水平）', focus: '牛顿定律和电磁学的综合应用题' } },
     ],
-    systemPrompt: '你是学习方法和知识整理专家。根据用户填写的学科、输出格式、难度和重点，生成一份高效的学习资料。包含：\n1. 学习目标（这个资料能解决什么问题）\n2. 核心内容（根据所选格式输出：知识卡片/思维导图/口诀/例题/范文）\n3. 记忆技巧（帮助快速理解和记忆的方法）\n4. 易错提醒（常见错误和避免方法）\n5. 进阶练习（2-3道检测题，附答案和解析）\n用中文回复，排版清晰适合打印或截图保存。',
+    systemPrompt: '你是学习方法和知识整理专家。根据用户填写的学科、输出格式、难度和重点，生成一份高效的学习资料。包含：学习目标、核心内容（根据所选格式输出知识卡片或思维导图或口诀或例题或范文）、记忆技巧、易错提醒、进阶练习（2到3道检测题附答案和解析）。排版清晰适合打印或截图保存，不要使用markdown符号如星号和井号。',
   },
   {
     id: 'game-design', icon: <Gamepad2 className="w-5 h-5" />, label: '游戏创作', badge: '🎮', gradient: 'from-blue-500 to-cyan-500', shadow: 'shadow-blue-500/25', accentClasses: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300', selected: 'bg-blue-100 border-blue-300 text-blue-700' },
@@ -122,11 +122,11 @@ const CONFIGS: TypeConfig[] = [
       { name: '诗词大闯关', desc: '古诗填空问答挑战', emoji: '📜', fields: { genre: 'quiz', theme: '中国风', hero: '小书生', mechanic: '看到上一句古诗，从四个选项中选出正确的下一句' } },
       { name: '记忆翻牌', desc: '翻牌配对考验记忆力', emoji: '🃏', fields: { genre: 'match', theme: '校园', hero: '卡牌上的小动物', mechanic: '点击翻牌，两张相同则消除，全部消除即过关' } },
     ],
-    systemPrompt: '你是一个HTML游戏开发专家。根据用户填写的游戏类型、主题风格、主角和玩法描述，生成一个可直接运行的HTML游戏文件。\n\n要求：\n1. 输出完整的HTML文件，包含内嵌CSS和JavaScript\n2. 游戏画面精美，配色和谐，适合学生群体\n3. 使用Canvas或DOM操作实现游戏逻辑\n4. 包含游戏标题、开始按钮、得分/计时显示\n5. 支持键盘和触摸操作（移动端兼容）\n6. 游戏要有明确的结束条件和重新开始功能\n7. 代码需包含中文注释\n8. 输出格式：先输出游戏代码（用```html包裹），再输出玩法说明\n\n示例小游戏方向：\n- clicker类型：物体从上方掉落，玩家移动接住/躲避\n- runner类型：左右/上下移动躲避障碍物\n- reaction类型：随机出现目标，快速点击得分\n- quiz类型：题目显示+选项点击，判断对错\n- match类型：翻牌配对，记忆挑战\n\n确保代码完整可运行，所有资源自包含（不使用外部图片/CDN链接）。',
+    systemPrompt: '你是一个HTML游戏开发专家。根据用户填写的游戏类型、主题风格、主角和玩法描述，生成一个可直接运行的HTML游戏文件。\n\n要求：\n第一，输出完整的HTML文件，包含内嵌CSS和JavaScript。\n第二，游戏画面精美，配色和谐，适合学生群体。\n第三，使用Canvas或DOM操作实现游戏逻辑。\n第四，包含游戏标题、开始按钮、得分或计时显示。\n第五，支持键盘和触摸操作，移动端兼容。\n第六，游戏要有明确的结束条件和重新开始功能。\n第七，输出格式：先用代码块包裹HTML代码，然后附上玩法说明。\n\n确保代码完整可运行，所有资源自包含，不使用外部图片或CDN链接。不要使用markdown符号如星号和井号，标题用换行和空行区分即可。',
   },
 ];
 
-const FREE_SYSTEM_PROMPT = '你是AI创意助手，擅长将用户的想法落地为可执行的创作方案。根据用户描述的创作需求，生成详细的方案。包含：方案概述、执行步骤、所需工具/资源、预期效果。用中文回复，排版清晰。';
+const FREE_SYSTEM_PROMPT = '你是AI创意助手，擅长将用户的想法落地为可执行的创作方案。根据用户描述的创作需求，生成详细的方案。包含：方案概述、执行步骤、所需工具或资源、预期效果。用中文回复，排版清晰，不要使用markdown符号如星号和井号。';
 
 export default function CreateWorkshop() {
   const navigate = useNavigate();
@@ -203,12 +203,15 @@ export default function CreateWorkshop() {
         const fields = activeConfig.fields.map(f =>
           `【${f.label}】${form[f.key] || '（未填写）'}`
         ).join('\n');
+        const maxTokens = activeConfig.id === 'game-design' ? 8192 : undefined;
         const fullText = await sendToDeepSeek(
           [
             { role: 'system', content: activeConfig.systemPrompt },
             { role: 'user', content: `请根据以下需求生成方案：\n\n${fields}` }
           ],
-          (chunk) => setStreamingText(prev => prev + chunk)
+          (chunk) => setStreamingText(prev => prev + chunk),
+          undefined,
+          maxTokens
         );
         setResult(fullText);
       }
@@ -227,6 +230,42 @@ export default function CreateWorkshop() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {}
+  };
+
+    const [chatOpen, setChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([
+    { role: 'assistant', content: '你好！我是创作工坊的AI助手。你可以把生成的内容粘贴给我，我能帮你继续优化、改写、解释，或者回答你的任何问题。' }
+  ]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim() || chatLoading) return;
+    const userMsg = chatInput.trim();
+    setChatInput('');
+    setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setChatLoading(true);
+    try {
+      const history = chatMessages.map(m => ({ role: m.role, content: m.content }));
+      history.push({ role: 'user', content: userMsg });
+      let full = '';
+      const res = await sendToDeepSeek(
+        [{ role: 'system', content: '你是创作工坊的AI助手，回答简洁有用，不要使用markdown符号。' }, ...history],
+        (chunk) => { full += chunk; },
+        undefined,
+        4096
+      );
+      setChatMessages(prev => [...prev, { role: 'assistant', content: full }]);
+    } catch {
+      setChatMessages(prev => [...prev, { role: 'assistant', content: '抱歉，出错了，请稍后再试。' }]);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   const displayText = result || streamingText;
@@ -439,6 +478,79 @@ export default function CreateWorkshop() {
                 >
                   <RefreshCw className="w-3 h-3" /> 重启游戏
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI 助手聊天入口 */}
+        <div className="text-center mt-8">
+          <button
+            onClick={() => setChatOpen(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/80 backdrop-blur-xl rounded-full border border-slate-200/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all text-slate-600 hover:text-indigo-600"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span className="font-medium text-sm">粘贴到这里，AI 帮你继续处理</span>
+            <Sparkles className="w-4 h-4 text-indigo-500" />
+          </button>
+          <p className="text-xs text-slate-400 mt-2">把生成的内容粘贴到对话框，让AI帮你优化、改写或回答疑问</p>
+        </div>
+
+        {/* AI 聊天弹窗 */}
+        {chatOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl overflow-hidden max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="font-semibold text-slate-800 text-sm">创作助手</span>
+                  <span className="text-[10px] text-green-600 font-medium bg-green-50 px-1.5 py-0.5 rounded-full">在线</span>
+                </div>
+                <button onClick={() => setChatOpen(false)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[300px] bg-slate-50/50">
+                {chatMessages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-tr-sm'
+                        : 'bg-white text-slate-700 rounded-tl-sm shadow-sm border border-slate-100'
+                    }`}>
+                      {msg.content}
+                    </div>
+                  </div>
+                ))}
+                {chatLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-slate-100">
+                      <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+                    </div>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+              <div className="p-4 border-t border-slate-100 bg-white">
+                <div className="flex gap-2">
+                  <input
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleChatSend()}
+                    placeholder="粘贴内容或输入问题..."
+                    className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none"
+                    disabled={chatLoading}
+                  />
+                  <button
+                    onClick={handleChatSend}
+                    disabled={chatLoading || !chatInput.trim()}
+                    className="px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:shadow-md transition-all disabled:opacity-50 flex items-center justify-center"
+                  >
+                    {chatLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
