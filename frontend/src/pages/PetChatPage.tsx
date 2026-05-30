@@ -112,7 +112,6 @@ export const PetChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const voicePrimedRef = useRef(false);
   
   // 滚动到底部
   const scrollToBottom = useCallback(() => {
@@ -263,8 +262,8 @@ export const PetChatPage: React.FC = () => {
       
       setMessages(prev => [...prev, assistantMessage]);
       
-      // 自动语音播报（语音已激活且没有在播放）
-      if (voiceEnabled && !isSpeaking) {
+      // 自动语音播报
+      if (voiceEnabled) {
         speakMessage(response);
       }
       
@@ -340,20 +339,6 @@ export const PetChatPage: React.FC = () => {
     window.speechSynthesis.speak(utterance);
   }, [speechLang, ttsSupported, cachedVoices]);
   
-  // 首次激活语音（须在用户手势内调用）
-  const initVoice = useCallback(() => {
-    if (voicePrimedRef.current) return;
-    if (!ttsSupported) return;
-    try {
-      const u = new SpeechSynthesisUtterance(' ');
-      u.volume = 0.01;
-      u.rate = 10;
-      window.speechSynthesis.speak(u);
-      window.speechSynthesis.cancel();
-      voicePrimedRef.current = true;
-    } catch (_) {}
-  }, [ttsSupported]);
-
   // 停止语音
   const stopSpeaking = () => {
     window.speechSynthesis.cancel();
@@ -529,7 +514,9 @@ export const PetChatPage: React.FC = () => {
                     setIsSpeaking(false);
                   } else {
                     setVoiceEnabled(true);
-                    initVoice();
+                    if (personalityData?.greeting) {
+                      speakMessage(personalityData.greeting, true);
+                    }
                   }
                 }}
                 className={`p-2 rounded-xl transition-colors ${
