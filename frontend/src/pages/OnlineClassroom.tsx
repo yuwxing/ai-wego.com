@@ -9,81 +9,95 @@ export default function OnlineClassroom() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 flex flex-col">
-      <header className="flex items-center justify-between px-4 py-3 bg-slate-800/50 border-b border-slate-700 shrink-0">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 flex flex-col">
+      <header className="flex items-center justify-between px-4 py-3 bg-white/80 backdrop-blur-sm border-b border-sky-100 shrink-0">
         <button
           onClick={() => navigate('/learn')}
-          className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-slate-500 hover:text-sky-600 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>返回学习系统</span>
         </button>
-        <h1 className="text-white font-semibold text-lg">在线教室</h1>
+        <h1 className="text-slate-800 font-semibold text-lg">在线教室</h1>
         <div className="w-24" />
       </header>
 
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="max-w-2xl w-full text-center">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-red-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-red-500/30">
-            <GraduationCap className="w-10 h-10 text-white" />
+        <div className="max-w-2xl w-full">
+          {/* 顶部装饰 */}
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-emerald-400 to-sky-400 rounded-3xl flex items-center justify-center shadow-lg shadow-emerald-200/50">
+              <GraduationCap className="w-10 h-10 text-white" />
+            </div>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium mb-4">
+              <Sparkles className="w-4 h-4" />
+              清华大学开源项目 · AI 赋能教学
+            </div>
+            <h2 className="text-3xl font-bold text-slate-800 mb-2">OpenMAIC 在线教室</h2>
+            <p className="text-slate-500">输入课题，AI 自动生成互动课堂，让备课更轻松</p>
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-3">OpenMAIC 在线教室</h2>
-          <p className="text-slate-400 mb-8 text-lg">
-            清华大学开源的多智能体 AI 互动课堂平台
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          {/* 功能卡片 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {[
-              { icon: BookOpen, label: '自动生成课件', color: 'from-blue-500 to-cyan-500' },
-              { icon: Bot, label: 'AI 教师授课', color: 'from-purple-500 to-pink-500' },
-              { icon: MessageSquare, label: '课堂实时互动', color: 'from-green-500 to-emerald-500' },
-              { icon: Sparkles, label: '随堂测验', color: 'from-amber-500 to-orange-500' },
+              { icon: BookOpen, label: '自动生成课件', desc: 'PPT+语音讲解', color: 'from-blue-400 to-cyan-400' },
+              { icon: Bot, label: 'AI 教师授课', desc: '多智能体互动', color: 'from-purple-400 to-pink-400' },
+              { icon: MessageSquare, label: '随堂测验', desc: 'AI 自动评分', color: 'from-emerald-400 to-teal-400' },
+              { icon: Sparkles, label: '互动实验', desc: '模拟+项目制', color: 'from-amber-400 to-orange-400' },
             ].map((item) => (
-              <div key={item.label} className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                <div className={`w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center`}>
+              <div key={item.label} className="p-4 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow text-center">
+                <div className={`w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-sm`}>
                   <item.icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-sm text-slate-300">{item.label}</p>
+                <p className="text-sm font-semibold text-slate-700">{item.label}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{item.desc}</p>
               </div>
             ))}
           </div>
 
-          <div className="space-y-4">
+          {/* 进入教室按钮 */}
+          <div className="text-center mb-8">
             <button
               onClick={openClassroom}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white text-lg font-bold rounded-2xl hover:from-red-400 hover:to-orange-400 transition-all shadow-xl shadow-red-500/30 hover:shadow-2xl hover:-translate-y-0.5"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-emerald-500 to-sky-500 text-white text-lg font-bold rounded-2xl hover:from-emerald-400 hover:to-sky-400 transition-all shadow-lg shadow-emerald-300/40 hover:shadow-xl hover:-translate-y-0.5"
             >
               <GraduationCap className="w-6 h-6" />
               进入教室
               <ExternalLink className="w-5 h-5" />
             </button>
-            <p className="text-sm text-slate-500">
-              点击后将在新标签页打开 open.maic.chat · 输入课题即可生成课程
+            <p className="text-sm text-slate-400 mt-3">
+              将在新标签页打开 open.maic.chat · 无需注册，即开即用
             </p>
           </div>
 
-          <div className="mt-12 p-6 rounded-2xl bg-white/5 border border-white/10 text-left">
-            <h3 className="text-white font-semibold mb-3">使用步骤</h3>
-            <ol className="space-y-2 text-sm text-slate-400">
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-red-500/20 text-red-400 text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
-                <span>点击上方"进入教室"按钮，打开 OpenMAIC</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-red-500/20 text-red-400 text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
-                <span>输入你想教授的课题（如"初中物理欧姆定律"）</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-red-500/20 text-red-400 text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
-                <span>等待 15-30 分钟，AI 自动生成完整课程（课件 + 测验 + 互动实验）</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-red-500/20 text-red-400 text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
-                <span>开始上课！AI 老师授课，学生可随时提问互动</span>
-              </li>
-            </ol>
+          {/* 使用步骤 */}
+          <div className="p-6 rounded-2xl bg-white border border-sky-100 shadow-sm">
+            <h3 className="text-slate-800 font-semibold mb-4 flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-emerald-500" />
+              使用步骤
+            </h3>
+            <div className="grid md:grid-cols-4 gap-4">
+              {[
+                { step: '1', title: '打开教室', desc: '点击上方按钮进入 OpenMAIC' },
+                { step: '2', title: '输入课题', desc: '如"初中物理欧姆定律"' },
+                { step: '3', title: '等待生成', desc: '15-30 分钟自动完成备课' },
+                { step: '4', title: '开始上课', desc: 'AI 老师授课，学生互动' },
+              ].map((item) => (
+                <div key={item.step} className="text-center">
+                  <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-gradient-to-br from-emerald-100 to-sky-100 text-emerald-600 text-sm font-bold flex items-center justify-center">
+                    {item.step}
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700">{item.title}</p>
+                  <p className="text-xs text-slate-400">{item.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* 底部提示 */}
+          <p className="text-center text-xs text-slate-400 mt-6">
+            OpenMAIC 由清华大学 THU-MAIC 团队开发 · 开源项目
+          </p>
         </div>
       </div>
     </div>
