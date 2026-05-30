@@ -161,7 +161,7 @@ export const PetChatPage: React.FC = () => {
   
   // 调用 DeepSeek API
   const callDeepSeekAPI = async (userMessage: string, conversationHistory: Message[]): Promise<string> => {
-    const systemPrompt = personalityData?.personality || '你是一只可爱的宠物，请用友好的语气回答问题。';
+    const systemPrompt = personalityData?.personality || '你是一只萌萌的小宠物，像3-4岁小朋友那样说话：多用叠词（吃饭饭、睡觉觉）、语气词（呀、啦、嘛、呢、哟）、拟声词（嘿嘿、喵呜~、汪汪！），句子短，爱撒娇，活泼俏皮，充满童趣。不要用任何标点符号之外的格式符号。';
     
     // 构建消息历史（最近5条）
     const recentMessages = conversationHistory.slice(-5).map(msg => ({
@@ -223,6 +223,14 @@ export const PetChatPage: React.FC = () => {
   // 发送消息
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
+
+    // Chrome自动播放策略：在用户手势内预解锁SpeechSynthesis（await前执行）
+    try {
+      const prime = new SpeechSynthesisUtterance('');
+      prime.volume = 0;
+      window.speechSynthesis.speak(prime);
+      window.speechSynthesis.cancel();
+    } catch (_) {}
 
     // 检查API Key（拒绝使用默认共享Key）
     const apiKey = getApiKey();
@@ -298,8 +306,8 @@ export const PetChatPage: React.FC = () => {
     
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = speechLang;
-    utterance.rate = 1.1;
-    utterance.pitch = 1.8;
+    utterance.rate = 1.2;
+    utterance.pitch = 2.0;
     
     const availableVoices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
     const voiceStyle = petId ? PET_VOICE_STYLE[petId] || 'young-girl' : 'young-girl';
@@ -316,10 +324,12 @@ export const PetChatPage: React.FC = () => {
           || availableVoices.find(v => v.name.includes('Microsoft Yunjian'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('male'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN'))
-        : availableVoices.find(v => v.name.includes('Microsoft Xiaozhen'))
-          || availableVoices.find(v => v.name.includes('Microsoft Xiaoxiao'))
-          || availableVoices.find(v => v.name.includes('Microsoft Xiaomeng'))
+        : availableVoices.find(v => v.name.includes('Microsoft Xiaomeng'))
           || availableVoices.find(v => v.name.includes('Microsoft Hanhan'))
+          || availableVoices.find(v => v.name.includes('Microsoft Xiaoyi'))
+          || availableVoices.find(v => v.name.includes('Microsoft Xiaochen'))
+          || availableVoices.find(v => v.name.includes('Microsoft Xiaozhen'))
+          || availableVoices.find(v => v.name.includes('Microsoft Xiaoxiao'))
           || availableVoices.find(v => v.name.includes('Microsoft Yaoyao'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('female'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN'));
