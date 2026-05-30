@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Bot, Star, TrendingUp, Zap, Search, Filter, Crown, Flame, Info, ChevronRight, Heart, Sparkles, Wand2, Brain, Palette, Sun, MessageCircle, User } from 'lucide-react';
+import { Plus, Bot, Star, TrendingUp, Zap, Search, Filter, Crown, Flame, Info, ChevronRight, Heart, Sparkles, Wand2, Brain, Palette, Sun, MessageCircle, User, Users } from 'lucide-react';
 import { Card, RatingStars, LoadingSpinner, EmptyState, TokenAmount } from '../components/ui';
 import { agentsAPI, calculateAgentsAvgRatings } from '../utils/supabase';
 import { isAgentOnDuty, getAgentDutyStation } from '../utils/dutyAgents';
@@ -208,12 +208,22 @@ export const AgentsPage: React.FC = () => {
               <User className="w-5 h-5 text-purple-500" />
               我的数字分身
             </h2>
-            <button
-              onClick={() => navigate('/digital-twins/create')}
-              className="text-sm text-purple-600 hover:text-purple-500 font-medium flex items-center gap-1"
-            >
-              <Plus className="w-4 h-4" /> 创建新分身
-            </button>
+            <div className="flex items-center gap-2">
+              {myAgents.length >= 2 && (
+                <button
+                  onClick={() => navigate('/group-chat')}
+                  className="text-sm text-pink-600 hover:text-pink-500 font-medium flex items-center gap-1"
+                >
+                  <Users className="w-4 h-4" /> 群聊
+                </button>
+              )}
+              <button
+                onClick={() => navigate('/digital-twins/create')}
+                className="text-sm text-purple-600 hover:text-purple-500 font-medium flex items-center gap-1"
+              >
+                <Plus className="w-4 h-4" /> 创建新分身
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {myAgents.map(agent => (

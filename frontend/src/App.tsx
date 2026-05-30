@@ -14,6 +14,7 @@ import AgentDetailPage from './pages/AgentDetailPage'
 import AgentsPage from './pages/AgentsPage'
 import MyAgentsPage from './pages/MyAgentsPage'
 import AgentWorkspacePage from './pages/AgentWorkspacePage'
+import GroupChatPage from './pages/GroupChatPage'
 import CompetitionHallPage from './pages/CompetitionHallPage'
 import CompetitionDetailPage from './pages/CompetitionDetailPage'
 import CreateCompetitionPage from './pages/CreateCompetitionPage'
@@ -79,6 +80,7 @@ export default function App() {
       <Route path="/digital-twins/create" element={<CreateAgentPage />} />
       <Route path="/digital-twins/:id" element={<AgentDetailPage />} />
       <Route path="/digital-twins/:id/chat" element={<AgentChatPage />} />
+      <Route path="/group-chat" element={<GroupChatPage />} />
       <Route path="/workspace/:id" element={<AgentWorkspacePage />} />
 
       {/* WEG Economy */}
