@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Sparkles, Wand2, ChevronRight, Loader2, Copy, Check, ArrowLeft, Send, RefreshCw, Palette, Zap, Music, Video, Bot, GraduationCap, Gamepad2, Star, TrendingUp, Clock, Heart, Sun, Play } from 'lucide-react';
+import { Sparkles, Wand2, ChevronRight, Loader2, Copy, Check, ArrowLeft, Send, RefreshCw, Palette, Zap, Music, Video, Bot, GraduationCap, Gamepad2, Star, TrendingUp, Clock, Heart, Sun, Play, X, Maximize2 } from 'lucide-react';
 import { sendToDeepSeek } from '../utils/deepseek';
 import { Card } from '../components/ui';
 
@@ -109,19 +109,20 @@ const CONFIGS: TypeConfig[] = [
   {
     id: 'game-design', icon: <Gamepad2 className="w-5 h-5" />, label: '游戏创作', badge: '🎮', gradient: 'from-blue-500 to-cyan-500', shadow: 'shadow-blue-500/25', accentClasses: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300', selected: 'bg-blue-100 border-blue-300 text-blue-700' },
     fields: [
-      { key: 'genre', label: '游戏类型', placeholder: '如：RPG、解谜、模拟经营',
-        options: [{ label: 'RPG冒险', value: '角色扮演冒险，剧情驱动' }, { label: '解谜逃脱', value: '解谜逃脱，烧脑关卡' }, { label: '模拟经营', value: '模拟经营，养成建造' }, { label: '平台跳跃', value: '平台跳跃，动作闯关' }, { label: '卡牌策略', value: '卡牌策略，构筑牌组' }] },
-      { key: 'setting', label: '世界观', placeholder: '如：科幻、奇幻、校园、历史' },
-      { key: 'hero', label: '主角设定', placeholder: '描述主角的性格、能力和目标' },
-      { key: 'hook', label: '核心玩法', placeholder: '一句话概括游戏的核心玩法' },
+      { key: 'genre', label: '游戏类型', placeholder: '如：点击收集、跑酷、打地鼠',
+        options: [{ label: '点击收集', value: 'clicker' }, { label: '跑酷/躲避', value: 'runner' }, { label: '打地鼠/反应', value: 'reaction' }, { label: '猜谜/问答', value: 'quiz' }, { label: '消除/配对', value: 'match' }] },
+      { key: 'theme', label: '主题风格', placeholder: '如：太空、校园、动物、中国风',
+        options: [{ label: '太空冒险', value: '太空' }, { label: '校园生活', value: '校园' }, { label: '可爱动物', value: '动物' }, { label: '中国风', value: '中国风' }, { label: '奇幻魔法', value: '奇幻' }] },
+      { key: 'hero', label: '主角/元素', placeholder: '如：小火箭、熊猫、侠客' },
+      { key: 'mechanic', label: '玩法一句话', placeholder: '如：点击屏幕跳跃躲避障碍、配对两张相同卡片' },
     ],
     templates: [
-      { name: '梦境修补师', desc: '进入他人梦境的冒险', emoji: '💭', fields: { genre: '角色扮演冒险，剧情驱动', setting: '现代奇幻：有一种职业可以进入他人的梦境，修复噩梦带来的创伤', hero: '新手梦境修补师小梦，能力是具象化想象力，目标是成为最厉害的修补师', hook: '进入不同人的梦境世界，解开心结、打败噩梦怪物、收集梦境碎片' } },
-      { name: '校园异能者', desc: '超能力校园物语', emoji: '🏫', fields: { genre: '角色扮演冒险，剧情驱动', setting: '隐藏着超能力者的普通高中，每个学生都有独特的异能', hero: '转学生小明，能力是"复制"（看到别人异能就能暂时复制使用），目标是揭开学校隐藏的秘密', hook: '白天上课交朋友，晚上用超能力探索学校的神秘地下层' } },
-      { name: '时间咖啡馆', desc: '回到过去的解谜之旅', emoji: '☕', fields: { genre: '解谜逃脱，烧脑关卡', setting: '街角的神秘咖啡馆，喝下咖啡就能回到过去某个时间点', hero: '咖啡馆老板，能调配不同时间的咖啡，帮助客人改变遗憾', hook: '根据客人的故事调配对应时间的咖啡，穿越回去解开当年的谜题' } },
-      { name: '像素宠物', desc: '养成对战小精灵', emoji: '🐣', fields: { genre: '模拟经营，养成建造', setting: '像素世界的宠物岛，生活着各种可爱的像素小动物', hero: '岛上的饲养员，目标是收集全100种像素宠物并建成最棒的宠物乐园', hook: '孵化宠物蛋→喂养进化→训练技能→参加宠物比赛→扩建乐园设施' } },
+      { name: '太空拾荒者', desc: '控制飞船收集星星躲避陨石', emoji: '🚀', fields: { genre: 'runner', theme: '太空', hero: '蓝色小飞船', mechanic: '按空格/点击让飞船上下移动，躲避陨石收集星星' } },
+      { name: '熊猫吃竹笋', desc: '熊猫左右移动接住竹笋', emoji: '🐼', fields: { genre: 'clicker', theme: '动物', hero: '一只圆滚滚的熊猫', mechanic: '左右移动熊猫接住从上方掉落的竹笋，避开炸弹' } },
+      { name: '诗词大闯关', desc: '古诗填空问答挑战', emoji: '📜', fields: { genre: 'quiz', theme: '中国风', hero: '小书生', mechanic: '看到上一句古诗，从四个选项中选出正确的下一句' } },
+      { name: '记忆翻牌', desc: '翻牌配对考验记忆力', emoji: '🃏', fields: { genre: 'match', theme: '校园', hero: '卡牌上的小动物', mechanic: '点击翻牌，两张相同则消除，全部消除即过关' } },
     ],
-    systemPrompt: '你是游戏策划师和世界观构建师。根据用户填写的游戏类型、世界观、主角和核心玩法，生成一份完整的游戏设计方案。包含：\n1. 游戏名称（含副标题）\n2. 一句话卖点（用一句话让人想玩）\n3. 世界观设定（世界背景、核心冲突、关键设定）\n4. 角色设计（主角、NPC、敌人，含性格+外观+能力）\n5. 玩法系统详解（核心循环、关卡设计、成长体系）\n6. 美术风格参考（关键词+参考作品+配色方案）\n7. Demo开发建议（最小的可玩版本包含什么）\n用中文回复，分项清晰。',
+    systemPrompt: '你是一个HTML游戏开发专家。根据用户填写的游戏类型、主题风格、主角和玩法描述，生成一个可直接运行的HTML游戏文件。\n\n要求：\n1. 输出完整的HTML文件，包含内嵌CSS和JavaScript\n2. 游戏画面精美，配色和谐，适合学生群体\n3. 使用Canvas或DOM操作实现游戏逻辑\n4. 包含游戏标题、开始按钮、得分/计时显示\n5. 支持键盘和触摸操作（移动端兼容）\n6. 游戏要有明确的结束条件和重新开始功能\n7. 代码需包含中文注释\n8. 输出格式：先输出游戏代码（用```html包裹），再输出玩法说明\n\n示例小游戏方向：\n- clicker类型：物体从上方掉落，玩家移动接住/躲避\n- runner类型：左右/上下移动躲避障碍物\n- reaction类型：随机出现目标，快速点击得分\n- quiz类型：题目显示+选项点击，判断对错\n- match类型：翻牌配对，记忆挑战\n\n确保代码完整可运行，所有资源自包含（不使用外部图片/CDN链接）。',
   },
 ];
 
@@ -138,8 +139,19 @@ export default function CreateWorkshop() {
   const [copied, setCopied] = useState(false);
   const [streamingText, setStreamingText] = useState('');
   const [showAll, setShowAll] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
 
   const activeConfig = CONFIGS.find(c => c.id === activeType);
+
+  const extractGameHtml = (text: string): string | null => {
+    const match = text.match(/```html\s*([\s\S]*?)```/);
+    if (match) return match[1].trim();
+    if (text.trim().startsWith('<!DOCTYPE html') || text.trim().startsWith('<html') || text.trim().startsWith('<style') || text.trim().startsWith('<script') || text.trim().startsWith('<div') || text.trim().startsWith('<canvas')) {
+      return text.trim();
+    }
+    return null;
+  };
 
   useEffect(() => {
     if (typeParam && CONFIGS.find(c => c.id === typeParam)) {
@@ -398,6 +410,40 @@ export default function CreateWorkshop() {
           </>
         )}
 
+        {/* 游戏预览弹窗 */}
+        {showPreview && previewHtml && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl overflow-hidden max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Gamepad2 className="w-4 h-4 text-emerald-500" />
+                  <span className="font-semibold text-slate-800 text-sm">游戏试玩</span>
+                </div>
+                <button onClick={() => setShowPreview(false)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 bg-slate-900 min-h-[500px]">
+                <iframe
+                  srcDoc={previewHtml}
+                  className="w-full h-full min-h-[500px]"
+                  title="游戏预览"
+                  sandbox="allow-scripts"
+                />
+              </div>
+              <div className="px-5 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+                <span className="text-xs text-slate-400">游戏代码由 AI 生成，刷新页面可重新开始</span>
+                <button
+                  onClick={() => setPreviewHtml(extractGameHtml(result!)!)}
+                  className="px-3 py-1.5 text-xs bg-slate-200 hover:bg-slate-300 rounded-lg transition-colors text-slate-600 flex items-center gap-1"
+                >
+                  <RefreshCw className="w-3 h-3" /> 重启游戏
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 结果展示 */}
         {displayText && (
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-slate-200/50">
@@ -410,6 +456,14 @@ export default function CreateWorkshop() {
                 {loading && <span className="text-xs text-slate-400 animate-pulse ml-1">AI 思考中...</span>}
               </div>
               <div className="flex gap-2">
+                {activeType === 'game-design' && result && !loading && extractGameHtml(result) && (
+                  <button
+                    onClick={() => { setPreviewHtml(extractGameHtml(result)!); setShowPreview(true); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:shadow-md transition-all"
+                  >
+                    <Play className="w-3.5 h-3.5" /> 试玩
+                  </button>
+                )}
                 <button
                   onClick={handleCopy}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-slate-600"
