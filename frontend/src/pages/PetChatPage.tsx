@@ -298,23 +298,29 @@ export const PetChatPage: React.FC = () => {
     
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = speechLang;
-    utterance.rate = 0.9;
-    utterance.pitch = 1.2;
+    utterance.rate = 1.1;
+    utterance.pitch = 1.8;
     
     const availableVoices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
     const voiceStyle = petId ? PET_VOICE_STYLE[petId] || 'young-girl' : 'young-girl';
     const isEn = speechLang.startsWith('en');
     const targetVoice = isEn
-      ? availableVoices.find(v => v.name.includes('Microsoft David'))
-        || availableVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('male'))
+      ? availableVoices.find(v => v.name.includes('Microsoft Ava'))
         || availableVoices.find(v => v.name.includes('Google US English'))
+        || availableVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
         || availableVoices.find(v => v.lang.startsWith('en-US'))
         || availableVoices.find(v => v.lang.startsWith('en'))
       : voiceStyle === 'young-boy'
-        ? availableVoices.find(v => v.name.includes('Microsoft Kangkang'))
+        ? availableVoices.find(v => v.name.includes('Microsoft Yunxi'))
+          || availableVoices.find(v => v.name.includes('Microsoft Kangkang'))
+          || availableVoices.find(v => v.name.includes('Microsoft Yunjian'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('male'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN'))
-        : availableVoices.find(v => v.name.includes('Microsoft Yaoyao'))
+        : availableVoices.find(v => v.name.includes('Microsoft Xiaozhen'))
+          || availableVoices.find(v => v.name.includes('Microsoft Xiaoxiao'))
+          || availableVoices.find(v => v.name.includes('Microsoft Xiaomeng'))
+          || availableVoices.find(v => v.name.includes('Microsoft Hanhan'))
+          || availableVoices.find(v => v.name.includes('Microsoft Yaoyao'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('female'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN'));
     if (targetVoice) utterance.voice = targetVoice;
