@@ -245,7 +245,7 @@ export default function DailyEnglishAdmin() {
             onClick={() => navigate('/admin/listening-speaking')}
             className="px-3 py-1.5 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium"
           >
-            ← 听说训练管理
+            听说训练管理 →
           </button>
         </div>
 
@@ -261,7 +261,12 @@ export default function DailyEnglishAdmin() {
               <label className="block text-xs font-medium text-[#64748B] mb-1.5">话题类别</label>
               <select
                 value={topicCategory}
-                onChange={e => { setTopicCategory(e.target.value); setTopic(''); }}
+                onChange={e => {
+                  const cat = e.target.value;
+                  setTopicCategory(cat);
+                  const first = TOPIC_CATEGORIES.find(c => c.name === cat)?.topics[0] || '';
+                  setTopic(first);
+                }}
                 className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-emerald-300 bg-white"
               >
                 {TOPIC_CATEGORIES.map(c => (
