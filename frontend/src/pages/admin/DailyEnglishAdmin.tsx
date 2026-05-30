@@ -245,7 +245,13 @@ export default function DailyEnglishAdmin() {
             onClick={() => navigate('/admin/listening-speaking')}
             className="px-3 py-1.5 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium"
           >
-            听说训练管理 →
+            听说训练 →
+          </button>
+          <button
+            onClick={() => navigate('/admin/job-square')}
+            className="px-3 py-1.5 text-sm bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors font-medium"
+          >
+            求职广场 →
           </button>
         </div>
 

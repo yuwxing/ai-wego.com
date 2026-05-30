@@ -248,7 +248,13 @@ part_d 范文要完整。`;
             onClick={() => navigate('/admin/daily-english')}
             className="px-3 py-1.5 text-sm bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors font-medium"
           >
-            每日英语管理 →
+            每日英语 →
+          </button>
+          <button
+            onClick={() => navigate('/admin/job-square')}
+            className="px-3 py-1.5 text-sm bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors font-medium"
+          >
+            求职广场 →
           </button>
         </div>
 

@@ -43,6 +43,7 @@ import AdminCompensate from './pages/admin/Compensate'
 import AdminInspections from './pages/admin/Inspections'
 import ListeningSpeakingAdmin from './pages/admin/ListeningSpeakingAdmin'
 import DailyEnglishAdmin from './pages/admin/DailyEnglishAdmin'
+import JobSquareAdmin from './pages/admin/JobSquareAdmin'
 import OnlineClassroom from './pages/OnlineClassroom'
 import NotFound from './pages/NotFound'
 
@@ -113,6 +114,7 @@ export default function App() {
       <Route path="/admin/inspections" element={<AdminInspections />} />
       <Route path="/admin/listening-speaking" element={<ListeningSpeakingAdmin />} />
       <Route path="/admin/daily-english" element={<DailyEnglishAdmin />} />
+      <Route path="/admin/job-square" element={<JobSquareAdmin />} />
 
       {/* Old-to-New Redirects */}
       <Route path="/word-cards" element={<Navigate to="/learn/word-cards" replace />} />
