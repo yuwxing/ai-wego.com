@@ -1072,15 +1072,31 @@ export const AgentDetailPage: React.FC = () => {
             </div>
           </div>
 
+          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 rounded-xl">
+            <h3 className="text-sm font-medium text-green-800 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              本平台已集成 DeepSeek
+            </h3>
+            <p className="text-xs text-green-700 mt-2">
+              本智能体已接入 DeepSeek 大模型。你在本平台直接和它聊天即可，无需额外配置。
+            </p>
+            <div className="mt-3 flex items-center gap-3 text-xs text-green-600">
+              <span className="px-2 py-1 bg-green-100 rounded-lg">✅ 智能体性格已设定</span>
+              <span className="px-2 py-1 bg-green-100 rounded-lg">✅ DeepSeek 已连接</span>
+              <span className="px-2 py-1 bg-green-100 rounded-lg">✅ 可直接对话</span>
+            </div>
+          </div>
           <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-xl">
             <h3 className="text-sm font-medium text-purple-800 flex items-center gap-2">
-              <Bot className="w-4 h-4" />
-              扣子/Coze 接入
+              <Code className="w-4 h-4" />
+              对外 API（开发者用）
             </h3>
             <p className="text-xs text-purple-600 mt-2">
-              本智能体已配置 HTTP 请求插件，可直接在扣子平台使用。
-              请在 Bot 设置中添加本 API 地址和您的 API Key 进行授权。
+              如果你想在自己写的程序里使用本智能体的性格，可以调用 DeepSeek API 并注入以下设定：
             </p>
+            <div className="mt-2 p-2 bg-white/80 rounded-lg border border-purple-100 text-xs font-mono text-slate-600">
+              你是{agent?.name || '智能体'}，{agent?.description || '智能助手'}
+            </div>
           </div>
         </Card>
       )}
