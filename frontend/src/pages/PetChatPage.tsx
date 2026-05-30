@@ -106,11 +106,13 @@ export const PetChatPage: React.FC = () => {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cachedVoices, setCachedVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const voicePrimedRef = useRef(false);
   
   // 滚动到底部
   const scrollToBottom = useCallback(() => {
@@ -224,14 +226,6 @@ export const PetChatPage: React.FC = () => {
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
 
-    // Chrome自动播放策略：在用户手势内预解锁SpeechSynthesis（await前执行）
-    try {
-      const prime = new SpeechSynthesisUtterance('');
-      prime.volume = 0;
-      window.speechSynthesis.speak(prime);
-      window.speechSynthesis.cancel();
-    } catch (_) {}
-
     // 检查API Key（拒绝使用默认共享Key）
     const apiKey = getApiKey();
     const DEFAULT_KEY = 'sk-6b389e1afd534d07b9d63b8aca7320b6';
@@ -269,8 +263,8 @@ export const PetChatPage: React.FC = () => {
       
       setMessages(prev => [...prev, assistantMessage]);
       
-      // 自动语音播报（如果当前没有在播放）
-      if (!isSpeaking) {
+      // 自动语音播报（语音已激活且没有在播放）
+      if (voiceEnabled && !isSpeaking) {
         speakMessage(response);
       }
       
@@ -294,12 +288,11 @@ export const PetChatPage: React.FC = () => {
   // 语音合成（TTS）
   const ttsSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   
-  const speakMessage = useCallback((text: string) => {
+  const speakMessage = useCallback((text: string, retryOnFail = true) => {
     if (!ttsSupported) return;
     
     window.speechSynthesis.cancel();
     
-    // 处理 Chrome bug: 恢复暂停状态
     if (window.speechSynthesis.paused) {
       window.speechSynthesis.resume();
     }
@@ -320,8 +313,8 @@ export const PetChatPage: React.FC = () => {
         || availableVoices.find(v => v.lang.startsWith('en'))
       : voiceStyle === 'young-boy'
         ? availableVoices.find(v => v.name.includes('Microsoft Yunxi'))
-          || availableVoices.find(v => v.name.includes('Microsoft Kangkang'))
           || availableVoices.find(v => v.name.includes('Microsoft Yunjian'))
+          || availableVoices.find(v => v.name.includes('Microsoft Kangkang'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('male'))
           || availableVoices.find(v => v.lang.startsWith('zh-CN'))
         : availableVoices.find(v => v.name.includes('Microsoft Xiaomeng'))
@@ -337,11 +330,30 @@ export const PetChatPage: React.FC = () => {
     
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      if (retryOnFail) {
+        setTimeout(() => speakMessage(text, false), 500);
+      }
+    };
     
     window.speechSynthesis.speak(utterance);
   }, [speechLang, ttsSupported, cachedVoices]);
   
+  // 首次激活语音（须在用户手势内调用）
+  const initVoice = useCallback(() => {
+    if (voicePrimedRef.current) return;
+    if (!ttsSupported) return;
+    try {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0.01;
+      u.rate = 10;
+      window.speechSynthesis.speak(u);
+      window.speechSynthesis.cancel();
+      voicePrimedRef.current = true;
+    } catch (_) {}
+  }, [ttsSupported]);
+
   // 停止语音
   const stopSpeaking = () => {
     window.speechSynthesis.cancel();
@@ -510,15 +522,26 @@ export const PetChatPage: React.FC = () => {
               {/* 语音开关 */}
               {ttsSupported && (
               <button
-                onClick={isSpeaking ? stopSpeaking : () => {}}
+                onClick={() => {
+                  if (voiceEnabled) {
+                    setVoiceEnabled(false);
+                    window.speechSynthesis.cancel();
+                    setIsSpeaking(false);
+                  } else {
+                    setVoiceEnabled(true);
+                    initVoice();
+                  }
+                }}
                 className={`p-2 rounded-xl transition-colors ${
-                  isSpeaking 
-                    ? 'bg-pink-100 text-pink-600 animate-pulse' 
-                    : 'bg-purple-50 text-purple-600 hover:bg-purple-100'
+                  voiceEnabled && isSpeaking
+                    ? 'bg-pink-100 text-pink-600 animate-pulse'
+                    : voiceEnabled
+                      ? 'bg-pink-100 text-pink-600'
+                      : 'bg-purple-50 text-purple-600 hover:bg-purple-100'
                 }`}
-                title={isSpeaking ? '停止播报' : '自动播报'}
+                title={voiceEnabled ? '关闭语音' : '开启语音'}
               >
-                {isSpeaking ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                {voiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
               </button>
               )}
             </div>
