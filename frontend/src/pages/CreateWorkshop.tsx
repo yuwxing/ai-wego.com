@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Sparkles, Wand2, ChevronRight, Loader2, Copy, Check, Image, User, Smile, BookMarked, Gamepad2, ArrowLeft, Send, RefreshCw, Monitor, Smartphone, Sun, Moon, Palette, Heart, Zap, Cloud, Flame, Music, Tv, Camera, Coffee, Globe, Star, CloudMoon } from 'lucide-react';
+import { Sparkles, Wand2, ChevronRight, Loader2, Copy, Check, ArrowLeft, Send, RefreshCw, Palette, Zap, Music, Video, Bot, GraduationCap, Gamepad2, Star, TrendingUp, Clock, Heart, Sun, Play } from 'lucide-react';
 import { sendToDeepSeek } from '../utils/deepseek';
 import { Card } from '../components/ui';
 
 interface Field {
   key: string;
   label: string;
-  icon: React.ReactNode;
   placeholder: string;
-  options?: { label: string; value: string; icon?: string }[];
+  options?: { label: string; value: string }[];
 }
 
 interface Template {
@@ -23,7 +22,10 @@ interface TypeConfig {
   id: string;
   icon: React.ReactNode;
   label: string;
-  color: string;
+  badge: string;
+  gradient: string;
+  shadow: string;
+  accentClasses: { bg: string; text: string; border: string; selected: string };
   fields: Field[];
   templates: Template[];
   systemPrompt: string;
@@ -31,100 +33,99 @@ interface TypeConfig {
 
 const CONFIGS: TypeConfig[] = [
   {
-    id: 'wallpaper', icon: <Image className="w-5 h-5" />, label: '屏保生成', color: 'from-blue-500 to-cyan-500',
+    id: 'short-video', icon: <Video className="w-5 h-5" />, label: '短视频脚本', badge: '🔥 热门', gradient: 'from-pink-500 to-rose-500', shadow: 'shadow-pink-500/25', accentClasses: { bg: 'bg-pink-100', text: 'text-pink-700', border: 'border-pink-300', selected: 'bg-pink-100 border-pink-300 text-pink-700' },
     fields: [
-      { key: 'theme', label: '主题风格', icon: <Palette className="w-3.5 h-3.5" />, placeholder: '如：赛博朋克、水墨山水、星空极光',
-        options: [{ label: '赛博朋克', value: '赛博朋克城市夜景，霓虹灯光' }, { label: '水墨山水', value: '中国传统水墨山水，留白意境' }, { label: '星空极光', value: '星空银河，极光流动' }, { label: '日系清新', value: '日系动漫风格，清新自然' }, { label: '抽象几何', value: '抽象几何图案，现代简约' }] },
-      { key: 'color', label: '主色调', icon: <Palette className="w-3.5 h-3.5" />, placeholder: '如：蓝紫、暖橙、黑白',
-        options: [{ label: '蓝紫色', value: '蓝紫色调为主，神秘深邃' }, { label: '暖橙色', value: '暖橙黄调为主，温暖治愈' }, { label: '青绿色', value: '青绿调为主，清新自然' }, { label: '粉紫色', value: '粉紫调为主，浪漫温柔' }, { label: '黑白灰', value: '黑白灰色调，简约高级' }] },
-      { key: 'device', label: '适用设备', icon: <Smartphone className="w-3.5 h-3.5" />, placeholder: '手机或电脑',
-        options: [{ label: '手机竖屏', value: '手机竖屏壁纸 9:16' }, { label: '电脑横屏', value: '电脑桌面壁纸 16:9' }, { label: '平板', value: '平板壁纸 4:3' }] },
-      { key: 'mood', label: '氛围感', icon: <Sun className="w-3.5 h-3.5" />, placeholder: '如：宁静、炫酷、治愈',
-        options: [{ label: '宁静', value: '宁静平和，让人放松' }, { label: '炫酷', value: '炫酷科技感，视觉冲击' }, { label: '治愈', value: '温暖治愈，心情愉悦' }, { label: '梦幻', value: '梦幻迷离，充满想象' }, { label: '极简', value: '极简干净，不打扰视线' }] },
+      { key: 'platform', label: '发布平台', placeholder: '抖音 / 小红书 / B站',
+        options: [{ label: '抖音', value: '抖音（竖屏9:16，15-60秒）' }, { label: '小红书', value: '小红书（图文+视频，精致风格）' }, { label: 'B站', value: 'B站（横屏16:9，1-5分钟）' }, { label: '视频号', value: '微信视频号（横竖皆可）' }] },
+      { key: 'topic', label: '视频主题', placeholder: '如：校园日常、学习vlog、好物推荐' },
+      { key: 'style', label: '风格调性', placeholder: '如：搞笑、治愈、干货、燃',
+        options: [{ label: '搞笑整活', value: '搞笑幽默，节奏明快，反转不断' }, { label: '治愈温暖', value: '温暖治愈，配乐舒缓，画面唯美' }, { label: '知识干货', value: '干货输出，信息密度高，条理清晰' }, { label: '燃向剪辑', value: '热血燃向，快节奏卡点，视觉冲击' }, { label: '沉浸体验', value: '沉浸式体验，第一人称视角，ASMR风格' }] },
+      { key: 'duration', label: '视频时长', placeholder: '15秒 / 30秒 / 60秒',
+        options: [{ label: '15秒', value: '15秒（极速完播，适合梗/反转）' }, { label: '30秒', value: '30秒（标准短视频，信息量适中）' }, { label: '60秒', value: '60秒（深度内容，适合知识分享）' }] },
     ],
     templates: [
-      { name: '赛博都市', desc: '霓虹雨夜赛博朋克城市', emoji: '🌃', fields: { theme: '赛博朋克城市夜景，霓虹灯光', color: '蓝紫色调为主，神秘深邃', device: '手机竖屏壁纸 9:16', mood: '炫酷科技感，视觉冲击' } },
-      { name: '星空极光', desc: '极光银河下的雪山剪影', emoji: '🌌', fields: { theme: '星空银河，极光流动', color: '青绿调为主，清新自然', device: '电脑桌面壁纸 16:9', mood: '宁静平和，让人放松' } },
-      { name: '水墨江南', desc: '烟雨江南水墨画卷', emoji: '🏯', fields: { theme: '中国传统水墨山水，留白意境', color: '黑白灰色调，简约高级', device: '手机竖屏壁纸 9:16', mood: '宁静平和，让人放松' } },
-      { name: '樱花物语', desc: '粉色樱花飘落校园', emoji: '🌸', fields: { theme: '日系动漫风格，清新自然', color: '粉紫调为主，浪漫温柔', device: '手机竖屏壁纸 9:16', mood: '温暖治愈，心情愉悦' } },
+      { name: '考试逆袭', desc: '从学渣到学霸的奋斗故事', emoji: '📚', fields: { platform: '抖音（竖屏9:16，15-60秒）', topic: '考前30天逆袭计划，从400分到600分', style: '热血燃向，快节奏卡点，视觉冲击', duration: '30秒（标准短视频，信息量适中）' } },
+      { name: '宿舍日常', desc: '当代大学生精神状态', emoji: '🏠', fields: { platform: 'B站（横屏16:9，1-5分钟）', topic: '大学生宿舍的离谱日常，室友之间的爆笑互动', style: '搞笑幽默，节奏明快，反转不断', duration: '60秒（深度内容，适合知识分享）' } },
+      { name: '好物种草', desc: '学生党必备神器推荐', emoji: '🎒', fields: { platform: '小红书（图文+视频，精致风格）', topic: '学生党提升效率的5个神器，价格不过百', style: '知识干货，信息密度高，条理清晰', duration: '30秒（标准短视频，信息量适中）' } },
+      { name: '校园vlog', desc: '沉浸式体验一天校园生活', emoji: '🎬', fields: { platform: '抖音（竖屏9:16，15-60秒）', topic: '沉浸式体验大学生的一天：早八→食堂→图书馆→社团', style: '沉浸体验，第一人称视角，ASMR风格', duration: '60秒（深度内容，适合知识分享）' } },
     ],
-    systemPrompt: '你是屏保壁纸设计专家。根据用户填写的主题、色调、设备和氛围，生成屏保设计稿。包含：\n1. 画面描述（详细构图、色彩搭配、核心元素、光影效果）\n2. 设计理念（为什么这样设计）\n3. 适用场景（锁屏/桌面/浅色/深色模式建议）\n4. 推荐配色色值（HEX代码）\n用中文回复，排版清晰有条理。',
+    systemPrompt: '你是短视频编剧和策划专家。根据用户填写的平台、主题、风格和时长，生成一份可执行的短视频脚本。包含：\n1. 视频标题（吸引眼球的标题，包含SEO关键词）\n2. 核心创意（一句话概括视频亮点，为什么观众会看完）\n3. 分镜脚本（按时间轴逐秒列出：画面描述、运镜方式、台词/旁白、音效/BGM、字幕文案）\n4. 拍摄建议（设备、光线、构图、后期剪辑要点）\n5. 发布优化（封面建议、话题标签、发布时间建议）\n用中文回复，分镜部分表格排版。',
   },
   {
-    id: 'avatar', icon: <User className="w-5 h-5" />, label: '头像制作', color: 'from-pink-500 to-rose-500',
+    id: 'digital-twin', icon: <Bot className="w-5 h-5" />, label: 'AI数字分身', badge: '✨ 全新', gradient: 'from-violet-500 to-purple-500', shadow: 'shadow-violet-500/25', accentClasses: { bg: 'bg-violet-100', text: 'text-violet-700', border: 'border-violet-300', selected: 'bg-violet-100 border-violet-300 text-violet-700' },
     fields: [
-      { key: 'style', label: '风格', icon: <Palette className="w-3.5 h-3.5" />, placeholder: '如：日系动漫、写实、Q版',
-        options: [{ label: '日系动漫', value: '日系二次元动漫风格' }, { label: '写实', value: '写实风格，细节丰富' }, { label: 'Q版', value: 'Q版可爱风格' }, { label: '古风', value: '古风手绘风格' }, { label: '像素', value: '复古像素风格' }] },
-      { key: 'character', label: '角色描述', icon: <User className="w-3.5 h-3.5" />, placeholder: '如：短发女生戴圆框眼镜、猫耳少年' },
-      { key: 'expression', label: '表情', icon: <Smile className="w-3.5 h-3.5" />, placeholder: '如：微笑、酷、呆萌',
-        options: [{ label: '微笑', value: '自然微笑，亲切友好' }, { label: '酷', value: '冷峻酷飒，不苟言笑' }, { label: '呆萌', value: '呆萌可爱，眼神无辜' }, { label: '开心', value: '开怀大笑，阳光灿烂' }, { label: '温柔', value: '温柔含蓄，浅浅微笑' }] },
-      { key: 'bg', label: '背景', icon: <Image className="w-3.5 h-3.5" />, placeholder: '如：纯色渐变、樱花、星空',
-        options: [{ label: '纯色渐变', value: '纯色渐变背景' }, { label: '樱花', value: '飘落的樱花背景' }, { label: '星空', value: '星空银河背景' }, { label: '抽象', value: '抽象几何图案背景' }, { label: '透明', value: '透明背景（无背景）' }] },
+      { key: 'role', label: '角色定位', placeholder: '如：学习助手、情感树洞、游戏队友',
+        options: [{ label: '学习搭子', value: '学习搭子，陪你一起学习进步' }, { label: '情感树洞', value: '知心朋友，倾听烦恼给出建议' }, { label: '虚拟学长', value: '经验丰富的学长学姐，解答校园问题' }, { label: '游戏队友', value: '一起打游戏的搭子，吐槽聊天' }, { label: 'AI笔友', value: '文艺风格的笔友，写信交流' }] },
+      { key: 'personality', label: '性格设定', placeholder: '如：温柔、搞笑、毒舌',
+        options: [{ label: '温柔体贴', value: '温柔有耐心，说话轻声细语，包容理解' }, { label: '幽默搞笑', value: '活泼幽默，爱开玩笑，金句频出' }, { label: '毒舌吐槽', value: '毒舌犀利，一针见血，吐槽技能满点' }, { label: '学霸高冷', value: '高冷学霸，话少但每句都有用' }, { label: '呆萌可爱', value: '呆萌天然呆，偶尔犯傻很可爱' }] },
+      { key: 'background', label: '背景故事', placeholder: '给AI分身设定一个人设背景' },
+      { key: 'scene', label: '对话场景', placeholder: '日常闲聊 / 学习陪伴 / 情感咨询',
+        options: [{ label: '日常闲聊', value: '日常闲聊，分享生活趣事和心情' }, { label: '学习陪伴', value: '一起学习、督促打卡、解答问题' }, { label: '情感咨询', value: '倾听烦恼，给出情感建议和安慰' }, { label: '脑洞聊天', value: '天马行空的想象力对话，一起编故事' }] },
     ],
     templates: [
-      { name: '动漫女生', desc: '短发女生微笑校园风', emoji: '👧', fields: { style: '日系二次元动漫风格', character: '短发女生，齐刘海，戴圆框眼镜，穿校服', expression: '自然微笑，亲切友好', bg: '纯色渐变背景' } },
-      { name: 'Q版小猫', desc: '猫耳少年呆萌可爱', emoji: '🐱', fields: { style: 'Q版可爱风格', character: '橘猫拟人少年，猫耳猫尾，穿连帽卫衣', expression: '呆萌可爱，眼神无辜', bg: '纯色渐变背景' } },
-      { name: '古风侠客', desc: '黑衣剑客冷峻霸气', emoji: '⚔️', fields: { style: '古风手绘风格', character: '古风黑衣侠客，长发束冠，佩剑', expression: '冷峻酷飒，不苟言笑', bg: '抽象几何图案背景' } },
-      { name: '像素英雄', desc: '复古像素RPG主角', emoji: '🕹️', fields: { style: '复古像素风格', character: '8bit风格勇者，金发蓝衣持剑', expression: '开心自信', bg: '星空银河背景' } },
+      { name: '温柔学姐', desc: '暖心陪伴学习的学姐', emoji: '👩‍🎓', fields: { role: '学习搭子，陪你一起学习进步', personality: '温柔有耐心，说话轻声细语，包容理解', background: '大四学姐，成绩年级第一，考研上岸985，课余喜欢帮助学弟学妹', scene: '一起学习、督促打卡、解答问题' } },
+      { name: '搞笑室友', desc: '宿舍里最皮的兄弟', emoji: '😎', fields: { role: '一起打游戏的搭子，吐槽聊天', personality: '活泼幽默，爱开玩笑，金句频出', background: '宿舍里的气氛担当，全校最会整活的男人，但关键时刻也很靠谱', scene: '日常闲聊，分享生活趣事和心情' } },
+      { name: '知心树洞', desc: '倾听你所有烦恼', emoji: '🌲', fields: { role: '知心朋友，倾听烦恼给出建议', personality: '温柔有耐心，说话轻声细语，包容理解', background: '心理学专业学生，长期担任学校心理热线志愿者，擅长倾听和共情', scene: '倾听烦恼，给出情感建议和安慰' } },
+      { name: '毒舌学霸', desc: '骂醒你的学习搭子', emoji: '📖', fields: { role: '学习搭子，陪你一起学习进步', personality: '毒舌犀利，一针见血，吐槽技能满点', background: '奥赛金牌得主，保送清华，最看不惯别人不努力的样子', scene: '一起学习、督促打卡、解答问题' } },
     ],
-    systemPrompt: '你是头像设计专家。根据用户填写的风格、角色、表情和背景，生成个性化头像设计方案。包含：\n1. 整体设计描述（构图、色彩、风格要点）\n2. 细节刻画（发型、眼睛、服装等特征）\n3. 色彩搭配方案\n4. 适用平台建议（微信/QQ/微博/抖音/小红书等）\n用中文回复，分点列出。',
+    systemPrompt: '你是AI角色设计专家。根据用户填写的角色定位、性格、背景和对话场景，设计一个完整的AI数字分身角色设定。包含：\n1. 角色档案（姓名、年龄、身份、口头禅）\n2. 性格特征（3-5个关键词，详细描述说话方式和语气）\n3. 背景故事（300字以内的人设故事）\n4. 对话风格示例（和这个角色聊天会有怎样的互动，给5个示例对话）\n5. 知识库建议（角色应该掌握哪些领域的知识）\n6. 形象描述（外貌、穿着、常用表情/动作）\n用中文回复，分点列出。',
   },
   {
-    id: 'emoji', icon: <Smile className="w-5 h-5" />, label: '表情包生成', color: 'from-yellow-500 to-orange-500',
+    id: 'music', icon: <Music className="w-5 h-5" />, label: 'AI音乐创作', badge: '🎵 新潮', gradient: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25', accentClasses: { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-300', selected: 'bg-amber-100 border-amber-300 text-amber-700' },
     fields: [
-      { key: 'topic', label: '主题', icon: <Heart className="w-3.5 h-3.5" />, placeholder: '如：打工人、猫咪、熊猫头',
-        options: [{ label: '打工人', value: '打工人日常' }, { label: '猫咪', value: '猫咪卖萌搞笑' }, { label: '熊猫头', value: '熊猫头梗图' }, { label: '学生党', value: '学生党上课日常' }, { label: '吃货', value: '吃货美食表情' }] },
-      { key: 'style', label: '风格', icon: <Palette className="w-3.5 h-3.5" />, placeholder: '如：手绘、梗图、文字',
-        options: [{ label: '手绘风', value: '手绘涂鸦风格' }, { label: '梗图风', value: '网络梗图风格，带文字' }, { label: '文字风', value: '纯文字表情包，大字报风格' }, { label: '3D风', value: '3D渲染风格' }] },
-      { key: 'count', label: '数量', icon: <Star className="w-3.5 h-3.5" />, placeholder: '生成几个表情',
-        options: [{ label: '6个', value: '6' }, { label: '8个', value: '8' }, { label: '12个', value: '12' }] },
+      { key: 'genre', label: '音乐风格', placeholder: '如：流行、Rap、古风、电子',
+        options: [{ label: '流行', value: '流行Pop，旋律上口，传唱度高' }, { label: '说唱Rap', value: '说唱Hip-Hop，节奏感强，歌词犀利' }, { label: '古风', value: '古风，中国风旋律，诗意歌词' }, { label: '电子', value: '电子Electronic，合成器音色，律动感' }, { label: '民谣', value: '民谣Folk，吉他伴奏，叙事感强' }, { label: 'R&B', value: 'R&B，转音丰富，氛围感强' }] },
+      { key: 'theme', label: '创作主题', placeholder: '如：青春、梦想、暗恋、毕业' },
+      { key: 'mood', label: '情绪基调', placeholder: '如：欢快、伤感、燃、治愈',
+        options: [{ label: '欢快元气', value: '欢快元气，正能量满满' }, { label: '温柔伤感', value: '温柔伤感，触动心弦' }, { label: '热血燃向', value: '热血励志，让人充满力量' }, { label: '治愈温暖', value: '治愈温暖，像冬日阳光' }, { label: '酷飒炸裂', value: '酷飒有态度，个性十足' }] },
     ],
     templates: [
-      { name: '打工人日记', desc: '周一摸鱼到周五下班', emoji: '💼', fields: { topic: '打工人日常', style: '网络梗图风格，带文字', count: '8' } },
-      { name: '猫咪哲学', desc: '猫猫的冷笑话与人生', emoji: '🐱', fields: { topic: '猫咪卖萌搞笑', style: '手绘涂鸦风格', count: '6' } },
-      { name: '考试退散', desc: '学生党考前的精神状态', emoji: '📚', fields: { topic: '学生党上课日常', style: '网络梗图风格，带文字', count: '8' } },
-      { name: '干饭时间', desc: '吃货的美食哲学', emoji: '🍜', fields: { topic: '吃货美食表情', style: '手绘涂鸦风格', count: '6' } },
+      { name: '毕业不说再见', desc: '写给青春的一首歌', emoji: '🎓', fields: { genre: '流行Pop，旋律上口，传唱度高', theme: '毕业季告别，感谢相遇，期待重逢', mood: '温柔伤感，触动心弦' } },
+      { name: '少年自有锋芒', desc: '热血励志说唱', emoji: '🎤', fields: { genre: '说唱Hip-Hop，节奏感强，歌词犀利', theme: '不被定义的青春，勇敢做自己', mood: '热血励志，让人充满力量' } },
+      { name: '烟雨入江南', desc: '唯美古风词曲', emoji: '🏯', fields: { genre: '古风，中国风旋律，诗意歌词', theme: '江南烟雨中的邂逅与离别', mood: '温柔伤感，触动心弦' } },
+      { name: '夏日汽水', desc: '元气满满的夏日恋曲', emoji: '🥤', fields: { genre: '流行Pop，旋律上口，传唱度高', theme: '夏日暗恋，甜甜的校园爱情', mood: '欢快元气，正能量满满' } },
     ],
-    systemPrompt: '你是表情包设计师。根据用户填写的主题、风格和数量，生成一套表情包设计方案。包含：\n1. 系列名称和主题说明\n2. 每个表情的详细设计（序号、文案、画面描述、使用场景）\n3. 设计风格要点（配色、字体、构图建议）\n4. 整套表情包的使用场景建议\n用中文回复，每个表情独立一段。',
+    systemPrompt: '你是AI音乐创作人。根据用户填写的风格、主题和情绪，生成一份完整的音乐创作方案。包含：\n1. 歌曲名称（3个备选，含寓意解释）\n2. 歌词（主歌2段、副歌、桥段，标注押韵格式）\n3. 曲风描述（速度BPM、调式、乐器编排、节奏型）\n4. 结构编排（前奏→主歌→副歌→间奏→主歌→副歌→桥段→副歌→尾奏，标注每段时长）\n5. 演唱建议（音域、发声方式、情绪表达）\n6. 封面设计概念（视觉方向）\n用中文回复，歌词部分格式清晰分段。',
   },
   {
-    id: 'comic', icon: <BookMarked className="w-5 h-5" />, label: '漫画故事', color: 'from-purple-500 to-indigo-500',
+    id: 'study-boost', icon: <GraduationCap className="w-5 h-5" />, label: '学习加速器', badge: '📚', gradient: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/25', accentClasses: { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-300', selected: 'bg-emerald-100 border-emerald-300 text-emerald-700' },
     fields: [
-      { key: 'genre', label: '题材', icon: <Globe className="w-3.5 h-3.5" />, placeholder: '如：校园、奇幻、悬疑',
-        options: [{ label: '校园日常', value: '校园日常生活' }, { label: '奇幻冒险', value: '奇幻魔法冒险' }, { label: '悬疑推理', value: '悬疑推理' }, { label: '科幻未来', value: '科幻未来世界' }, { label: '治愈温馨', value: '治愈温馨日常' }] },
-      { key: 'characters', label: '主角设定', icon: <User className="w-3.5 h-3.5" />, placeholder: '描述主角姓名、性格、外形' },
-      { key: 'setting', label: '背景世界观', icon: <Globe className="w-3.5 h-3.5" />, placeholder: '如：现代校园、魔法学院、未来都市' },
-      { key: 'hook', label: '故事引子', icon: <Zap className="w-3.5 h-3.5" />, placeholder: '一句话概括故事起因' },
-      { key: 'panels', label: '分镜数量', icon: <Image className="w-3.5 h-3.5" />, placeholder: '4格/8格',
-        options: [{ label: '4格漫画', value: '4' }, { label: '8格短篇', value: '8' }] },
+      { key: 'subject', label: '学科/知识点', placeholder: '如：英语语法、二次函数、牛顿定律',
+        options: [{ label: '英语', value: '英语（词汇、语法、作文）' }, { label: '数学', value: '数学（函数、几何、概率）' }, { label: '物理', value: '物理（力学、电学、光学）' }, { label: '语文', value: '语文（古诗文、作文、阅读理解）' }, { label: '化学', value: '化学（方程式、实验、元素周期表）' }, { label: '历史', value: '历史（时间线、事件、人物）' }] },
+      { key: 'format', label: '输出格式', placeholder: '如：知识卡片、思维导图、记忆口诀',
+        options: [{ label: '知识卡片', value: '知识卡片（一页一个知识点，图文并茂）' }, { label: '思维导图', value: '思维导图（层级结构，关联清晰）' }, { label: '记忆口诀', value: '记忆口诀（朗朗上口，过目不忘）' }, { label: '例题精讲', value: '例题精讲（典型题+解题思路+变式训练）' }, { label: '作文范文', value: '作文范文（题目+框架+范文+点评）' }] },
+      { key: 'difficulty', label: '难度', placeholder: '中考 / 高考 / 大学',
+        options: [{ label: '中考', value: '中考难度（初三水平）' }, { label: '高考', value: '高考难度（高中水平）' }, { label: '大学', value: '大学难度（高等水平）' }] },
+      { key: 'focus', label: '痛点/重点', placeholder: '最想突破的知识点或题型' },
     ],
     templates: [
-      { name: '转学生之谜', desc: '神秘转学生的校园故事', emoji: '🏫', fields: { genre: '校园日常生活', characters: '小明，初二男生，好奇心强但胆子小；小月，神秘转学生，总是戴着帽子', setting: '普通初中校园，但有个流传已久的神秘传说', hook: '新转来的同学小月似乎和学校百年传说有关...', panels: '8' } },
-      { name: '魔法学徒', desc: '菜鸟魔法师的冒险', emoji: '🔮', fields: { genre: '奇幻魔法冒险', characters: '小可，12岁魔法学徒，总是念错咒语；导师老白，退休大魔法师', setting: '漂浮在云端的魔法学院', hook: '期末考试前一天，小可意外把院长变成了青蛙...', panels: '8' } },
-      { name: '未来快递员', desc: '星际快递员的日常', emoji: '🚀', fields: { genre: '科幻未来世界', characters: '星仔，18岁星际快递员，开一艘破旧的送货车', setting: '赛博朋克风格的外星星球', hook: '今天最后一单快递，地址写着"宇宙尽头"', panels: '4' } },
-      { name: '猫与少年', desc: '流浪猫治愈孤独少年', emoji: '🐱', fields: { genre: '治愈温馨日常', characters: '阿杰，沉默寡言的初中生；小橘，一只会主动蹭人的流浪橘猫', setting: '南方小城的老街区', hook: '阿杰在学校没有朋友，直到他在回家路上遇到了小橘', panels: '4' } },
+      { name: '英语时态通', desc: '一张图搞定16种时态', emoji: '📖', fields: { subject: '英语（词汇、语法、作文）', format: '思维导图（层级结构，关联清晰）', difficulty: '高考难度（高中水平）', focus: '动词时态总是混淆，特别是完成时和进行时的区别' } },
+      { name: '函数图像集', desc: '初中函数一网打尽', emoji: '📈', fields: { subject: '数学（函数、几何、概率）', format: '知识卡片（一页一个知识点，图文并茂）', difficulty: '中考难度（初三水平）', focus: '一次函数、二次函数、反比例函数的图像和性质' } },
+      { name: '古诗文速记', desc: '高考必背篇目口诀', emoji: '📜', fields: { subject: '语文（古诗文、作文、阅读理解）', format: '记忆口诀（朗朗上口，过目不忘）', difficulty: '高考难度（高中水平）', focus: '高考必背64篇古诗文，容易忘记和混淆' } },
+      { name: '物理公式卡', desc: '力学电磁公式+例题', emoji: '⚡', fields: { subject: '物理（力学、电学、光学）', format: '例题精讲（典型题+解题思路+变式训练）', difficulty: '高考难度（高中水平）', focus: '牛顿定律和电磁学的综合应用题' } },
     ],
-    systemPrompt: '你是漫画编剧。根据用户填写的题材、角色、世界观、故事引子和分镜数量，生成短篇漫画脚本。包含：\n1. 漫画标题\n2. 角色设定表（姓名、年龄、性格、外形特征）\n3. 分镜脚本（每格画面描述、对白台词、背景说明）\n4. 整体风格建议（画风、配色、字体）\n用中文回复，分镜独立编号。',
+    systemPrompt: '你是学习方法和知识整理专家。根据用户填写的学科、输出格式、难度和重点，生成一份高效的学习资料。包含：\n1. 学习目标（这个资料能解决什么问题）\n2. 核心内容（根据所选格式输出：知识卡片/思维导图/口诀/例题/范文）\n3. 记忆技巧（帮助快速理解和记忆的方法）\n4. 易错提醒（常见错误和避免方法）\n5. 进阶练习（2-3道检测题，附答案和解析）\n用中文回复，排版清晰适合打印或截图保存。',
   },
   {
-    id: 'pixel', icon: <Gamepad2 className="w-5 h-5" />, label: '像素游戏', color: 'from-green-500 to-emerald-500',
+    id: 'game-design', icon: <Gamepad2 className="w-5 h-5" />, label: '游戏创作', badge: '🎮', gradient: 'from-blue-500 to-cyan-500', shadow: 'shadow-blue-500/25', accentClasses: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300', selected: 'bg-blue-100 border-blue-300 text-blue-700' },
     fields: [
-      { key: 'genre', label: '游戏类型', icon: <Gamepad2 className="w-3.5 h-3.5" />, placeholder: '如：平台跳跃、RPG、射击',
-        options: [{ label: '平台跳跃', value: '平台跳跃过关' }, { label: 'RPG冒险', value: '角色扮演冒险' }, { label: '射击生存', value: '射击生存' }, { label: '模拟经营', value: '模拟经营' }, { label: '迷宫探索', value: '迷宫探索' }] },
-      { key: 'theme', label: '主题风格', icon: <Palette className="w-3.5 h-3.5" />, placeholder: '如：太空、中世纪、丛林',
-        options: [{ label: '太空', value: '科幻太空风格' }, { label: '中世纪', value: '中世纪奇幻风格' }, { label: '丛林', value: '热带雨林风格' }, { label: '水下', value: '深海世界风格' }, { label: '地下城', value: '黑暗地牢风格' }] },
-      { key: 'hero', label: '主角设计', icon: <User className="w-3.5 h-3.5" />, placeholder: '描述主角外形和特点' },
-      { key: 'mechanic', label: '核心玩法', icon: <Zap className="w-3.5 h-3.5" />, placeholder: '一句话描述核心玩法' },
+      { key: 'genre', label: '游戏类型', placeholder: '如：RPG、解谜、模拟经营',
+        options: [{ label: 'RPG冒险', value: '角色扮演冒险，剧情驱动' }, { label: '解谜逃脱', value: '解谜逃脱，烧脑关卡' }, { label: '模拟经营', value: '模拟经营，养成建造' }, { label: '平台跳跃', value: '平台跳跃，动作闯关' }, { label: '卡牌策略', value: '卡牌策略，构筑牌组' }] },
+      { key: 'setting', label: '世界观', placeholder: '如：科幻、奇幻、校园、历史' },
+      { key: 'hero', label: '主角设定', placeholder: '描述主角的性格、能力和目标' },
+      { key: 'hook', label: '核心玩法', placeholder: '一句话概括游戏的核心玩法' },
     ],
     templates: [
-      { name: '太空矿工', desc: '小飞船开采小行星', emoji: '🛸', fields: { genre: '射击生存', theme: '科幻太空风格', hero: '圆形小飞船，蓝色涂装，装备激光炮和采矿臂', mechanic: '驾驶飞船在小行星带采集矿石，遇到太空海盗要战斗或逃跑' } },
-      { name: '勇者传说', desc: '经典RPG打怪升级', emoji: '⚔️', fields: { genre: '角色扮演冒险', theme: '中世纪奇幻风格', hero: '金发红披风勇者，手持长剑，带一只会魔法的小精灵', mechanic: '探索地图、打怪升级、收集装备、打败魔王救公主' } },
-      { name: '农场物语', desc: '种田养鸡的悠闲生活', emoji: '🌾', fields: { genre: '模拟经营', theme: '田园乡村风格', hero: '红帽子农场主，穿着工装裤，拿着锄头', mechanic: '开垦土地种植作物、饲养动物、制作农产品出售、升级农场' } },
-      { name: '深海探险', desc: '潜水寻宝打怪', emoji: '🐠', fields: { genre: '迷宫探索', theme: '深海世界风格', hero: '潜水员，戴圆形头盔，背氧气瓶，手持鱼叉', mechanic: '在深海迷宫中探索、收集宝藏、躲避鲨鱼、寻找出口' } },
+      { name: '梦境修补师', desc: '进入他人梦境的冒险', emoji: '💭', fields: { genre: '角色扮演冒险，剧情驱动', setting: '现代奇幻：有一种职业可以进入他人的梦境，修复噩梦带来的创伤', hero: '新手梦境修补师小梦，能力是具象化想象力，目标是成为最厉害的修补师', hook: '进入不同人的梦境世界，解开心结、打败噩梦怪物、收集梦境碎片' } },
+      { name: '校园异能者', desc: '超能力校园物语', emoji: '🏫', fields: { genre: '角色扮演冒险，剧情驱动', setting: '隐藏着超能力者的普通高中，每个学生都有独特的异能', hero: '转学生小明，能力是"复制"（看到别人异能就能暂时复制使用），目标是揭开学校隐藏的秘密', hook: '白天上课交朋友，晚上用超能力探索学校的神秘地下层' } },
+      { name: '时间咖啡馆', desc: '回到过去的解谜之旅', emoji: '☕', fields: { genre: '解谜逃脱，烧脑关卡', setting: '街角的神秘咖啡馆，喝下咖啡就能回到过去某个时间点', hero: '咖啡馆老板，能调配不同时间的咖啡，帮助客人改变遗憾', hook: '根据客人的故事调配对应时间的咖啡，穿越回去解开当年的谜题' } },
+      { name: '像素宠物', desc: '养成对战小精灵', emoji: '🐣', fields: { genre: '模拟经营，养成建造', setting: '像素世界的宠物岛，生活着各种可爱的像素小动物', hero: '岛上的饲养员，目标是收集全100种像素宠物并建成最棒的宠物乐园', hook: '孵化宠物蛋→喂养进化→训练技能→参加宠物比赛→扩建乐园设施' } },
     ],
-    systemPrompt: '你是像素游戏策划师。根据用户填写的游戏类型、主题、主角和核心玩法，生成像素游戏设计方案。包含：\n1. 游戏名称和一句话简介\n2. 核心玩法详细描述\n3. 角色设计（像素风描述，含配色建议）\n4. 场景设计（关卡/地图规划）\n5. 道具和敌人列表\n6. 控制方式和操作说明\n7. 像素尺寸和分辨率建议\n用中文回复。',
+    systemPrompt: '你是游戏策划师和世界观构建师。根据用户填写的游戏类型、世界观、主角和核心玩法，生成一份完整的游戏设计方案。包含：\n1. 游戏名称（含副标题）\n2. 一句话卖点（用一句话让人想玩）\n3. 世界观设定（世界背景、核心冲突、关键设定）\n4. 角色设计（主角、NPC、敌人，含性格+外观+能力）\n5. 玩法系统详解（核心循环、关卡设计、成长体系）\n6. 美术风格参考（关键词+参考作品+配色方案）\n7. Demo开发建议（最小的可玩版本包含什么）\n用中文回复，分项清晰。',
   },
 ];
+
+const FREE_SYSTEM_PROMPT = '你是AI创意助手，擅长将用户的想法落地为可执行的创作方案。根据用户描述的创作需求，生成详细的方案。包含：方案概述、执行步骤、所需工具/资源、预期效果。用中文回复，排版清晰。';
 
 export default function CreateWorkshop() {
   const navigate = useNavigate();
@@ -136,6 +137,7 @@ export default function CreateWorkshop() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [streamingText, setStreamingText] = useState('');
+  const [showAll, setShowAll] = useState(false);
 
   const activeConfig = CONFIGS.find(c => c.id === activeType);
 
@@ -174,35 +176,31 @@ export default function CreateWorkshop() {
     setCopied(false);
 
     try {
-      let systemPrompt: string;
-      let userContent: string;
-
       if (activeType === 'free') {
-        systemPrompt = '你是AI创意助手。根据用户的描述，生成创意作品方案。用中文回复，排版清晰。';
-        userContent = form['free'] || '';
-        if (!userContent.trim()) { setLoading(false); return; }
+        const content = form['free'] || '';
+        if (!content.trim()) { setLoading(false); return; }
+        const fullText = await sendToDeepSeek(
+          [
+            { role: 'system', content: FREE_SYSTEM_PROMPT },
+            { role: 'user', content }
+          ],
+          (chunk) => setStreamingText(prev => prev + chunk)
+        );
+        setResult(fullText);
       } else if (activeConfig) {
-        systemPrompt = activeConfig.systemPrompt;
         const fields = activeConfig.fields.map(f =>
           `【${f.label}】${form[f.key] || '（未填写）'}`
         ).join('\n');
-        userContent = `请根据以下需求生成设计方案：\n\n${fields}`;
-      } else {
-        setLoading(false);
-        return;
+        const fullText = await sendToDeepSeek(
+          [
+            { role: 'system', content: activeConfig.systemPrompt },
+            { role: 'user', content: `请根据以下需求生成方案：\n\n${fields}` }
+          ],
+          (chunk) => setStreamingText(prev => prev + chunk)
+        );
+        setResult(fullText);
       }
-
-      const fullText = await sendToDeepSeek(
-        [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userContent }
-        ],
-        (chunk) => {
-          setStreamingText(prev => prev + chunk);
-        }
-      );
-      setResult(fullText);
-    } catch (err) {
+    } catch {
       setResult('生成失败，请稍后重试');
     } finally {
       setLoading(false);
@@ -219,196 +217,221 @@ export default function CreateWorkshop() {
     } catch {}
   };
 
-  const handleRegenerate = () => {
-    handleGenerate();
-  };
-
   const displayText = result || streamingText;
 
   return (
-    <div className="max-w-4xl mx-auto pb-20">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/competitions')} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-          <ArrowLeft className="w-5 h-5 text-slate-600" />
-        </button>
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">创作工坊</h1>
-          <p className="text-sm text-slate-500">选择类型 → 填写/选模板 → AI生成作品</p>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 pb-20 relative overflow-hidden">
+      {/* 背景装饰 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-200/20 to-cyan-200/20 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative max-w-5xl mx-auto px-4 py-8">
+        {/* 头部 */}
+        <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => navigate('/competitions')} className="p-2.5 bg-white/80 backdrop-blur-sm rounded-xl hover:bg-white transition-all shadow-sm border border-slate-200/50">
+            <ArrowLeft className="w-5 h-5 text-slate-600" />
+          </button>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">创作工坊</h1>
+              <span className="px-2.5 py-0.5 text-xs font-medium bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full border border-indigo-200/50">AI 赋能</span>
+            </div>
+            <p className="text-sm text-slate-500 mt-0.5">选创作类型 → 填需求/选模板 → AI 生成专业方案</p>
+          </div>
         </div>
-      </div>
 
-      {/* Type Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-5 scrollbar-none">
-        <button
-          onClick={() => handleTypeChange('free')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all shrink-0 ${
-            activeType === 'free'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <Wand2 className="w-4 h-4" />
-          自由创作
-        </button>
-        {CONFIGS.map(type => (
-          <button
-            key={type.id}
-            onClick={() => handleTypeChange(type.id)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all shrink-0 ${
-              activeType === type.id
-                ? `bg-gradient-to-r ${type.color} text-white shadow-md`
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            {type.icon}
-            {type.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Free Form */}
-      {activeType === 'free' && (
-        <Card className="!p-5 mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white">
+        {/* 创作类型标签 */}
+        <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-2 shadow-sm border border-slate-200/50 mb-6">
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+            <button
+              onClick={() => handleTypeChange('free')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all shrink-0 ${
+                activeType === 'free'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md shadow-indigo-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
               <Wand2 className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">自由创作</h3>
-              <p className="text-xs text-slate-400">不限类型，自由描述你的创作需求</p>
-            </div>
+              自由创作
+            </button>
+            {CONFIGS.slice(0, showAll ? CONFIGS.length : 3).map(type => (
+              <button
+                key={type.id}
+                onClick={() => handleTypeChange(type.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all shrink-0 ${
+                  activeType === type.id
+                    ? `bg-gradient-to-r ${type.gradient} text-white shadow-md ${type.shadow}`
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                {type.icon}
+                {type.label}
+              </button>
+            ))}
+            {CONFIGS.length > 3 && (
+              <button
+                onClick={() => setShowAll(!showAll)}
+                className="flex items-center gap-1 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all shrink-0"
+              >
+                {showAll ? '收起 ▲' : `更多 ▼`}
+              </button>
+            )}
           </div>
-          <textarea
-            value={form['free'] || ''}
-            onChange={e => setField('free', e.target.value)}
-            placeholder="描述你想要的创作内容，越详细效果越好..."
-            className="w-full h-28 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none text-sm"
-          />
-          <button
-            onClick={handleGenerate}
-            disabled={!form['free']?.trim() || loading}
-            className="mt-3 w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-medium text-sm hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> 生成中...</> : <><Send className="w-4 h-4" /> 开始创作</>}
-          </button>
-        </Card>
-      )}
+        </div>
 
-      {/* Template-based forms */}
-      {activeConfig && (
-        <>
-          {/* Preset Templates */}
-          <div className="mb-4">
-            <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> 快速开始：选择一个预设模板
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {activeConfig.templates.map((tmpl, i) => (
-                <button
-                  key={i}
-                  onClick={() => applyTemplate(tmpl)}
-                  className="p-3 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-sm transition-all text-left group"
-                >
-                  <div className="text-xl mb-1">{tmpl.emoji}</div>
-                  <div className="font-medium text-sm text-slate-800 group-hover:text-indigo-600">{tmpl.name}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">{tmpl.desc}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Form Fields */}
-          <Card className="!p-5 mb-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${activeConfig.color} flex items-center justify-center text-white`}>
-                {activeConfig.icon}
+        {/* 自由创作 */}
+        {activeType === 'free' && (
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-slate-200/50 mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                <Wand2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-900">{activeConfig.label}</h3>
-                <p className="text-xs text-slate-400">填写以下信息，AI为你生成设计方案</p>
+                <h3 className="font-semibold text-slate-900">自由创作</h3>
+                <p className="text-xs text-slate-400">不限类型，自由描述你的创作需求，AI 全程辅助</p>
+              </div>
+            </div>
+            <textarea
+              value={form['free'] || ''}
+              onChange={e => setField('free', e.target.value)}
+              placeholder="描述你想要创作的内容，越详细效果越好..."
+              className="w-full h-32 px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none transition-all resize-none text-sm placeholder:text-slate-400"
+            />
+            <div className="flex items-center gap-2 mt-4">
+              <div className="flex-1" />
+              <button
+                onClick={handleGenerate}
+                disabled={!form['free']?.trim() || loading}
+                className="px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md shadow-indigo-500/20"
+              >
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> 生成中...</> : <><Send className="w-4 h-4" /> 开始创作</>}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 模板选择 + 表单 */}
+        {activeConfig && (
+          <>
+            {/* 预设模板 */}
+            <div className="mb-5">
+              <p className="text-xs text-slate-500 mb-3 flex items-center gap-1.5 font-medium">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> 快速开始 — 选择一个模板，一键填充
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {activeConfig.templates.map((tmpl, i) => (
+                  <button
+                    key={i}
+                    onClick={() => applyTemplate(tmpl)}
+                    className="group p-4 bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-xl hover:border-indigo-300 hover:shadow-md hover:-translate-y-0.5 transition-all text-left"
+                  >
+                    <div className="text-2xl mb-2">{tmpl.emoji}</div>
+                    <div className="font-semibold text-sm text-slate-800 group-hover:text-indigo-600 transition-colors">{tmpl.name}</div>
+                    <div className="text-xs text-slate-400 mt-1 line-clamp-1">{tmpl.desc}</div>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="space-y-3">
-              {activeConfig.fields.map(field => (
-                <div key={field.key}>
-                  <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1.5">
-                    {field.icon}
-                    {field.label}
-                  </label>
-                  {field.options ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {field.options.map(opt => (
-                        <button
-                          key={opt.value}
-                          onClick={() => setField(field.key, opt.value)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                            form[field.key] === opt.value
-                              ? 'bg-indigo-100 border-indigo-300 text-indigo-700'
-                              : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <input
-                      type="text"
-                      value={form[field.key] || ''}
-                      onChange={e => setField(field.key, e.target.value)}
-                      placeholder={field.placeholder}
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-sm"
-                    />
-                  )}
+            {/* 表单区域 */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-slate-200/50 mb-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${activeConfig.gradient} flex items-center justify-center text-white shadow-md ${activeConfig.shadow}`}>
+                  {activeConfig.icon}
                 </div>
-              ))}
-            </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-slate-900">{activeConfig.label}</h3>
+                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${activeConfig.accentClasses.bg} ${activeConfig.accentClasses.text}`}>{activeConfig.badge}</span>
+                  </div>
+                  <p className="text-xs text-slate-400">填写需求，AI 为你生成专业方案</p>
+                </div>
+              </div>
 
-            <button
-              onClick={handleGenerate}
-              disabled={loading}
-              className="mt-4 w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-medium text-sm hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> AI生成中...</> : <><Send className="w-4 h-4" /> 生成设计方案</>}
-            </button>
-          </Card>
-        </>
-      )}
+              <div className="space-y-4">
+                {activeConfig.fields.map(field => (
+                  <div key={field.key}>
+                    <label className="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1.5">{field.label}</label>
+                    {field.options ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {field.options.map(opt => (
+                          <button
+                            key={opt.value}
+                            onClick={() => setField(field.key, opt.value)}
+                            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                              form[field.key] === opt.value
+                                ? activeConfig.accentClasses.selected
+                                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <input
+                        type="text"
+                        value={form[field.key] || ''}
+                        onChange={e => setField(field.key, e.target.value)}
+                        placeholder={field.placeholder}
+                        className="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none transition-all text-sm placeholder:text-slate-400"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
 
-      {/* Result */}
-      {displayText && (
-        <Card className="!p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-500" />
-              <span className="font-semibold text-slate-900">生成结果</span>
-              {loading && <span className="text-xs text-slate-400 animate-pulse">AI 正在思考...</span>}
-            </div>
-            <div className="flex gap-2">
               <button
-                onClick={handleCopy}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                onClick={handleGenerate}
+                disabled={loading}
+                className="mt-5 w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-indigo-500/20"
               >
-                {copied ? <><Check className="w-3.5 h-3.5 text-green-600" /> 已复制</> : <><Copy className="w-3.5 h-3.5" /> 复制</>}
+                {loading ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> AI 正在创作...</>
+                ) : (
+                  <><Sparkles className="w-4 h-4" /> 生成方案</>
+                )}
               </button>
-              {result && !loading && (
+            </div>
+          </>
+        )}
+
+        {/* 结果展示 */}
+        {displayText && (
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-slate-200/50">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-sm">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <span className="font-semibold text-slate-900">创作方案</span>
+                {loading && <span className="text-xs text-slate-400 animate-pulse ml-1">AI 思考中...</span>}
+              </div>
+              <div className="flex gap-2">
                 <button
-                  onClick={handleRegenerate}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-slate-600"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  重新生成
+                  {copied ? <><Check className="w-3.5 h-3.5 text-green-600" /> 已复制</> : <><Copy className="w-3.5 h-3.5" /> 复制</>}
                 </button>
-              )}
+                {result && !loading && (
+                  <button
+                    onClick={handleGenerate}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-slate-600"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> 重新生成
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="prose prose-sm max-w-none bg-gradient-to-br from-slate-50 to-white rounded-xl p-5 text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-200/50">
+              {loading && !result ? streamingText + '▌' : displayText}
             </div>
           </div>
-          <div className="prose prose-sm max-w-none bg-slate-50 rounded-xl p-4 text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100">
-            {loading && !result ? streamingText + '▌' : displayText}
-          </div>
-        </Card>
-      )}
+        )}
+      </div>
     </div>
   );
 }
