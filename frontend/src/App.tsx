@@ -36,6 +36,7 @@ import NotesPage from './pages/NotesPage'
 import RegisterPage from './pages/RegisterPage'
 import AdoptPage from './pages/AdoptPage'
 import { PetChatPage } from './pages/PetChatPage'
+import { AgentChatPage } from './pages/AgentChatPage'
 import PetWidget from './components/PetWidget'
 import AdminApplications from './pages/admin/Applications'
 import AdminFeedback from './pages/admin/Feedback'
@@ -77,6 +78,7 @@ export default function App() {
       <Route path="/digital-twins" element={<AgentsPage />} />
       <Route path="/digital-twins/create" element={<CreateAgentPage />} />
       <Route path="/digital-twins/:id" element={<AgentDetailPage />} />
+      <Route path="/digital-twins/:id/chat" element={<AgentChatPage />} />
       <Route path="/workspace/:id" element={<AgentWorkspacePage />} />
 
       {/* WEG Economy */}

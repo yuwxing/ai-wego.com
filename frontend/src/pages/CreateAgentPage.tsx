@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, AlertCircle, Bot, Info, Lightbulb, Sparkles, ChevronRight, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, AlertCircle, Bot, Info, Lightbulb, Sparkles, ChevronRight, CheckCircle, Wand2 } from 'lucide-react';
 import { Card } from '../components/ui';
 import { agentsAPI, usersAPI } from '../utils/supabase';
+import { getApiKey } from '../utils/deepseek';
 import type { User, CapabilityInput } from '../types';
+
+const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 const categories = ['编程', '写作', '设计', '分析'];
 
@@ -99,6 +102,51 @@ export const CreateAgentPage: React.FC = () => {
     capabilities: [] as CapabilityInput[],
     avatar_url: '',
   });
+  const [aiGenerating, setAiGenerating] = useState(false);
+
+  const generateWithDeepSeek = async () => {
+    const name = formData.name.trim();
+    if (!name || name.length < 2) {
+      setError('请先填写智能体名称（至少2个字符）');
+      return;
+    }
+    setAiGenerating(true);
+    setError(null);
+    try {
+      const resp = await fetch(DEEPSEEK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getApiKey()}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: '你是一个AI智能体设计师。根据用户提供的智能体名称，生成一段描述和3个能力配置。输出JSON格式：{"description":"一句话描述","capabilities":[{"category":"编程|写作|设计|分析","level":1-10}]}' },
+            { role: 'user', content: `为智能体"${name}"生成描述和能力配置` },
+          ],
+          temperature: 0.8,
+          max_tokens: 500,
+        }),
+      });
+      if (!resp.ok) throw new Error('AI生成失败');
+      const data = await resp.json();
+      const text = data.choices?.[0]?.message?.content || '';
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        setFormData(prev => ({
+          ...prev,
+          description: parsed.description || prev.description,
+          capabilities: parsed.capabilities || prev.capabilities,
+        }));
+      }
+    } catch (err) {
+      setError('AI生成失败，请手动填写');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   useEffect(() => {
     fetchMyAgents();
@@ -192,7 +240,7 @@ export const CreateAgentPage: React.FC = () => {
         capabilities: formData.capabilities,
         avatar_url: formData.avatar_url || null
       });
-      navigate('/agents');
+      navigate('/digital-twins');
     } catch (err) {
       setError(err instanceof Error ? err.message : '创建失败');
     } finally {
@@ -204,11 +252,11 @@ export const CreateAgentPage: React.FC = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* 返回按钮 */}
       <button
-        onClick={() => navigate('/agents')}
+              onClick={() => navigate('/digital-twins')}
         className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        返回智能体列表
+        返回智能体市场
       </button>
 
       {/* 页面标题 */}
@@ -355,9 +403,24 @@ export const CreateAgentPage: React.FC = () => {
 
           {/* 描述 */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              智能体描述
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-semibold text-slate-700">
+                智能体描述
+              </label>
+              <button
+                type="button"
+                onClick={generateWithDeepSeek}
+                disabled={aiGenerating}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-400 hover:to-pink-400 transition-all disabled:opacity-50 font-medium"
+              >
+                {aiGenerating ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Wand2 className="w-4 h-4" />
+                )}
+                {aiGenerating ? '生成中...' : 'AI 生成'}
+              </button>
+            </div>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -475,7 +538,7 @@ export const CreateAgentPage: React.FC = () => {
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
-              onClick={() => navigate('/agents')}
+        onClick={() => navigate('/digital-twins')}
               className="px-6 py-3 text-slate-600 hover:text-slate-900 font-medium"
             >
               取消

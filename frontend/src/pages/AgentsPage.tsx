@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Bot, Star, TrendingUp, Zap, Search, Filter, Crown, Flame, Info, ChevronRight, Heart, Sparkles, Wand2, Brain, Palette, Sun } from 'lucide-react';
+import { Plus, Bot, Star, TrendingUp, Zap, Search, Filter, Crown, Flame, Info, ChevronRight, Heart, Sparkles, Wand2, Brain, Palette, Sun, MessageCircle, User } from 'lucide-react';
 import { Card, RatingStars, LoadingSpinner, EmptyState, TokenAmount } from '../components/ui';
 import { agentsAPI, calculateAgentsAvgRatings } from '../utils/supabase';
 import { isAgentOnDuty, getAgentDutyStation } from '../utils/dutyAgents';
@@ -83,10 +83,28 @@ export const AgentsPage: React.FC = () => {
   const [filter, setFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'rating' | 'tasks' | 'success'>('rating');
+  const [myAgents, setMyAgents] = useState<Agent[]>([]);
+  const [myAgentsLoading, setMyAgentsLoading] = useState(true);
 
   useEffect(() => {
     fetchAgents();
+    fetchMyAgents();
   }, [filter, sortBy]);
+
+  const fetchMyAgents = async () => {
+    try {
+      setMyAgentsLoading(true);
+      const userData = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = userData?.id;
+      if (userId) {
+        const data = await agentsAPI.listAgents({ owner_id: userId });
+        setMyAgents(data || []);
+      }
+    } catch (_) {
+    } finally {
+      setMyAgentsLoading(false);
+    }
+  };
 
   const fetchAgents = async () => {
     try {
@@ -181,6 +199,46 @@ export const AgentsPage: React.FC = () => {
           注册智能体
         </button>
       </div>
+
+      {/* 我的数字分身 */}
+      {!myAgentsLoading && myAgents.length > 0 && (
+        <Card className="!p-4 glass-card border border-purple-100/30">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <User className="w-5 h-5 text-purple-500" />
+              我的数字分身
+            </h2>
+            <button
+              onClick={() => navigate('/digital-twins/create')}
+              className="text-sm text-purple-600 hover:text-purple-500 font-medium flex items-center gap-1"
+            >
+              <Plus className="w-4 h-4" /> 创建新分身
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {myAgents.map(agent => (
+              <div
+                key={agent.id}
+                className="flex items-center gap-3 p-3 rounded-xl bg-white/80 border border-purple-100 hover:shadow-md transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center flex-shrink-0 shadow-md">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-slate-800 text-sm truncate">{agent.name}</p>
+                  <p className="text-xs text-slate-500 truncate">{agent.description || '数字分身'}</p>
+                </div>
+                <button
+                  onClick={() => navigate(`/digital-twins/${agent.id}/chat`)}
+                  className="px-3 py-1.5 rounded-lg bg-purple-100 text-purple-600 text-sm font-medium hover:bg-purple-200 transition-all opacity-0 group-hover:opacity-100 flex items-center gap-1"
+                >
+                  <MessageCircle className="w-4 h-4" /> 聊天
+                </button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* 搜索和筛选 - 毛玻璃卡片 */}
       <Card className="!p-4 glass-card border border-purple-100/30">
