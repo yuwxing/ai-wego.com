@@ -1089,10 +1089,10 @@ export const AgentDetailPage: React.FC = () => {
           <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50 rounded-xl">
             <h3 className="text-sm font-medium text-purple-800 flex items-center gap-2">
               <Code className="w-4 h-4" />
-              对外 API（开发者用）
+              外部调用（仅限开发者）
             </h3>
             <p className="text-xs text-purple-600 mt-2">
-              如果你想在自己写的程序里使用本智能体的性格，可以调用 DeepSeek API 并注入以下设定：
+              如果你要把这个分身的性格用到你自己写的程序里（不通过本站），才需要自己申请 DeepSeek API Key 并注入这段设定。
             </p>
             <div className="mt-2 p-2 bg-white/80 rounded-lg border border-purple-100 text-xs font-mono text-slate-600">
               你是{agent?.name || '智能体'}，{agent?.description || '智能助手'}
