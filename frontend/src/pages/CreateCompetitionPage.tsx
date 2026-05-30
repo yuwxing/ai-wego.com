@@ -8,7 +8,8 @@ import {
   Sparkles, ChevronRight, CheckCircle, Clock, DollarSign, Target, 
   Award, X, Wand2, RefreshCw, Zap, Search, PenTool, BarChart3, 
   Languages, GraduationCap, Bot, AlertTriangle, Coins, Wallet, Users,
-  Upload, FileText, Image as ImageIcon, Music, Link as LinkIcon, Loader2
+  Upload, FileText, Image as ImageIcon, Music, Link as LinkIcon, Loader2,
+  BookOpen, Globe, Trophy
 } from 'lucide-react';
 import { Card } from '../components/ui';
 import toast from 'react-hot-toast';
@@ -16,16 +17,29 @@ import { tasksAPI, usersAPI, transactionsAPI, supabaseFetch, workerTokenAPI, age
 import { saveCompetition } from '../services/competitionService';
 import type { User } from '../types';
 
-// 任务类型 - 突出平台差异化：多智能体协作、自动执行闭环、专业场景
-const TASK_TYPES = [
-  { id: '智能体协作', name: '智能体协作', icon: Bot, color: 'from-violet-500 to-fuchsia-600', desc: '多智能体团队协作，复杂任务拆解执行' },
-  { id: '求职全托管', name: '求职全托管', icon: Target, color: 'from-violet-500 to-blue-600', desc: '搜岗位·写简历·备面试，一条龙' },
-  { id: '自动执行', name: '自动执行', icon: Zap, color: 'from-amber-500 to-orange-500', desc: '发布即执行，交付可验收，全闭环' },
-  { id: '搜索整理', name: '搜索整理', icon: Search, color: 'from-blue-500 to-cyan-500', desc: '全网信息搜索、筛选、整理成报告' },
-  { id: '内容创作', name: '内容创作', icon: PenTool, color: 'from-pink-500 to-rose-500', desc: '文章·文案·PPT·设计，专业交付' },
-  { id: '数据分析', name: '数据分析', icon: BarChart3, color: 'from-violet-500 to-fuchsia-500', desc: '数据处理、可视化、洞察报告' },
-  { id: '长期追踪', name: '长期追踪', icon: Clock, color: 'from-rose-500 to-red-500', desc: '持续监控·定时推送·动态更新' },
-  { id: '翻译润色', name: '翻译润色', icon: Languages, color: 'from-sky-500 to-blue-500', desc: '多语言翻译、专业润色校对' },
+// 竞赛科目
+const COMPETITION_CATEGORIES = [
+  { id: '英语', name: '英语', icon: Languages, color: 'from-blue-500 to-cyan-500', desc: '英语写作、演讲、综合能力' },
+  { id: '数学', name: '数学', icon: BarChart3, color: 'from-green-500 to-emerald-500', desc: '解题思维、建模、逻辑推理' },
+  { id: '编程', name: '编程', icon: Bot, color: 'from-violet-500 to-fuchsia-600', desc: '算法、项目开发、AI应用' },
+  { id: 'AI', name: 'AI', icon: Zap, color: 'from-amber-500 to-orange-500', desc: 'AI创意、智能体协作、提示工程' },
+  { id: '阅读', name: '阅读', icon: BookOpen, color: 'from-pink-500 to-rose-500', desc: '阅读理解、文学鉴赏、知识拓展' },
+];
+
+// 竞赛类型
+const COMPETITION_TYPES = [
+  { id: '每日挑战', name: '每日挑战', icon: Zap, desc: '每天一道题，轻松积累' },
+  { id: '周赛', name: '周赛', icon: Clock, desc: '每周一赛，系统训练' },
+  { id: '月赛', name: '月赛', icon: Award, desc: '月度比拼，综合考验' },
+  { id: '全国活动', name: '全国活动', icon: Globe, desc: '面向全国的大型竞赛' },
+];
+
+// 难度等级
+const DIFFICULTY_LEVELS = [
+  { id: '青铜', name: '青铜', color: 'from-amber-600 to-yellow-500', desc: '入门友好' },
+  { id: '白银', name: '白银', color: 'from-slate-400 to-gray-300', desc: '基础巩固' },
+  { id: '黄金', name: '黄金', color: 'from-yellow-500 to-orange-400', desc: '进阶挑战' },
+  { id: '大师', name: '大师', color: 'from-red-500 to-purple-600', desc: '极限突破' },
 ];
 
 // 关键词到能力的映射
@@ -279,16 +293,16 @@ const RequirementItem: React.FC<RequirementItemProps> = ({
 
 const exampleTasks = [
   { 
-    title: '企业官网前端开发', 
-    description: '使用React开发一个包含首页、关于我们、产品展示、联系我们的企业官网，需要响应式设计', 
-    budget: 5000,
-    requirements: [{ description: '开发React响应式官网，包含首页、产品展示等模块', min_level: 6 }]
+    title: 'AI创意写作大赛 — 用智能体写科幻故事', 
+    description: '使用AI智能体创作一篇2000字以内的科幻短篇故事，主题为"未来的学校"，要求有完整的故事情节和人物设定', 
+    budget: 500,
+    requirements: [{ description: '创作科幻短篇，主题"未来的学校"，2000字以内', min_level: 3 }]
   },
   { 
-    title: '科技产品评测文章', 
-    description: '撰写一篇3000字左右的智能手表评测文章，包含外观、性能、续航、性价比等维度', 
-    budget: 800,
-    requirements: [{ description: '写一篇智能手表评测文章，包含外观、性能、续航等维度', min_level: 5 }]
+    title: '数学解题挑战赛 — 趣味数学题', 
+    description: '设计并解答5道趣味数学题，涵盖几何、代数、逻辑推理，难度对应初中水平', 
+    budget: 300,
+    requirements: [{ description: '设计5道趣味数学题并附解答', min_level: 4 }]
   },
 ];
 
@@ -325,12 +339,15 @@ export const CreateTaskPage: React.FC = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    taskType: searchParams.get('task_type') || '自动执行', // 默认任务类型，支持URL参数预选
+    category: 'AI',
+    competitionType: '每日挑战',
+    difficulty: '青铜',
     publisher_id: currentUserId,
-    reward: 50, // 任务报酬，默认50 token，最低10
-    deadline: '',
+    reward: 50,
+    startTime: '',
+    endTime: '',
     requirements: [] as TaskRequirement[],
-    maxClaimants: 1, // 需要几人完成，默认1人
+    maxClaimants: 1,
   });
 
   // 自动分析任务描述并推荐能力
@@ -486,19 +503,31 @@ export const CreateTaskPage: React.FC = () => {
 
   const validateForm = () => {
     if (!formData.title.trim()) {
-      setError('请输入任务标题');
+      setError('请输入竞赛标题');
       return false;
     }
     if (formData.title.length < 5) {
-      setError('任务标题至少需要5个字符');
+      setError('竞赛标题至少需要5个字符');
+      return false;
+    }
+    if (!formData.startTime) {
+      setError('请选择开始时间');
+      return false;
+    }
+    if (!formData.endTime) {
+      setError('请选择截止时间');
+      return false;
+    }
+    if (formData.startTime >= formData.endTime) {
+      setError('截止时间必须晚于开始时间');
       return false;
     }
     if (formData.reward < 10) {
-      setError('任务报酬至少10 WEG币');
+      setError('竞赛奖金至少10 积分');
       return false;
     }
     if (formData.reward > userBalance) {
-      setError(`余额不足！当前余额 ${userBalance} WEG币，任务报酬 ${formData.reward} WEG币`);
+      setError(`余额不足！当前余额 ${userBalance} 积分，竞赛奖金 ${formData.reward} 积分`);
       return false;
     }
     return true;
@@ -515,7 +544,8 @@ export const CreateTaskPage: React.FC = () => {
       
       const submitData = {
         ...formData,
-        deadline: formData.deadline ? new Date(formData.deadline).toISOString() : undefined,
+        endTime: formData.endTime ? new Date(formData.endTime).toISOString() : undefined,
+        startTime: formData.startTime ? new Date(formData.startTime).toISOString() : undefined,
       };
       
       // 计算含8%手续费的总额
@@ -524,7 +554,7 @@ export const CreateTaskPage: React.FC = () => {
       
       // 检查余额是否足够（含手续费）
       if (userBalance < totalCost) {
-        setError(`余额不足！当前余额 ${userBalance} <WegCoin size={14} />，发布任务需要 ${totalCost} WEG（含8%手续费${platformFee} WEG）`);
+        setError(`余额不足！当前余额 ${userBalance} <WegCoin size={14} />，发布任务需要 ${totalCost} 积分（含8%手续费${platformFee} 积分）`);
         setLoading(false);
         return;
       }
@@ -548,11 +578,11 @@ export const CreateTaskPage: React.FC = () => {
           description: submitData.description,
           publisher_id: currentUserId,
           budget: submitData.reward,
-          deadline: submitData.deadline,
+          deadline: submitData.endTime,
           requirements: submitData.requirements || [],
           status: 'open',
           matched_agent_id: null,
-          source: 'manual',
+          source: 'competition',
           max_claimants: submitData.maxClaimants,
           claimed_by: [],
         });
@@ -578,7 +608,7 @@ export const CreateTaskPage: React.FC = () => {
           amount: totalCost,
           task_id: taskId,
           type: 'task_payment',
-          description: `发布任务「${submitData.title}」，扣除 ${totalCost} WEG币（含手续费${platformFee}）`,
+          description: `发布任务「${submitData.title}」，扣除 ${totalCost} 积分（含手续费${platformFee}）`,
         });
         
         // 5. 更新本地余额显示
@@ -595,38 +625,39 @@ export const CreateTaskPage: React.FC = () => {
           console.warn('触发任务执行失败:', execErr);
         }
         
-        // 7. 跳转到我的智能体页面，并显示匹配提示
-        toast.success(`任务「${submitData.title}」已发布，正在为您匹配智能体...`, { duration: 4000 });
-        
-        // 3秒后触发自动匹配
-        setTimeout(async () => {
-          try {
-            // 获取当前用户的所有智能体
-            const agents = await agentsAPI.listAgents({ owner_id: currentUserId });
-            if (agents && agents.length > 0) {
-              // 简单匹配：找到第一个空闲智能体
-              const idleAgent = agents.find((a: any) => !a.status || a.status === 'idle');
-              if (idleAgent) {
-                await tasksAPI.matchTask(taskId, idleAgent.id);
-                toast.success(`已自动匹配智能体「${idleAgent.name}」执行任务`);
-              }
+        // 7. 自动匹配智能体
+        let matchedAgentName = '';
+        try {
+          const agents = await agentsAPI.listAgents({ owner_id: currentUserId });
+          if (agents && agents.length > 0) {
+            const idleAgent = agents.find((a: any) => !a.status || a.status === 'idle');
+            if (idleAgent) {
+              await tasksAPI.matchTask(taskId, idleAgent.id);
+              matchedAgentName = idleAgent.name;
             }
-          } catch (matchErr) {
-            console.warn('自动匹配失败', matchErr);
           }
-        }, 3000);
+        } catch (matchErr) {
+          console.warn('自动匹配失败', matchErr);
+        }
+        
+        // 8. 显示匹配结果并保存
+        if (matchedAgentName) {
+          toast.success(`任务「${submitData.title}」已发布，已自动匹配智能体「${matchedAgentName}」`, { duration: 5000 });
+        } else {
+          toast.success(`任务「${submitData.title}」已发布`, { duration: 3000 });
+        }
         
         saveCompetition({
           id: String(taskId),
           title: submitData.title,
           subtitle: submitData.description?.slice(0, 80),
-          category: 'AI',
-          type: '每日挑战',
-          difficulty: '青铜',
+          category: submitData.category as '英语' | '数学' | '编程' | 'AI' | '阅读',
+          type: submitData.competitionType as '每日挑战' | '周赛' | '月赛' | '全国活动',
+          difficulty: submitData.difficulty as '青铜' | '白银' | '黄金' | '大师',
           description: submitData.description,
           organizer: user?.username || 'AI-WEGO',
-          startTime: new Date().toISOString(),
-          endTime: submitData.deadline || new Date(Date.now() + 7*86400000).toISOString(),
+          startTime: submitData.startTime || new Date().toISOString(),
+          endTime: submitData.endTime || new Date(Date.now() + 7*86400000).toISOString(),
           rewardWEG: submitData.reward || 0,
           participants: 0,
           status: 'running',
@@ -672,7 +703,7 @@ export const CreateTaskPage: React.FC = () => {
         className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
-        返回任务列表
+         返回竞赛列表
       </button>
 
       {/* 页面标题 */}
@@ -682,7 +713,7 @@ export const CreateTaskPage: React.FC = () => {
         </div>
         <div>
           <h1 className="text-3xl font-bold text-slate-900">创建竞赛活动</h1>
-          <p className="text-slate-500 mt-1">填写任务信息，吸引合适的智能体来接取</p>
+          <p className="text-slate-500 mt-1">设定竞赛主题、科目和规则，吸引参与者挑战</p>
         </div>
       </div>
 
@@ -733,7 +764,7 @@ export const CreateTaskPage: React.FC = () => {
             <Lightbulb className="w-5 h-5 text-violet-600 mt-0.5" />
             <div>
               <h4 className="font-medium text-violet-900">不知道怎么写？</h4>
-              <p className="text-sm text-violet-700 mt-1">参考以下示例快速创建任务</p>
+              <p className="text-sm text-violet-700 mt-1">参考以下示例快速创建竞赛</p>
             </div>
           </div>
           <button
@@ -754,7 +785,7 @@ export const CreateTaskPage: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-slate-900">{example.title}</span>
-                  <span className="text-purple-600 font-bold"><img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} />{example.budget}</span>
+                  <span className="text-purple-600 font-bold"><img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} />{example.budget}</span>
                 </div>
                 <p className="text-sm text-slate-500 line-clamp-2">{example.description}</p>
               </button>
@@ -766,73 +797,120 @@ export const CreateTaskPage: React.FC = () => {
       {/* 表单 */}
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 任务类型选择 */}
+          {/* 竞赛科目 */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-3">
-              任务类型 <span className="text-red-500">*</span>
+              竞赛科目 <span className="text-red-500">*</span>
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {TASK_TYPES.map((type) => {
-                const Icon = type.icon;
-                const isSelected = formData.taskType === type.id;
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+              {COMPETITION_CATEGORIES.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = formData.category === cat.id;
                 return (
                   <button
-                    key={type.id}
+                    key={cat.id}
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, taskType: type.id }))}
+                    onClick={() => setFormData(prev => ({ ...prev, category: cat.id }))}
                     className={`p-4 rounded-xl border-2 transition-all text-center ${
                       isSelected 
-                        ? `border-transparent bg-gradient-to-br ${type.color} text-white shadow-lg` 
+                        ? `border-transparent bg-gradient-to-br ${cat.color} text-white shadow-lg` 
                         : 'border-slate-200 bg-white hover:border-indigo-300'
                     }`}
                   >
-                    <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? 'text-white' : type.color.split(' ')[0].replace('from-', 'text-')}`} />
-                    <div className={`font-medium text-sm ${isSelected ? 'text-white' : 'text-slate-700'}`}>
-                      {type.name}
-                    </div>
-                    <div className={`text-xs mt-1 ${isSelected ? 'text-white/80' : 'text-slate-400'}`}>
-                      {type.desc}
-                    </div>
+                    <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? 'text-white' : cat.color.split(' ')[0].replace('from-', 'text-')}`} />
+                    <div className={`font-medium text-sm ${isSelected ? 'text-white' : 'text-slate-700'}`}>{cat.name}</div>
+                    <div className={`text-xs mt-1 ${isSelected ? 'text-white/80' : 'text-slate-400'}`}>{cat.desc}</div>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* 任务标题 */}
+          {/* 竞赛类型 + 难度 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">竞赛类型 <span className="text-red-500">*</span></label>
+              <div className="flex gap-2 flex-wrap">
+                {COMPETITION_TYPES.map((t) => {
+                  const Icon = t.icon;
+                  const isSelected = formData.competitionType === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, competitionType: t.id }))}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 transition-all ${
+                        isSelected
+                          ? 'border-violet-500 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-md'
+                          : 'border-slate-200 bg-white hover:border-violet-300 text-slate-600'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="text-sm font-medium">{t.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">难度等级 <span className="text-red-500">*</span></label>
+              <div className="flex gap-2">
+                {DIFFICULTY_LEVELS.map((d) => {
+                  const isSelected = formData.difficulty === d.id;
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, difficulty: d.id }))}
+                      className={`flex-1 px-3 py-2.5 rounded-xl border-2 transition-all text-center ${
+                        isSelected
+                          ? `border-transparent bg-gradient-to-br ${d.color} text-white shadow-md`
+                          : 'border-slate-200 bg-white hover:border-violet-300 text-slate-600'
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{d.name}</div>
+                      <div className={`text-xs ${isSelected ? 'text-white/80' : 'text-slate-400'}`}>{d.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* 竞赛标题 */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              任务标题 <span className="text-red-500">*</span>
+              竞赛标题 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="例如：帮我搜索最新AI技术趋势"
+              placeholder="例如：AI创意写作大赛 — 用智能体写一篇科幻故事"
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
               maxLength={200}
             />
             <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
               <Info className="w-3 h-3" />
-              清晰明确的任务标题让 AI 更好地理解您的需求
+              一个有吸引力的标题能让更多人参与
             </p>
           </div>
 
-          {/* 任务描述 */}
+          {/* 竞赛描述 */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              任务描述
+              竞赛描述
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="详细描述任务要求、预期成果、交付标准..."
+              placeholder="详细描述竞赛规则、评审标准、提交要求..."
               rows={4}
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
             />
             <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
               <Info className="w-3 h-3" />
-              详细的描述能帮助智能体更好地理解和完成任务，系统会自动分析并推荐能力
+              清晰的规则和标准能让参赛者更好地准备
             </p>
           </div>
 
@@ -1002,9 +1080,8 @@ export const CreateTaskPage: React.FC = () => {
             </p>
           </div>
 
-          {/* 发布者和报酬 */}
+          {/* 竞赛奖金和余额 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* 余额显示卡片 */}
             <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-violet-200 rounded-xl p-4">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center">
@@ -1015,22 +1092,22 @@ export const CreateTaskPage: React.FC = () => {
                   {balanceLoading ? (
                     <div className="w-16 h-6 bg-violet-200/50 rounded animate-pulse" />
                   ) : (
-                    <p className="text-2xl font-bold text-violet-700">{userBalance.toLocaleString()} <span className="text-sm font-normal">WEG币</span></p>
+                    <p className="text-2xl font-bold text-violet-700">{userBalance.toLocaleString()} <span className="text-sm font-normal">积分</span></p>
                   )}
                 </div>
               </div>
               {formData.reward > userBalance && !balanceLoading && (
                 <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
                   <AlertCircle className="w-4 h-4" />
-                  <span>余额不足以支付任务报酬</span>
+                  <span>余额不足以支付竞赛奖金</span>
                 </div>
               )}
             </div>
             
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                <DollarSign className="w-4 h-4 inline mr-1" />
-                任务报酬 (WEG币) <span className="text-red-500">*</span>
+                <Trophy className="w-4 h-4 inline mr-1" />
+                竞赛奖金 (积分) <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -1046,14 +1123,12 @@ export const CreateTaskPage: React.FC = () => {
                       : 'border-slate-200 focus:ring-violet-500'
                   }`}
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /></span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /></span>
               </div>
               <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                 <Info className="w-3 h-3" />
-                最低10 WEG币，最高10000 WEG币
+                最低10 积分，最高10000 积分
               </p>
-              
-              {/* 快速选择金额 */}
               <div className="flex gap-2 mt-2">
                 {[10, 50, 100, 200].map(amount => (
                   <button
@@ -1073,56 +1148,63 @@ export const CreateTaskPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 截止时间和认领人数 */}
+          {/* 竞赛时间 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* 截止时间 */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 <Clock className="w-4 h-4 inline mr-1" />
-                截止时间
+                开始时间 <span className="text-red-500">*</span>
               </label>
               <input
                 type="datetime-local"
-                value={formData.deadline}
-                onChange={(e) => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
+                value={formData.startTime}
+                onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
               />
-              <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                <Info className="w-3 h-3" />
-                设置合理的截止时间，避免任务过期
-              </p>
             </div>
-
-            {/* 认领人数 */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                <Users className="w-4 h-4 inline mr-1" />
-                需要几人完成 <span className="text-red-500">*</span>
+                <Clock className="w-4 h-4 inline mr-1" />
+                截止时间 <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  id="maxClaimants-input"
-                  value={formData.maxClaimants}
-                  onChange={(e) => { 
-                    const val = e.target.value;
-                    const parsed = parseInt(val, 10); 
-                    setFormData(prev => ({ 
-                      ...prev, 
-                      maxClaimants: isNaN(parsed) ? 1 : Math.max(1, Math.min(10, parsed)) 
-                    })); 
-                  }}
-                  min={1}
-                  max={10}
-                  className="w-full px-4 py-3 pr-10 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">人</span>
-              </div>
-              <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                <Info className="w-3 h-3" />
-                1-10人，允许多人同时认领执行
-              </p>
+              <input
+                type="datetime-local"
+                value={formData.endTime}
+                onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
+              />
             </div>
+          </div>
+
+          {/* 参与人数限制 */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <Users className="w-4 h-4 inline mr-1" />
+              参赛人数上限 <span className="text-red-500">*</span>
+            </label>
+            <div className="relative w-full md:w-1/3">
+              <input
+                type="number"
+                id="maxClaimants-input"
+                value={formData.maxClaimants}
+                onChange={(e) => { 
+                  const val = e.target.value;
+                  const parsed = parseInt(val, 10); 
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    maxClaimants: isNaN(parsed) ? 1 : Math.max(1, Math.min(100, parsed)) 
+                  })); 
+                }}
+                min={1}
+                max={100}
+                className="w-full px-4 py-3 pr-12 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-base"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">人</span>
+            </div>
+            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+              <Info className="w-3 h-3" />
+              1-100人，设置参赛人数上限
+            </p>
           </div>
 
           {/* 能力要求 - AI智能推荐版 */}
@@ -1254,7 +1336,7 @@ export const CreateTaskPage: React.FC = () => {
                 ) : (
                   <>
                     <Zap className="w-5 h-5" />
-                    发布任务（-{formData.reward} WEG币）
+                    发布竞赛（-{formData.reward} 积分）
                   </>
                 )}
               </button>

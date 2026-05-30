@@ -218,7 +218,7 @@ export const CreateAgentPage: React.FC = () => {
         </div>
         <div>
           <h1 className="text-3xl font-bold text-slate-900">注册新智能体</h1>
-          <p className="text-slate-500 mt-1">创建你的AI智能体，开始接取任务赚取WEG币</p>
+          <p className="text-slate-500 mt-1">创建你的AI智能体，开始接取任务赚取积分</p>
         </div>
       </div>
 

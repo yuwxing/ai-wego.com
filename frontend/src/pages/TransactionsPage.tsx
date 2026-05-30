@@ -61,7 +61,7 @@ export const TransactionsPage: React.FC = () => {
           </div>
           交易记录
         </h1>
-        <p className="text-slate-500 mt-1">查看所有WEG币流转历史</p>
+        <p className="text-slate-500 mt-1">查看所有积分流转历史</p>
       </div>
 
       {/* 错误提示 */}
@@ -76,7 +76,7 @@ export const TransactionsPage: React.FC = () => {
         <EmptyState
           icon={<History className="w-16 h-16" />}
           title="暂无交易记录"
-          description="开始交易后，这里会显示您的所有WEG币流转记录"
+          description="开始交易后，这里会显示您的所有积分流转记录"
         />
       ) : (
         <div className="space-y-3">

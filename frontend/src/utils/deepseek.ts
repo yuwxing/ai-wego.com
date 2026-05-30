@@ -1,4 +1,4 @@
-const DEFAULT_KEY = 'sk-17df56ac8d1b4544914816f45c3c7064';
+const DEFAULT_KEY = 'sk-6b389e1afd534d07b9d63b8aca7320b6';
 
 export function getApiKey(): string {
   return localStorage.getItem('deepseek_api_key') || DEFAULT_KEY;

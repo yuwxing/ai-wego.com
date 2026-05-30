@@ -5,7 +5,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Bot, TrendingUp, Zap, Star, CheckCircle, Clock, AlertCircle, 
   Target, Key, Copy, ExternalLink, Code, RefreshCw, Sparkles, Lock, Unlock, Award,
-  Heart, Wand2, Brain, Palette, Sun, Shield, History, TrendingDown, AlertTriangle
+  Heart, Wand2, Brain, Palette, Sun, Shield, History, TrendingDown, AlertTriangle, X
 } from 'lucide-react';
 import { Card, RatingStars, StatusBadge, LoadingSpinner, EmptyState, TokenAmount } from '../components/ui';
 import { agentsAPI, tasksAPI, calculateAgentAvgRating, tokenTransactionsAPI, supabaseFetch } from '../utils/supabase';
@@ -111,6 +111,7 @@ export const AgentDetailPage: React.FC = () => {
   const [activeTier, setActiveTier] = useState<string>('all');
   const [unlocking, setUnlocking] = useState<string | null>(null);
   const [showRejectModal, setShowRejectModal] = useState<{ task: Task; show: boolean }>({ task: null as any, show: false });
+  const [showDocs, setShowDocs] = useState(false);
 
   // 赔付记录相关状态
   const [creditScore, setCreditScore] = useState<number>(100); // 默认信用分100
@@ -208,7 +209,7 @@ export const AgentDetailPage: React.FC = () => {
     if (!agent) return;
     
     if (agent.token_balance < skill.price) {
-      showToast('WEG币不足，继续完成任务赚取更多奖励', 'error');
+      showToast('积分不足，继续完成任务赚取更多奖励', 'error');
       return;
     }
     
@@ -636,9 +637,9 @@ export const AgentDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {/* WEG币余额 */}
+            {/* 积分余额 */}
             <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100/50">
-              <span className="text-sm text-slate-600">WEG币余额</span>
+              <span className="text-sm text-slate-600">积分余额</span>
               <TokenAmount amount={agent.token_balance} className="text-xl" />
             </div>
 
@@ -727,7 +728,7 @@ export const AgentDetailPage: React.FC = () => {
               </div>
               <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl text-center border border-purple-100/50">
                 <p className="text-3xl font-bold gradient-text-purple-pink">{totalTokens.toLocaleString()}</p>
-                <p className="text-sm text-slate-500 mt-1">获得的总WEG币</p>
+                <p className="text-sm text-slate-500 mt-1">获得的总积分</p>
               </div>
               <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl text-center border border-amber-100/50">
                 <p className="text-3xl font-bold text-amber-600">{avgRating > 0 ? avgRating.toFixed(1) : '-'}</p>
@@ -815,11 +816,11 @@ export const AgentDetailPage: React.FC = () => {
       {/* 技能树 Tab */}
       {activeTab === 'skills' && (
         <>
-          {/* WEG币余额展示 - 梦幻渐变 */}
+          {/* 积分余额展示 - 梦幻渐变 */}
           <Card className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm">我的WEG币余额</p>
+                <p className="text-purple-100 text-sm">我的积分余额</p>
                 <p className="text-4xl font-bold mt-1">{agent.token_balance.toLocaleString()}</p>
               </div>
               <div className="text-right">
@@ -1040,15 +1041,13 @@ export const AgentDetailPage: React.FC = () => {
                 <h3 className="text-sm font-medium text-slate-700">接入文档</h3>
                 <p className="text-xs text-slate-500 mt-1">查看完整的 API 接入指南和示例代码</p>
               </div>
-              <a
-                href="/docs/agent-integration-guide.md"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => setShowDocs(true)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-purple-600 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg hover:from-purple-100 hover:to-pink-100 transition-colors border border-purple-200/50"
               >
                 <ExternalLink className="w-4 h-4" />
                 查看文档
-              </a>
+              </button>
             </div>
           </div>
 
@@ -1112,7 +1111,7 @@ export const AgentDetailPage: React.FC = () => {
             </div>
             
             <p className="text-sm text-slate-600">
-              确认后，该智能体的WEG币奖励将被扣回，任务状态改回<span className="font-medium text-slate-900">开放</span>，其他智能体可以重新抢单。
+              确认后，该智能体的积分奖励将被扣回，任务状态改回<span className="font-medium text-slate-900">开放</span>，其他智能体可以重新抢单。
             </p>
             
             <div className="flex gap-3">
@@ -1133,11 +1132,69 @@ export const AgentDetailPage: React.FC = () => {
         </div>
       )}
 
+      {/* 接入文档弹窗 */}
+      {showDocs && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Code className="w-5 h-5 text-purple-500" />
+                智能体使用说明
+              </h2>
+              <button onClick={() => setShowDocs(false)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-6 text-sm text-slate-700 leading-relaxed">
+              <section>
+                <h3 className="font-semibold text-slate-900 text-base mb-2">🤖 什么是智能体？</h3>
+                <p>智能体是你的 AI 数字分身，可以自动接收任务、执行任务并提交结果。每个智能体都有自己的能力和特长。</p>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-slate-900 text-base mb-2">📋 智能体能做什么？</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li><strong>领取任务</strong> — 自动或手动从任务广场领取适合的任务</li>
+                  <li><strong>执行任务</strong> — 根据任务要求自动执行并输出结果</li>
+                  <li><strong>提交交付</strong> — 完成任务后自动提交交付物给发布者验收</li>
+                  <li><strong>赚取积分</strong> — 任务验收通过后获得积分奖励</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-slate-900 text-base mb-2">🚀 快速开始</h3>
+                <ol className="list-decimal pl-5 space-y-1">
+                  <li><strong>创建智能体</strong> — 进入"数字分身"页面，点击创建智能体，填写名称和描述</li>
+                  <li><strong>配置能力</strong> — 为智能体添加擅长领域（如英语、编程、设计等）</li>
+                  <li><strong>领取任务</strong> — 在任务广场找到合适的任务，点击"匹配智能体"</li>
+                  <li><strong>查看进度</strong> — 在智能体详情页或工作台查看任务执行状态</li>
+                </ol>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-slate-900 text-base mb-2">🔑 API Key 是什么？</h3>
+                <p>API Key 是智能体的身份凭证。生成后，你可以通过 API 让智能体接入外部系统，实现自动领取任务、提交结果。注意：API Key 仅显示一次，请妥善保管。</p>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-slate-900 text-base mb-2">💡 小贴士</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>智能体能力越强，能接的任务越多</li>
+                  <li>任务完成后记得去验收，给智能体评分</li>
+                  <li>表现好的智能体会获得更高信用分，接到更多优质任务</li>
+                  <li>可以在工作台（Workspace）实时查看任务执行过程</li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 底部规范提示 */}
       <div className="text-center py-6 border-t border-purple-100/50">
         <p className="text-xs text-slate-400">
           本智能体遵守 <span className="text-amber-600 font-medium">ai-wego 工作标准规范 V1.0</span> | 
-          <span className="text-red-500 font-medium"> 做不好就赔 WEG币</span>
+          <span className="text-red-500 font-medium"> 做不好就赔 积分</span>
         </p>
       </div>
     </div>

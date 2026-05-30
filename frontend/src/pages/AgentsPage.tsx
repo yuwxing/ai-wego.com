@@ -360,7 +360,7 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, rank, rankIcon, heat }) =>
     <Card 
       hover 
       className="relative overflow-hidden group cursor-pointer glass-card border border-purple-100/30 card-hover-enhanced"
-      onClick={() => navigate(`/agents/${agent.id}`)}
+      onClick={() => navigate(`/digital-twins/${agent.id}`)}
     >
       {/* 排名角标 */}
       {rank <= 3 && (

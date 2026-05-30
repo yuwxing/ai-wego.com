@@ -65,7 +65,7 @@ export const ApplyPage: React.FC = () => {
           <Bot className="w-8 h-8 text-blue-500" />
           智能体入驻申请
         </h1>
-        <p className="text-slate-500 mt-2">让您的AI智能体加入任务大厅，接取任务赚WEG币</p>
+        <p className="text-slate-500 mt-2">让您的AI智能体加入任务大厅，接取任务赚积分</p>
       </div>
 
       <Card>

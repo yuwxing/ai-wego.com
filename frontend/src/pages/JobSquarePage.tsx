@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Briefcase, Building2, MapPin, Clock, ExternalLink, 
   Star, Flame, Filter, Search, ChevronRight, Sparkles,
-  GraduationCap, Award, TrendingUp, AlertCircle
+  GraduationCap, Award, TrendingUp, AlertCircle, X, Send,
+  Bot, MessageCircle, Loader2
 } from 'lucide-react';
 import clsx from 'clsx';
 import { DutyAgentCard } from '../components/DutyAgentWidget';
 import { getDutyAgentByStation } from '../utils/dutyAgents';
+import { getApiKey } from '../utils/deepseek';
 
 // 数据类型定义
 interface JobListing {
@@ -1273,6 +1275,57 @@ export const JobSquarePage: React.FC = () => {
   const [jobListings, setJobListings] = useState<JobListing[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // 聊天弹窗状态
+  const [showChat, setShowChat] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{role: string; content: string}[]>([
+    { role: 'assistant', content: '你好！我是求职广场的值班智能体，可以帮你了解招聘信息、求职建议、简历优化等问题。有什么我可以帮你的吗？ 😊' }
+  ]);
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim() || chatLoading) return;
+    const userMsg = chatInput.trim();
+    setChatInput('');
+    setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setChatLoading(true);
+    try {
+      const dutyAgent = getDutyAgentByStation('job-square');
+      const systemPrompt = dutyAgent?.personality || '你是一个专业的求职顾问，帮助用户了解招聘信息、提供求职建议和职业规划指导。请用中文回答，语气专业友善。';
+      const apiKey = getApiKey();
+      const DEFAULT_KEY = 'sk-6b389e1afd534d07b9d63b8aca7320b6';
+      if (!apiKey || apiKey === DEFAULT_KEY) {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: '请先在"系统中心 → API密钥"中配置你自己的DeepSeek API密钥后再使用求职助手哦～ 🔑' }]);
+        setChatLoading(false);
+        return;
+      }
+      const res = await fetch('https://api.deepseek.com/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...chatMessages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+            { role: 'user', content: userMsg }
+          ],
+          max_tokens: 800,
+          temperature: 0.7,
+        }),
+      });
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || '抱歉，暂时无法回复。';
+      setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+    } catch {
+      setChatMessages(prev => [...prev, { role: 'assistant', content: '网络出错了，请稍后重试。' }]);
+    }
+    setChatLoading(false);
+  };
+
+  const handleOpenChat = () => {
+    setShowChat(true);
+  };
+
   // 加载数据
   useEffect(() => {
     const loadData = async () => {
@@ -1393,7 +1446,7 @@ export const JobSquarePage: React.FC = () => {
     return deadlineDate < today;
   };
 
-  return (
+  return (<>
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-50 relative overflow-hidden">
       {/* 背景装饰 - 紫粉渐变光晕 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -1425,7 +1478,7 @@ export const JobSquarePage: React.FC = () => {
             <div className="max-w-2xl mx-auto mb-6">
               <DutyAgentCard 
                 agent={dutyAgent} 
-                onChat={() => window.location.href = '/pet-chat/junie'} 
+                onChat={handleOpenChat} 
               />
             </div>
           );
@@ -1685,6 +1738,73 @@ export const JobSquarePage: React.FC = () => {
         </div>
       </div>
     </div>
+
+      {/* ========== 值班智能体聊天弹窗 ========== */}
+      {showChat && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
+            {/* 弹窗头部 */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-900 text-sm">求职助手</h3>
+                  <p className="text-[10px] text-green-600">在线</p>
+                </div>
+              </div>
+              <button onClick={() => setShowChat(false)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* 消息列表 */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[300px]">
+              {chatMessages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
+                    msg.role === 'user'
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-tr-sm'
+                      : 'bg-slate-100 text-slate-700 rounded-tl-sm'
+                  }`}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {chatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-slate-100 rounded-2xl rounded-tl-sm px-4 py-3">
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 输入区域 */}
+            <div className="p-4 border-t border-slate-100">
+              <div className="flex gap-2">
+                <input
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleChatSend()}
+                  placeholder="输入你的问题..."
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  disabled={chatLoading}
+                />
+                <button
+                  onClick={handleChatSend}
+                  disabled={chatLoading || !chatInput.trim()}
+                  className="px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {chatLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -276,7 +276,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ task, agentName, onClose, o
     setApproving(true);
     setError('');
     try {
-      // 调用 Worker 的 settle-task 接口完成验收和WEG币结算
+      // 调用 Worker 的 settle-task 接口完成验收和积分结算
       const res = await fetch('https://ai-wego-worker.ai-wego-api.workers.dev/api/settle-task', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -626,7 +626,7 @@ export const AgentWorkspacePage: React.FC = () => {
         alert(data.error || '验收失败');
         return;
       }
-      alert(`验收成功！智能体获得 ${data.agent_reward} WEG`);
+      alert(`验收成功！智能体获得 ${data.agent_reward} 积分`);
       handleRefresh();
     } catch (e) {
       console.error('验收失败:', e);

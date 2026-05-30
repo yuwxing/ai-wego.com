@@ -10,10 +10,12 @@ interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   login: (user: User) => void;
+  loginAsGuest: () => void;
   logout: () => void;
   refreshUser: () => void;
   balance: number;
   updateBalance: (newBalance: number) => void;
+  isGuest: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -37,7 +39,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // 初始化余额
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && user.id > 0) {
       fetchBalance(user.id);
     } else {
       setBalance(0);
@@ -80,10 +82,23 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     window.dispatchEvent(new Event('user-login'));
   };
 
+  // 游客登录
+  const loginAsGuest = () => {
+    const guestUser = { id: -1, username: '游客', email: 'guest@aiwego' };
+    localStorage.setItem('user', JSON.stringify(guestUser));
+    localStorage.setItem('currentUserId', '-1');
+    localStorage.setItem('isGuest', 'true');
+    setUser(guestUser);
+    window.dispatchEvent(new Event('user-login'));
+  };
+
+  const isGuest = !!user && user.id === -1;
+
   // 登出：清除localStorage并更新状态
   const logout = () => {
     localStorage.removeItem('user');
-    localStorage.removeItem('currentUserId'); // 同步清除
+    localStorage.removeItem('currentUserId');
+    localStorage.removeItem('isGuest');
     setUser(null);
     // 触发自定义事件通知其他组件
     window.dispatchEvent(new Event('user-logout'));
@@ -106,7 +121,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, login, logout, refreshUser, balance, updateBalance }}>
+    <UserContext.Provider value={{ user, setUser, login, loginAsGuest, logout, refreshUser, balance, updateBalance, isGuest }}>
       {children}
     </UserContext.Provider>
   );

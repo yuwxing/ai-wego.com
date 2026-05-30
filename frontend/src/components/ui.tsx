@@ -152,7 +152,7 @@ interface TokenAmountProps {
 export const TokenAmount: React.FC<TokenAmountProps> = ({ amount, className }) => {
   return (
     <span className={clsx('font-medium text-secondary-600', className)}>
-      <img src="/weg-coin.png" alt="WEG" style={{ width: 16, height: 16, display: 'inline-block', verticalAlign: 'middle', marginRight: 4, borderRadius: '50%' }} />
+      <img src="/weg-coin.png" alt="积分" style={{ width: 16, height: 16, display: 'inline-block', verticalAlign: 'middle', marginRight: 4, borderRadius: '50%' }} />
       {amount.toLocaleString()}
     </span>
   );

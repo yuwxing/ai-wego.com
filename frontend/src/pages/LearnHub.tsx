@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, Headphones, Newspaper, Bot } from 'lucide-react'
+import { BookOpen, Headphones, Newspaper, Bot, Monitor } from 'lucide-react'
 
 const tools = [
   { to: '/learn/word-cards', icon: BookOpen, title: '单词系统', desc: '单词卡片 · 记忆训练 · 测试模式', color: 'bg-blue-500' },
   { to: '/learn/listening-speaking', icon: Headphones, title: '听说训练', desc: '模仿朗读 · 听选信息 · 回答问题 · 信息转述 · AI评分', color: 'bg-green-500' },
   { to: '/learn/english-daily', icon: Newspaper, title: '每日英语', desc: '阅读理解 · 语法训练 · 写作训练 · AI批改', color: 'bg-purple-500' },
+  { to: '/learn/online-classroom', icon: Monitor, title: '在线教室', desc: 'AI智能备课 · 互动授课 · OpenMAIC 课堂', color: 'bg-red-500' },
   { to: '/learn/classroom', icon: Bot, title: 'AI学习助手', desc: 'AI智能辅导 · 宠物精灵陪伴 · 互动聊天', color: 'bg-orange-500' },
 ]
 

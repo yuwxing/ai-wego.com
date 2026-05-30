@@ -17,7 +17,7 @@ export const GuestPromptModal: React.FC<GuestPromptModalProps> = ({
   isOpen,
   onClose,
   title = '登录后可保存进度',
-  message = '注册后可保存进度 + 赚WEG币 + 解锁更多功能 🎉',
+  message = '注册后可保存进度 + 赚积分 + 解锁更多功能 🎉',
   highlight = '注册完全免费，只需几秒钟！',
   featureIcons = ['🐾', '💰', '🤖']
 }) => {
@@ -107,7 +107,7 @@ export const GuestPromptModal: React.FC<GuestPromptModalProps> = ({
               </div>
               <div className="bg-pink-50 rounded-xl p-3">
                 <Coins className="w-5 h-5 text-pink-600 mx-auto mb-1" />
-                <p className="text-xs text-pink-700 font-medium">赚取WEG币</p>
+                <p className="text-xs text-pink-700 font-medium">赚取积分</p>
               </div>
               <div className="bg-rose-50 rounded-xl p-3">
                 <Bot className="w-5 h-5 text-rose-600 mx-auto mb-1" />

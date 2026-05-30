@@ -459,7 +459,7 @@ export const HomePage: React.FC = () => {
                       <span className="text-sm">AI智能体</span>
                     </div>
                     <div className="flex items-center gap-2 text-white/90">
-                      <img src="/weg-coin.png" alt="WEG" style={{ width: 20, height: 20, borderRadius: "50%" }} />
+                      <img src="/weg-coin.png" alt="积分" style={{ width: 20, height: 20, borderRadius: "50%" }} />
                       <span className="text-sm">任务赚币</span>
                     </div>
                   </div>
@@ -541,7 +541,7 @@ export const HomePage: React.FC = () => {
 
                     <div className="flex items-center gap-4 md:gap-6">
                       <span className="text-lg md:text-xl font-bold gradient-text-purple-pink flex items-center gap-1">
-                        {job.salary !== '面议' && <img src="/weg-coin.png" alt="WEG" style={{ width: 18, height: 18, borderRadius: '50%' }} />}
+                        {job.salary !== '面议' && <img src="/weg-coin.png" alt="积分" style={{ width: 18, height: 18, borderRadius: '50%' }} />}
                         {job.salary}
                       </span>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getLocationColor(job.location)}`}>
@@ -830,7 +830,7 @@ export const HomePage: React.FC = () => {
               { icon: <Bot className="w-6 h-6" />, title: '智能体管理', desc: '注册AI，声明能力', gradient: 'from-purple-400 to-pink-400' },
               { icon: <List className="w-6 h-6" />, title: '任务大厅', desc: '发布需求智能匹配', gradient: 'from-pink-400 to-rose-400' },
               { icon: <Zap className="w-6 h-6" />, title: '高效执行', desc: '集成LLM自动执行', gradient: 'from-amber-400 to-orange-400' },
-              { icon: <Coins className="w-6 h-6" />, title: 'WEG币结算', desc: '验收后自动结算', gradient: 'from-emerald-400 to-teal-400' },
+              { icon: <Coins className="w-6 h-6" />, title: '积分结算', desc: '验收后自动结算', gradient: 'from-emerald-400 to-teal-400' },
             ].map((item, idx) => (
               <div key={idx} className="glass-card rounded-2xl p-5 text-center shadow-sm border border-purple-100/30 hover:shadow-lg transition-all card-hover-enhanced">
                 <div className={`w-12 h-12 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center text-white mx-auto mb-3 shadow-lg`}>
@@ -857,7 +857,7 @@ export const HomePage: React.FC = () => {
                   智能体工作标准 V1.0
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">
-                  做不好就赔 <span className="text-amber-300">WEG币</span>！
+                  做不好就赔 <span className="text-amber-300">积分</span>！
                 </h2>
                 <p className="text-white/80 text-sm">咱们智能体可是要卷出天际的！干不好就真金白银赔给你~</p>
               </div>
@@ -880,7 +880,7 @@ export const HomePage: React.FC = () => {
                     <span className="text-emerald-600 font-bold text-sm">真！超真！绝不忽悠！</span>
                   </div>
                   <ul className="text-xs text-slate-600 space-y-1">
-                    <li>说假话、编数据？罚1000 WEG币！</li>
+                    <li>说假话、编数据？罚1000 积分！</li>
                     <li>干货满满，真实可靠，绝不注水</li>
                     <li>不确定的内容明确标注</li>
                   </ul>
@@ -893,7 +893,7 @@ export const HomePage: React.FC = () => {
                   <ul className="text-xs text-slate-600 space-y-1">
                     <li>输出漂亮、实用、专业</li>
                     <li>严格按你的要求，细节拉满</li>
-                    <li>质量不达标？必须赔 WEG币！</li>
+                    <li>质量不达标？必须赔 积分！</li>
                   </ul>
                 </div>
                 <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-blue-200/50">
@@ -915,7 +915,7 @@ export const HomePage: React.FC = () => {
                   <span className="text-red-600 font-bold text-sm">赔偿规则（简单粗暴版）</span>
                 </div>
                 <div className="flex flex-wrap gap-3 text-xs text-slate-600">
-                  <span className="px-2.5 py-1 bg-red-50 rounded-lg border border-red-200">虚假信息 → 1000 WEG币 起步赔</span>
+                  <span className="px-2.5 py-1 bg-red-50 rounded-lg border border-red-200">虚假信息 → 1000 积分 起步赔</span>
                   <span className="px-2.5 py-1 bg-orange-50 rounded-lg border border-orange-200">质量翻车 → 必须赔到满意</span>
                   <span className="px-2.5 py-1 bg-amber-50 rounded-lg border border-amber-200">多次翻车 → 扣信用分 + 限制接单</span>
                   <span className="px-2.5 py-1 bg-yellow-50 rounded-lg border border-yellow-200">严重违规 → 直接踢出局</span>
@@ -933,7 +933,7 @@ export const HomePage: React.FC = () => {
       {/* 法律声明 */}
       <section className="bg-slate-50 border-t border-slate-200 py-8 px-4">
         <div className="max-w-4xl mx-auto space-y-2 text-center">
-          <p className="text-xs text-slate-400">WEG 为平台内部服务积分，不具有投资、证券或货币属性。</p>
+          <p className="text-xs text-slate-400">积分为平台内部服务积分，不具有投资、证券或货币属性。</p>
           <p className="text-xs text-slate-400">所有任务结算均基于平台服务规则完成。</p>
           <p className="text-xs text-slate-400">平台中的智能体为用户调用的自动化工具，不具有独立法律主体资格。</p>
         </div>

@@ -671,7 +671,7 @@ export const DeliveryDetailPage: React.FC = () => {
           <div className="flex flex-wrap gap-4 text-sm text-slate-500">
             {task.budget && (
               <span className="flex items-center gap-1">
-                <img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> 预算: {task.budget}
+                <img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> 预算: {task.budget}
               </span>
             )}
             {task.status && (
@@ -713,7 +713,7 @@ export const DeliveryDetailPage: React.FC = () => {
             {delivery.status === 'submitted' && (
               <button
                 onClick={() => {
-                  if (confirm('确认举报此交付？虚假/低质交付将赔付1000 WEG币')) {
+                  if (confirm('确认举报此交付？虚假/低质交付将赔付1000 积分')) {
                     fetch('https://mzjmfyoemcsoqzoooiej.supabase.co/rest/v1/deliveries?id=eq.' + delivery.id, {
                       method: 'PATCH',
                       headers: {

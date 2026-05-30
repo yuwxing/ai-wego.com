@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 // AI-Wego App v3 - Navigation Hub
 import Home from './pages/Home'
 import LearnHub from './pages/LearnHub'
@@ -17,6 +17,7 @@ import AgentWorkspacePage from './pages/AgentWorkspacePage'
 import CompetitionHallPage from './pages/CompetitionHallPage'
 import CompetitionDetailPage from './pages/CompetitionDetailPage'
 import CreateCompetitionPage from './pages/CreateCompetitionPage'
+import CreateWorkshop from './pages/CreateWorkshop'
 import SubmitPage from './pages/SubmitPage'
 import WegHub from './pages/WegHub'
 import XpPage from './pages/XpPage'
@@ -35,15 +36,28 @@ import NotesPage from './pages/NotesPage'
 import RegisterPage from './pages/RegisterPage'
 import AdoptPage from './pages/AdoptPage'
 import { PetChatPage } from './pages/PetChatPage'
+import PetWidget from './components/PetWidget'
 import AdminApplications from './pages/admin/Applications'
 import AdminFeedback from './pages/admin/Feedback'
 import AdminCompensate from './pages/admin/Compensate'
 import AdminInspections from './pages/admin/Inspections'
 import ListeningSpeakingAdmin from './pages/admin/ListeningSpeakingAdmin'
+import OnlineClassroom from './pages/OnlineClassroom'
 import NotFound from './pages/NotFound'
+
+function ParamRedirect({ to }: { to: string }) {
+  const params = useParams();
+  let resolved = to;
+  for (const [key, value] of Object.entries(params)) {
+    resolved = resolved.replace(`:${key}`, value || '');
+  }
+  return <Navigate to={resolved} replace />;
+}
 
 export default function App() {
   return (
+    <>
+    <PetWidget />
     <Routes>
       {/* Home */}
       <Route path="/" element={<Home />} />
@@ -55,6 +69,7 @@ export default function App() {
       <Route path="/learn/english-daily" element={<EnglishDailyPage />} />
       <Route path="/learn/classroom" element={<AIClassroomPage />} />
       <Route path="/learn/competitions" element={<LearnCompetitions />} />
+      <Route path="/learn/online-classroom" element={<OnlineClassroom />} />
 
       {/* Digital Twins */}
       <Route path="/digital-twins" element={<AgentsPage />} />
@@ -78,6 +93,7 @@ export default function App() {
 
       {/* Competition Center */}
       <Route path="/competitions" element={<CompetitionHallPage />} />
+      <Route path="/competitions/workshop" element={<CreateWorkshop />} />
       <Route path="/competitions/:id" element={<CompetitionDetailPage />} />
       <Route path="/competitions/new" element={<CreateCompetitionPage />} />
       <Route path="/competitions/:id/submit" element={<SubmitPage />} />
@@ -102,14 +118,14 @@ export default function App() {
       <Route path="/english-daily" element={<Navigate to="/learn/english-daily" replace />} />
       <Route path="/classroom" element={<Navigate to="/learn/classroom" replace />} />
       <Route path="/agents" element={<Navigate to="/digital-twins" replace />} />
-      <Route path="/agents/:id" element={<Navigate to="/digital-twins/:id" replace />} />
+      <Route path="/agents/:id" element={<ParamRedirect to="/digital-twins/:id" />} />
       <Route path="/create-agent" element={<Navigate to="/digital-twins/create" replace />} />
       <Route path="/my-agents" element={<Navigate to="/digital-twins" replace />} />
       <Route path="/balance" element={<Navigate to="/weg/balance" replace />} />
       <Route path="/job-square" element={<Navigate to="/jinghua/job-square" replace />} />
       <Route path="/benefits" element={<Navigate to="/weg/rewards" replace />} />
-      <Route path="/submit-result/:taskId" element={<Navigate to="/competitions/:taskId/submit" replace />} />
-      <Route path="/delivery/:id" element={<Navigate to="/workspace/:id" replace />} />
+      <Route path="/submit-result/:taskId" element={<ParamRedirect to="/competitions/:taskId/submit" />} />
+      <Route path="/delivery/:id" element={<ParamRedirect to="/workspace/:id" />} />
       <Route path="/jinghua/mentors" element={<Navigate to="/jinghua" replace />} />
       <Route path="/jinghua/labs" element={<Navigate to="/jinghua/projects" replace />} />
       <Route path="/jinghua/agents" element={<Navigate to="/jinghua" replace />} />
@@ -129,5 +145,6 @@ export default function App() {
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </>
   )
 }

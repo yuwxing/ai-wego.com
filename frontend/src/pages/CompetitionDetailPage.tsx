@@ -334,6 +334,11 @@ export const TaskDetailPage: React.FC = () => {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // 用户智能体相关
+  const [userAgents, setUserAgents] = useState<Agent[]>([]);
+  const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
+  const [loadingAgents, setLoadingAgents] = useState(false);
+
   // 交付相关状态
   const [deliveries, setDeliveries] = useState<any[]>([]);
   const [deliveryContent, setDeliveryContent] = useState('');
@@ -371,6 +376,29 @@ export const TaskDetailPage: React.FC = () => {
   const isClaimedByCurrentUser = claimedBy.includes(currentUserId);
   const maxClaimants: number = (task as any)?.max_claimants || 1;
   const claimedCount = claimedBy.length;
+
+  // 获取当前用户的智能体
+  const fetchUserAgents = async (userId: number) => {
+    try {
+      setLoadingAgents(true);
+      const data = await agentsAPI.listAgents({ owner_id: userId });
+      setUserAgents(data || []);
+      if (data && data.length > 0) {
+        setSelectedAgentId(data[0].id);
+      }
+    } catch (err) {
+      console.error('获取用户智能体失败', err);
+    } finally {
+      setLoadingAgents(false);
+    }
+  };
+
+  // 用户变化时重新获取智能体
+  useEffect(() => {
+    if (currentUserId && currentUserId > 0) {
+      fetchUserAgents(currentUserId);
+    }
+  }, [currentUserId]);
 
   useEffect(() => {
     if (id) {
@@ -435,7 +463,7 @@ export const TaskDetailPage: React.FC = () => {
     
     // 检查余额是否足够
     if (user && typeof user.balance === 'number' && task.budget > user.balance) {
-      showNotification('warning', `余额不足！需要 ${task.budget} WEG币，当前余额 ${user.balance} WEG币`);
+      showNotification('warning', `余额不足！需要 ${task.budget} 积分，当前余额 ${user.balance} 积分`);
       return;
     }
     
@@ -561,29 +589,46 @@ export const TaskDetailPage: React.FC = () => {
     try {
       setActionLoading(true);
       
-      // 使用 Worker cancel-task 接口
-      const res = await fetch('https://ai-wego-worker.ai-wego-api.workers.dev/api/cancel-task', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          task_id: parseInt(id)
-        })
-      });
-      const data = await res.json();
-      
-      if (!res.ok) {
-        setError(data.error || '取消失败');
-        return;
+      // 优先使用 Worker cancel-task 接口（含退款）
+      try {
+        const res = await fetch('https://ai-wego-worker.ai-wego-api.workers.dev/api/cancel-task', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task_id: parseInt(id) })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          showNotification('success', `任务已取消，退款 ${data.refund?.refund_amount || 0} 积分`);
+          await fetchTaskDetails(parseInt(id));
+          await fetchTaskLogs(parseInt(id));
+          setShowCancelConfirm(false);
+          window.dispatchEvent(new Event('balance-refresh'));
+          return;
+        }
+        console.warn('Worker取消失败，走Supabase降级:', data.error);
+      } catch (workerErr) {
+        console.warn('Worker不可达，走Supabase降级:', workerErr);
       }
       
-      showNotification('success', `任务已取消，退款 ${data.refund?.refund_amount || 0} WEG币`);
-      await fetchTaskDetails(parseInt(id));
-      await fetchTaskLogs(parseInt(id));
-      setShowCancelConfirm(false);
-      // 通知 Layout 刷新余额
-      window.dispatchEvent(new Event('balance-refresh'));
+      // 降级：直接通过 Supabase 取消任务
+      try {
+        await tasksAPI.updateTask(parseInt(id), { status: 'cancelled' });
+        showNotification('warning', '取消失败：Worker不可达，已通过本地取消（退款需联系管理员手动处理）');
+        await fetchTaskDetails(parseInt(id));
+        await fetchTaskLogs(parseInt(id));
+        setShowCancelConfirm(false);
+        window.dispatchEvent(new Event('balance-refresh'));
+        return;
+      } catch (supabaseErr) {
+        console.error('Supabase降级也失败了:', supabaseErr);
+        setError('取消失败：网络异常，请稍后重试');
+        setActionLoading(false);
+        return;
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '取消失败');
+      const msg = err instanceof TypeError ? '取消失败：Worker服务不可达' : (err instanceof Error ? err.message : '取消失败');
+      setError(msg);
     } finally {
       setActionLoading(false);
     }
@@ -599,24 +644,26 @@ export const TaskDetailPage: React.FC = () => {
     setShowCancelConfirm(true);
   };
 
-  // 提交交付物
+  // 提交交付物（通过用户的智能体）
   const handleSubmitDelivery = async () => {
     if (!id || !deliveryContent.trim()) {
       setError('请输入交付内容');
       return;
     }
+    if (!selectedAgentId) {
+      setError('请选择交付智能体');
+      return;
+    }
     try {
       setSubmitLoading(true);
-      // 如果是认领者提交，使用当前用户ID；否则使用智能体ID
-      const submitterId = isClaimedByCurrentUser ? currentUserId : (task?.matched_agent_id || 1);
-      await tasksAPI.submitDelivery(parseInt(id), submitterId, deliveryContent, deliveryUrl || undefined);
-      await tasksAPI.updateTask(parseInt(id), { status: 'submitted', delivery_status: 'submitted' });
+      await tasksAPI.submitDelivery(parseInt(id), selectedAgentId, deliveryContent, deliveryUrl || undefined);
+      await tasksAPI.updateTask(parseInt(id), { status: 'submitted', delivery_status: 'submitted', matched_agent_id: selectedAgentId });
       setDeliveryContent('');
       setDeliveryUrl('');
       await fetchDeliveries(parseInt(id));
       await fetchTaskDetails(parseInt(id));
       const reward = task?.budget || 0;
-      showNotification('reward', `🎁 交付成功！任务完成后可获得 ${reward} WEG币 奖励`);
+      showNotification('reward', `🎁 交付成功！任务完成后可获得 ${reward} 积分 奖励`);
     } catch (err) {
       setError(err instanceof Error ? err.message : '提交失败');
     } finally {
@@ -650,7 +697,7 @@ export const TaskDetailPage: React.FC = () => {
           return;
         }
         const reward = task?.budget || 0;
-        showNotification('reward', `✅ 验收通过！${reward} WEG币 已结算给智能体`);
+        showNotification('reward', `✅ 验收通过！${reward} 积分 已结算给智能体`);
         // 通知 Layout 刷新余额
         window.dispatchEvent(new Event('balance-refresh'));
       } else {
@@ -937,7 +984,7 @@ export const TaskDetailPage: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-y border-slate-100">
           <div className="text-center p-3 bg-slate-50 rounded-xl">
             <p className="text-xs text-slate-500 mb-1">预算</p>
-            <p className="font-bold text-purple-600 text-lg"><img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {task.budget}</p>
+            <p className="font-bold text-purple-600 text-lg"><img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {task.budget}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 rounded-xl">
             <p className="text-xs text-slate-500 mb-1">截止时间</p>
@@ -1085,22 +1132,28 @@ export const TaskDetailPage: React.FC = () => {
             </button>
             
             <p className="text-xs text-slate-400 mt-4">
-              任务预算：<img src="/weg-coin.png" alt="WEG" style={{width:14,height:14,display:"inline-block",verticalAlign:"middle",marginRight:2,borderRadius:"50%"}} /> {task.budget} WEG币
+              任务预算：<img src="/weg-coin.png" alt="积分" style={{width:14,height:14,display:"inline-block",verticalAlign:"middle",marginRight:2,borderRadius:"50%"}} /> {task.budget} 积分
             </p>
           </div>
         </Card>
       )}
 
-      {/* 任务状态：匹配中（保留兼容性，显示执行入口） */}
+      {/* 任务状态：匹配中（显示匹配的智能体） */}
       {task.status === 'matched' && isTaskCreator && (
         <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-md">
               <Bot className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <p className="font-semibold text-blue-700">🎉 已匹配！智能体已领取任务</p>
-              <p className="text-sm text-slate-500">请等待智能体处理，完成后会自动提交交付物</p>
+            <div className="flex-1">
+              <p className="font-semibold text-blue-700">🎉 已匹配！</p>
+              {task.agent ? (
+                <p className="text-sm text-slate-600">
+                  智能体 <span className="font-medium text-blue-600">{task.agent.name}</span> 已领取任务，正在处理中
+                </p>
+              ) : (
+                <p className="text-sm text-slate-500">智能体已领取任务，正在处理中</p>
+              )}
             </div>
             <button
               onClick={openCancelConfirm}
@@ -1175,27 +1228,104 @@ export const TaskDetailPage: React.FC = () => {
         </Card>
       )}
 
-      {/* ========== 交付提交区域（智能体视角 - 兼容旧逻辑） ========== */}
-      {(task.status === 'matched' || task.status === 'in_progress') && isMatchedAgent && !isClaimedByCurrentUser && (
+      {/* ========== 交付提交表单（仅注册用户，通过智能体提交） ========== */}
+      {(task.status === 'matched' || task.status === 'in_progress') && !isTaskCreator && currentUserId > 0 && (
         <Card className="!p-6">
-          <div className="text-center py-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse shadow-lg">
-              <Bot className="w-8 h-8 text-white" />
+          <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <Send className="w-5 h-5 text-purple-500" />
+            提交交付物
+          </h3>
+          
+          {/* 智能体选择 */}
+          {userAgents.length > 0 ? (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                交付智能体
+              </label>
+              <select
+                value={selectedAgentId ?? ''}
+                onChange={(e) => setSelectedAgentId(Number(e.target.value))}
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-800 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                {userAgents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-slate-400 mt-1">
+                交付物将以该智能体的名义提交
+              </p>
             </div>
-            <h3 className="font-semibold text-slate-900 text-lg mb-2">
-              {task.status === 'matched' ? '⏳ 等待开始执行' : '⚡ 任务执行中'}
-            </h3>
-            <p className="text-sm text-slate-500 mb-4">
-              请完成任务执行后提交交付物
-            </p>
-            <div className="flex items-center justify-center gap-1.5 mb-3">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'0ms'}}></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'150ms'}}></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay:'300ms'}}></div>
+          ) : (
+            <div className="mb-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+              <div className="flex items-center gap-2 text-amber-800 font-medium mb-1">
+                <AlertCircle className="w-4 h-4" />
+                暂无智能体
+              </div>
+              <p className="text-sm text-amber-700">
+                请先创建智能体后再提交交付物
+              </p>
             </div>
-            <p className="text-xs text-slate-400">
-              请在下方提交区域提交您的交付成果
-            </p>
+          )}
+
+          {/* 交付内容输入 */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              交付内容
+            </label>
+            <textarea
+              value={deliveryContent}
+              onChange={(e) => setDeliveryContent(e.target.value)}
+              placeholder="请描述您的交付成果，支持 Markdown 格式..."
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              rows={5}
+              disabled={userAgents.length === 0}
+            />
+          </div>
+
+          {/* 交付链接（可选） */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              交付链接（可选）
+            </label>
+            <input
+              value={deliveryUrl}
+              onChange={(e) => setDeliveryUrl(e.target.value)}
+              placeholder="https://..."
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              disabled={userAgents.length === 0}
+            />
+          </div>
+
+          {/* 提交按钮 */}
+          <button
+            onClick={handleSubmitDelivery}
+            disabled={submitLoading || !deliveryContent.trim() || !selectedAgentId || userAgents.length === 0}
+            className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {submitLoading ? (
+              <>提交中...</>
+            ) : (
+              <><Send className="w-4 h-4" />提交交付物</>
+            )}
+          </button>
+        </Card>
+      )}
+
+      {/* ========== 游客提示 ========== */}
+      {(task.status === 'matched' || task.status === 'in_progress') && !isTaskCreator && currentUserId <= 0 && (
+        <Card className="!p-6 border-2 border-amber-200 bg-amber-50">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900">仅注册用户可提交交付物</h3>
+              <p className="text-sm text-slate-600 mt-1">
+                请注册或登录后，创建智能体并参与任务交付
+              </p>
+            </div>
           </div>
         </Card>
       )}
@@ -1555,7 +1685,7 @@ export const TaskDetailPage: React.FC = () => {
               )}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">任务奖励</span>
-                <span className="text-blue-600 font-medium"><img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {task?.budget}</span>
+                <span className="text-blue-600 font-medium"><img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {task?.budget}</span>
               </div>
             </div>
             
@@ -1819,10 +1949,10 @@ export const TaskDetailPage: React.FC = () => {
                 取消后将退还以下金额：
               </p>
               <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#DC2626' }}>
-                <img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {cancelRefund} WEG币
+                <img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {cancelRefund} 积分
               </p>
               <p style={{ fontSize: '12px', color: '#991B1B', marginTop: '4px' }}>
-                （原预算：<img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {task?.budget || 10}，当前进度：{(task as any).progress || 0}%）
+                （原预算：<img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {task?.budget || 10}，当前进度：{(task as any).progress || 0}%）
               </p>
             </div>
 

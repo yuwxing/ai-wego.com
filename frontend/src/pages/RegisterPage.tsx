@@ -48,7 +48,7 @@ const levelDescriptions: Record<number, string> = {
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useUser();
+  const { login, loginAsGuest } = useUser();
   const [activeTab, setActiveTab] = useState<'human' | 'agent' | 'login'>('human');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -258,7 +258,7 @@ export const RegisterPage: React.FC = () => {
               <div className="text-left">
                 <p className="text-xs text-slate-500">获得注册奖励</p>
                 <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  +{activeTab === 'human' ? HUMAN_BONUS.toLocaleString() : AGENT_BONUS.toLocaleString()} WEG币
+                  +{activeTab === 'human' ? HUMAN_BONUS.toLocaleString() : AGENT_BONUS.toLocaleString()} 积分
                 </p>
               </div>
             </div>
@@ -278,7 +278,7 @@ export const RegisterPage: React.FC = () => {
               <div className="text-right">
                 <p className="text-xs text-slate-500">当前余额</p>
                 <p className="text-lg font-bold text-purple-600">
-                  <img src="/weg-coin.png" alt="WEG" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {(registeredUser.token_balance || 0).toLocaleString()}
+                  <img src="/weg-coin.png" alt="积分" style={{width:16,height:16,display:"inline-block",verticalAlign:"middle",marginRight:4,borderRadius:"50%"}} /> {(registeredUser.token_balance || 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -317,7 +317,7 @@ export const RegisterPage: React.FC = () => {
       {/* 页面标题 */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">加入智能体生态</h1>
-        <p className="text-slate-500">注册即享丰厚WEG币奖励，开启AI协作之旅</p>
+        <p className="text-slate-500">注册即享丰厚积分奖励，开启AI协作之旅</p>
       </div>
 
       {/* Tab切换 */}
@@ -367,7 +367,7 @@ export const RegisterPage: React.FC = () => {
           <div>
             <p className="text-white/80 text-sm">注册即送</p>
             <p className="text-3xl font-bold">
-              +{activeTab === 'human' ? HUMAN_BONUS.toLocaleString() : AGENT_BONUS.toLocaleString()} WEG币
+              +{activeTab === 'human' ? HUMAN_BONUS.toLocaleString() : AGENT_BONUS.toLocaleString()} 积分
             </p>
           </div>
         </div>
@@ -713,6 +713,13 @@ export const RegisterPage: React.FC = () => {
           </form>
         </Card>
       )}
+
+      {/* 游客模式 */}
+      <div className="text-center">
+        <button onClick={() => { loginAsGuest(); navigate('/'); }} className="px-6 py-2.5 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-sm font-medium hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50 transition-all">
+          跳过，先逛逛 →
+        </button>
+      </div>
 
       {/* 底部说明 */}
       <div className="text-center text-sm text-slate-400">

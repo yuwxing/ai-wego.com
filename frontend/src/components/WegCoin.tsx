@@ -9,7 +9,7 @@ const WegCoin: React.FC<WegCoinProps> = ({ size = 16, style }) => {
   return (
     <img 
       src="/weg-coin.png" 
-      alt="WEG" 
+      alt="积分" 
       style={{ 
         width: size, 
         height: size, 

@@ -347,7 +347,7 @@ export const AdoptPage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* WEG币不足警告 */}
+      {/* 积分不足警告 */}
       {balanceWarning && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-2xl shadow-2xl flex items-center gap-2 animate-scale-in">
           <AlertCircle className="w-5 h-5" />
@@ -456,7 +456,7 @@ export const AdoptPage: React.FC = () => {
           <div className="mb-4 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-purple-600" />
             <span className="text-sm text-purple-700">
-              领养需消耗 <strong>100 <img src="/weg-coin.png" alt="WEG" style={{ width: 14, height: 14, borderRadius: "50%", display: "inline-block", verticalAlign: "middle" }} /></strong>，完成英语学习即可喂养
+              领养需消耗 <strong>100 <img src="/weg-coin.png" alt="积分" style={{ width: 14, height: 14, borderRadius: "50%", display: "inline-block", verticalAlign: "middle" }} /></strong>，完成英语学习即可喂养
             </span>
           </div>
         )}
@@ -603,7 +603,7 @@ export const AdoptPage: React.FC = () => {
             <div className="px-4 py-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 mb-6">
               <p className="text-sm text-amber-700 flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span><strong>领养需消耗100 <img src="/weg-coin.png" alt="WEG" style={{ width: 14, height: 14, borderRadius: "50%", display: "inline-block", verticalAlign: "middle" }} /></strong>，完成英语学习即可喂养</span>
+                <span><strong>领养需消耗100 <img src="/weg-coin.png" alt="积分" style={{ width: 14, height: 14, borderRadius: "50%", display: "inline-block", verticalAlign: "middle" }} /></strong>，完成英语学习即可喂养</span>
               </p>
             </div>
             <div className="flex gap-3">
@@ -652,7 +652,7 @@ export const AdoptPage: React.FC = () => {
             </h3>
             <p className="text-center text-slate-600 mb-4">
               你确定要放归 <span className="font-bold text-red-600">{adoptedPet?.name}</span> 吗？<br/>
-              <span className="text-sm text-slate-500">放归后无法恢复，领养消耗的WEG币不予退还</span>
+              <span className="text-sm text-slate-500">放归后无法恢复，领养消耗的积分不予退还</span>
             </p>
             <div className="flex gap-3">
               <button
@@ -689,7 +689,7 @@ export const AdoptPage: React.FC = () => {
         isOpen={showGuestPrompt}
         onClose={() => setShowGuestPrompt(false)}
         title="注册后可永久保存宠物 🐾"
-        message="注册后可以领养宠物、赚取WEG币、解锁更多功能 🎉"
+        message="注册后可以领养宠物、赚取积分、解锁更多功能 🎉"
         highlight="注册完全免费，只需几秒钟！"
         featureIcons={['🐾', '💰', '🤖']}
       />

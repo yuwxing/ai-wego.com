@@ -10,7 +10,7 @@ const AI_ASSISTANTS = [
     icon: BookOpen,
     desc: '语法答疑、写作批改、阅读理解辅导',
     color: 'from-blue-500 to-cyan-500',
-    prompt: '你是AI英语学习助手，帮助初中生提高英语水平。请用中文回答，耐心解释语法、词汇和写作问题。'
+    prompt: '你是AI英语学习助手，帮助初中生提高英语水平。请用中文回答，耐心解释语法、词汇和写作问题。回答时分点列出，每条用-开头，不要用#和**符号。'
   },
   {
     id: 'math',
@@ -18,7 +18,7 @@ const AI_ASSISTANTS = [
     icon: Zap,
     desc: '解题思路、公式推导、错题分析',
     color: 'from-green-500 to-emerald-500',
-    prompt: '你是AI数学解题助手，帮助初中生理解数学概念和解题思路。用简单易懂的方式讲解，引导自主思考。'
+    prompt: '你是AI数学解题助手，帮助初中生理解数学概念和解题思路。用简单易懂的方式讲解，引导自主思考。回答时分步骤列出，每条用-开头，不要用#和**符号。'
   },
   {
     id: 'study',
@@ -26,7 +26,7 @@ const AI_ASSISTANTS = [
     icon: Star,
     desc: '学习计划、时间管理、方法指导',
     color: 'from-purple-500 to-pink-500',
-    prompt: '你是AI学习规划助手，帮助初中生制定学习计划，提高学习效率。给出具体可行的建议。'
+    prompt: '你是AI学习规划助手，帮助初中生制定学习计划，提高学习效率。给出具体可行的建议。回答时分点列出，每条用-开头，不要用#和**符号。'
   }
 ];
 
@@ -37,6 +37,15 @@ interface Message {
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 10);
+
+const formatResponse = (text: string) => {
+  return text
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*(?!\s)/g, '• ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+};
 
 const AIClassroomPage: React.FC = () => {
   const navigate = useNavigate();
@@ -156,7 +165,7 @@ const AIClassroomPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div onClick={() => navigate('/pet-chat/default')} className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-100 hover:shadow-lg transition-all cursor-pointer">
+            <div onClick={() => { const p = localStorage.getItem('adoptedPet'); navigate(p ? `/pet-chat/${JSON.parse(p).petId}` : '/adopt'); }} className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-100 hover:shadow-lg transition-all cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white text-2xl">
                   <MessageCircle className="w-7 h-7" />
@@ -186,7 +195,7 @@ const AIClassroomPage: React.FC = () => {
                 <p className="text-sm text-slate-500">宠物会回应你的问题，陪你学习成长</p>
               </div>
             </div>
-            <button onClick={() => navigate('/pet-chat/default')} className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+            <button onClick={() => { const p = localStorage.getItem('adoptedPet'); navigate(p ? `/pet-chat/${JSON.parse(p).petId}` : '/adopt'); }} className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2">
               <MessageCircle className="w-5 h-5" />
               开始聊天
             </button>
@@ -220,7 +229,7 @@ const AIClassroomPage: React.FC = () => {
                     ? 'bg-blue-500 text-white rounded-br-md'
                     : 'bg-white border border-slate-200 text-slate-700 rounded-bl-md shadow-sm'
                 }`}>
-                  {msg.content}
+                  {msg.role === 'assistant' ? formatResponse(msg.content) : msg.content}
                 </div>
               </div>
             ))}

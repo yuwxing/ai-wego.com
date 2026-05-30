@@ -3,13 +3,24 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Mic, MicOff, Volume2, VolumeX, Settings, Sparkles, Loader2 } from 'lucide-react';
 import { SpritePet, petSpriteMap } from '../components/SpritePet';
+import { getApiKey } from '../utils/deepseek';
 
 // DeepSeek API 配置
-const DEEPSEEK_API_KEY = 'sk-17df56ac8d1b4544914816f45c3c7064';
 const DEEPSEEK_BASE_URL = 'https://api.deepseek.com';
 const DEEPSEEK_MODEL = 'deepseek-chat';
 
 // 宠物性格配置
+// 宠物语音风格：young-girl / young-boy
+const PET_VOICE_STYLE: Record<string, 'young-girl' | 'young-boy'> = {
+  junie: 'young-girl',
+  duo: 'young-boy',
+  axobotl: 'young-boy',
+  kebo: 'young-boy',
+  swag: 'young-boy',
+  beier: 'young-girl',
+  'da-zhuang': 'young-boy',
+};
+
 const petPersonalityMap: Record<string, { 
   name: string; 
   personality: string; 
@@ -181,7 +192,7 @@ export const PetChatPage: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+            'Authorization': `Bearer ${getApiKey()}`,
           },
           body: JSON.stringify(requestBody),
           signal: controller.signal,
@@ -212,6 +223,19 @@ export const PetChatPage: React.FC = () => {
   // 发送消息
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
+
+    // 检查API Key（拒绝使用默认共享Key）
+    const apiKey = getApiKey();
+    const DEFAULT_KEY = 'sk-6b389e1afd534d07b9d63b8aca7320b6';
+    if (!apiKey || apiKey === DEFAULT_KEY) {
+      setMessages(prev => [...prev, {
+        id: generateId(),
+        role: 'assistant',
+        content: '请先在"系统中心 → API密钥"中配置你自己的DeepSeek API密钥后再和我聊天哦～ 🔑',
+        timestamp: Date.now(),
+      }]);
+      return;
+    }
     
     const userMessage: Message = {
       id: generateId(),
@@ -277,17 +301,22 @@ export const PetChatPage: React.FC = () => {
     utterance.rate = 0.9;
     utterance.pitch = 1.2;
     
-    // 使用预加载的语音列表，fallback 到即时获取
     const availableVoices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
+    const voiceStyle = petId ? PET_VOICE_STYLE[petId] || 'young-girl' : 'young-girl';
     const isEn = speechLang.startsWith('en');
     const targetVoice = isEn
-      ? availableVoices.find(v => v.name.includes('Google US English')) 
-        || availableVoices.find(v => v.name.includes('Microsoft Zira'))
-        || availableVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
+      ? availableVoices.find(v => v.name.includes('Microsoft David'))
+        || availableVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('male'))
+        || availableVoices.find(v => v.name.includes('Google US English'))
         || availableVoices.find(v => v.lang.startsWith('en-US'))
         || availableVoices.find(v => v.lang.startsWith('en'))
-      : availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('female'))
-        || availableVoices.find(v => v.lang.startsWith('zh-CN'));
+      : voiceStyle === 'young-boy'
+        ? availableVoices.find(v => v.name.includes('Microsoft Kangkang'))
+          || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('male'))
+          || availableVoices.find(v => v.lang.startsWith('zh-CN'))
+        : availableVoices.find(v => v.name.includes('Microsoft Yaoyao'))
+          || availableVoices.find(v => v.lang.startsWith('zh-CN') && v.name.toLowerCase().includes('female'))
+          || availableVoices.find(v => v.lang.startsWith('zh-CN'));
     if (targetVoice) utterance.voice = targetVoice;
     
     utterance.onstart = () => setIsSpeaking(true);
@@ -520,7 +549,7 @@ export const PetChatPage: React.FC = () => {
                     : 'bg-white/90 backdrop-blur-sm border border-purple-100 text-slate-700 rounded-bl-md'
                 }`}
               >
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.role === 'assistant' ? msg.content.replace(/#{1,6}\s*/g, '').replace(/\*\*/g, '').replace(/\*(?!\s)/g, '• ').trim() : msg.content}</p>
                 <p className={`text-xs mt-1 ${
                   msg.role === 'user' ? 'text-white/70' : 'text-slate-400'
                 }`}>

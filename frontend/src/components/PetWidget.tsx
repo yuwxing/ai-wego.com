@@ -105,7 +105,7 @@ export const PetWidget: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const petRef = useRef<HTMLDivElement>(null);
-  const actionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const actionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heartIdRef = useRef(0);
 
   // 加载宠物数据
@@ -127,7 +127,6 @@ export const PetWidget: React.FC = () => {
               petData.name = petdexInfo.name;
               petData.desc = petdexInfo.desc;
               petData.color = petdexInfo.color;
-              petData.avatar = petdexInfo.thumb;
               localStorage.setItem('adoptedPet', JSON.stringify(petData));
             }
           }

@@ -177,7 +177,7 @@ const FeedbackPage: React.FC = () => {
             {claimEnabled && claimAmount > 0 ? (
               <>
                 已提交！审核通过后<br />
-                <span className="text-emerald-600 font-bold text-lg">{claimAmount.toLocaleString()} <WegCoin size={14} />币</span><br />
+                <span className="text-emerald-600 font-bold text-lg">{claimAmount.toLocaleString()} <WegCoin size={14} /></span><br />
                 将自动到账
               </>
             ) : (
@@ -226,10 +226,10 @@ const FeedbackPage: React.FC = () => {
         <div className="text-center mb-6 pt-4">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-full mb-3">
             <Sparkles className="w-5 h-5" />
-            <span className="font-bold">发现错误，赚<WegCoin size={14} />币！</span>
+            <span className="font-bold">发现错误，赚<WegCoin size={14} />！</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">平台反馈</h1>
-          <p className="text-sm text-slate-500 mt-1">虚假信息赔1000<WegCoin size={14} />币，Bug按程度赔50-1000<WegCoin size={14} />币</p>
+          <p className="text-sm text-slate-500 mt-1">虚假信息赔1000<WegCoin size={14} />，Bug按程度赔50-1000<WegCoin size={14} /></p>
         </div>
 
         {/* 值班智能体入口 */}
@@ -305,7 +305,7 @@ const FeedbackPage: React.FC = () => {
               {claimEnabled && (
                 <>
                   <div className="mb-3">
-                    <label className="block text-xs text-slate-600 mb-1.5">赔付金额（<WegCoin size={14} />币）</label>
+                    <label className="block text-xs text-slate-600 mb-1.5">赔付金额（<WegCoin size={14} />）</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"

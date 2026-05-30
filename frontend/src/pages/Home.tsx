@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { BookOpen, Bot, Award, Trophy, Sparkles, GraduationCap, Shield, Sun, User, LogIn, UserPlus } from 'lucide-react'
+import { BookOpen, Bot, Award, Trophy, Sparkles, GraduationCap, Shield, Sun, User, LogIn, UserPlus, Monitor } from 'lucide-react'
 import { useUser } from '../contexts/UserContext'
 
 const sections = [
@@ -10,6 +10,7 @@ const sections = [
       { to: '/learn/word-cards', label: '单词' },
       { to: '/learn/listening-speaking', label: '听说' },
       { to: '/learn/english-daily', label: '每日英语' },
+      { to: '/learn/online-classroom', label: '在线教室' },
       { to: '/learn/classroom', label: 'AI学习助手' },
     ]
   },
@@ -22,7 +23,7 @@ const sections = [
     ]
   },
   {
-    title: 'WEG经济', icon: Award, desc: '核心经济层',
+    title: '积分经济', icon: Award, desc: '核心经济层',
     color: 'from-teal-400 to-cyan-500',
     links: [
       { to: '/weg', label: '经济总览' },
@@ -38,6 +39,7 @@ const sections = [
     links: [
       { to: '/competitions', label: '竞赛列表' },
       { to: '/competitions/new', label: '创建竞赛' },
+      { to: '/competitions/workshop', label: '创作工坊' },
     ]
   },
   {
@@ -66,13 +68,13 @@ const sections = [
 export default function HomePageNav() {
   const version = 'v3-' + Date.now()
   const navigate = useNavigate();
-  const { user, logout } = useUser();
+  const { user, logout, isGuest, loginAsGuest } = useUser();
   return (
     <div className="page-wrapper" data-version={version}>
       <div className="max-w-5xl mx-auto px-4 py-16 relative z-10">
         {/* User Status Bar */}
         <div className="flex justify-end mb-6">
-          {user ? (
+          {user && !isGuest ? (
             <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-slate-200 shadow-sm">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
                 {user.username?.[0]?.toUpperCase() || '?'}
@@ -80,13 +82,19 @@ export default function HomePageNav() {
               <span className="text-sm font-semibold text-slate-700">{user.username || user.email}</span>
               <button onClick={() => { logout(); navigate('/'); }} className="text-xs text-slate-400 hover:text-red-500 transition-colors">退出</button>
             </div>
+          ) : isGuest ? (
+            <div className="flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl border border-amber-200 shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-white text-sm font-bold">?</div>
+              <span className="text-sm font-semibold text-amber-700">游客模式</span>
+              <button onClick={() => navigate('/register')} className="text-xs text-indigo-500 hover:text-indigo-700 transition-colors font-medium">注册/登录</button>
+            </div>
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => navigate('/register')} className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-semibold hover:shadow-lg transition-all flex items-center gap-1.5">
                 <LogIn className="w-4 h-4" /> 登录
               </button>
-              <button onClick={() => navigate('/register')} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-all flex items-center gap-1.5">
-                <UserPlus className="w-4 h-4" /> 注册
+              <button onClick={() => { loginAsGuest(); navigate('/'); }} className="px-4 py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-sm font-medium hover:border-indigo-300 hover:text-indigo-500 transition-all">
+                游客进入
               </button>
             </div>
           )}

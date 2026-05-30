@@ -153,7 +153,7 @@ export const FeedbackButton: React.FC = () => {
             })
           });
           
-          console.log(`[反馈赔付] 已向用户 ${currentUser.id} 发放 ${claimAmount} WEG币`);
+          console.log(`[反馈赔付] 已向用户 ${currentUser.id} 发放 ${claimAmount} 积分`);
         } catch (rewardErr) {
           console.error('[反馈赔付] 自动赔付失败:', rewardErr);
         }
@@ -250,7 +250,7 @@ export const FeedbackButton: React.FC = () => {
                   {claimEnabled && claimAmount > 0 ? (
                     <>
                       已提交！审核通过后<br/>
-                      <span className="text-emerald-600 font-bold text-lg">{claimAmount.toLocaleString()} WEG币</span><br/>
+                      <span className="text-emerald-600 font-bold text-lg">{claimAmount.toLocaleString()} 积分</span><br/>
                       将自动到账，可在余额页面查看
                     </>
                   ) : (
@@ -261,8 +261,8 @@ export const FeedbackButton: React.FC = () => {
             ) : (
               <>
                 <div className="text-center mb-4">
-                  <h3 className="text-2xl font-bold text-slate-900">🔍 发现错误，赚WEG币！</h3>
-                  <p className="text-sm text-slate-500 mt-1">平台承诺：虚假信息赔1000WEG币，Bug按程度赔50-200WEG币</p>
+                  <h3 className="text-2xl font-bold text-slate-900">🔍 发现错误，赚积分！</h3>
+                  <p className="text-sm text-slate-500 mt-1">平台承诺：虚假信息赔1000积分，Bug按程度赔50-200积分</p>
                 </div>
 
                 {/* 反馈类型选择 */}
@@ -324,7 +324,7 @@ export const FeedbackButton: React.FC = () => {
                     {claimEnabled && (
                       <>
                         <div className="mb-3">
-                          <label className="block text-xs text-slate-600 mb-1.5">赔付金额（WEG币）</label>
+                          <label className="block text-xs text-slate-600 mb-1.5">赔付金额（积分）</label>
                           <div className="flex items-center gap-2">
                             <input
                               type="number"

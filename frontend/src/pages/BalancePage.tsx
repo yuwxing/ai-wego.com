@@ -343,7 +343,7 @@ const BalancePage: React.FC = () => {
         <div className="text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-white/80 text-sm mb-4">
             <Coins className="w-4 h-4" />
-            WEG币 余额
+            积分 余额
           </div>
           <div className="text-6xl sm:text-7xl font-black text-white mb-1 tracking-tight" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
             {calculatedBalance.toLocaleString()}
@@ -467,7 +467,7 @@ const BalancePage: React.FC = () => {
           {transactions.filter(shouldShowTransaction).length === 0 ? (
             <div className="p-8 text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden">
-                <img src="/weg-coin.png" alt="WEG币" className="w-12 h-12 rounded-xl" style={{ objectFit: 'cover', opacity: 0.3 }} />
+                <img src="/weg-coin.png" alt="积分" className="w-12 h-12 rounded-xl" style={{ objectFit: 'cover', opacity: 0.3 }} />
               </div>
               <p className="text-slate-500">暂无交易记录</p>
               <p className="text-xs text-slate-400 mt-1">发布任务或等待赔付到账</p>
@@ -523,7 +523,7 @@ const BalancePage: React.FC = () => {
             <div>
               <h3 className="font-semibold text-slate-800 mb-1">平台质量承诺</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                虚假信息赔 <span className="text-emerald-600 font-bold">1000 WEG币</span><br/>
+                虚假信息赔 <span className="text-emerald-600 font-bold">1000 积分</span><br/>
                 质量翻车必赔，服务不满意有保障
               </p>
             </div>
