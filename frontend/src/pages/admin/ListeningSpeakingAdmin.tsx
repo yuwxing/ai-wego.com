@@ -7,7 +7,7 @@ const SUPABASE_URL = 'https://mzjmfyoemcsoqzoooiej.supabase.co/rest/v1/';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16am1meW9lbWNzb3F6b29vaWVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ5MDgwMCwiZXhwIjoyMDkzMDY2ODAwfQ.BaovYmOpmOANyo6fmSPKV1FwNwLWlkVVSa7r8KsaMtM';
 
 const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
-const DEEPSEEK_KEY = 'sk-17df56ac8d1b4544914816f45c3c7064';
+const DEEPSEEK_KEY = 'sk-110110ebb0984f9ea1933f6eddd4ee79';
 
 const GRADE_OPTIONS = [
   { value: '7a', label: '七年级上册（新人教2024版）' },
