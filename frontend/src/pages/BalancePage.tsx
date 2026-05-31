@@ -257,25 +257,46 @@ const BalancePage: React.FC = () => {
     try {
       setClaimingReward(true);
       setRewardMessage(null);
-      
-      const result = await workerTokenAPI.claimDailyReward(userId);
-      
-      if (result.success) {
-        setRewardClaimed(true);
-        setRewardMessage(result.message);
-        // 更新用户余额
-        if (user) {
-          setUser({ ...user, token_balance: result.newBalance });
-        }
-        // 刷新交易记录
-        const txData = await fetchTransactions(userId);
-        setTransactions(txData);
-      } else if (result.error === 'ALREADY_CLAIMED') {
+
+      // Check if already claimed today
+      const today = new Date().toISOString().split('T')[0];
+      const existing = await supabaseFetch(`transactions?from_id=eq.${userId}&from_type=eq.user&type=eq.daily_login&created_at=gte.${today}&select=id`);
+      if (existing && existing.length > 0) {
         setRewardClaimed(true);
         setRewardMessage('今日已领取过登录奖励，明天再来吧！');
-      } else {
-        setRewardMessage(result.message || '领取失败');
+        return;
       }
+
+      // Get current balance
+      const userData = await supabaseFetch(`users?id=eq.${userId}&select=token_balance`);
+      const currentBalance = userData?.[0]?.token_balance || 0;
+      const newBalance = currentBalance + 20;
+
+      // Update balance
+      await supabaseFetch(`users?id=eq.${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ token_balance: newBalance }),
+      });
+
+      // Record transaction
+      await supabaseFetch('transactions', {
+        method: 'POST',
+        body: JSON.stringify({
+          from_id: userId, from_type: 'user', to_id: userId, to_type: 'user',
+          amount: 20, type: 'daily_login', description: '每日登录奖励',
+          created_at: new Date().toISOString(),
+        }),
+      });
+
+      setRewardClaimed(true);
+      setRewardMessage('领取成功！每日登录 +20 积分');
+
+      // Refresh user data
+      const fresh = await fetchUser(userId);
+      if (fresh) setUser(fresh);
+      const txData = await fetchTransactions(userId);
+      setTransactions(txData);
     } catch (err) {
       console.error('领取每日奖励失败:', err);
       setRewardMessage('领取失败，请稍后重试');

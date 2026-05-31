@@ -119,30 +119,43 @@ export default function EnglishDailyPage() {
       toast.error('请先登录');
       return;
     }
-    
+    if (!submitted) {
+      toast.error('请先完成答题再领取奖励');
+      return;
+    }
+
     setClaimLoading(true);
     try {
-      // 奖励 30 积分
-      const rewardResp = await fetch(`https://mzjmfyoemcsoqzoooiej.supabase.co/rest/v1/rpc/add_balance`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16am1meW9lbWNzb3F6b29vaWVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ5MDgwMCwiZXhwIjoyMDkzMDY2ODAwfQ.BaovYmOpmOANyo6fmSPKV1FwNwLWlkVVSa7r8KsaMtM',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16am1meW9lbWNzb3F6b29vaWVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ5MDgwMCwiZXhwIjoyMDkzMDY2ODAwfQ.BaovYmOpmOANyo6fmSPKV1FwNwLWlkVVSa7r8KsaMtM'
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          amount: 30,
-          reason: '完成每日英语学习'
-        })
+      const SUPABASE_URL = 'https://mzjmfyoemcsoqzoooiej.supabase.co/rest/v1/';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16am1meW9lbWNzb3F6b29vaWVqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzQ5MDgwMCwiZXhwIjoyMDkzMDY2ODAwfQ.BaovYmOpmOANyo6fmSPKV1FwNwLWlkVVSa7r8KsaMtM';
+
+      // Get current balance
+      const balResp = await fetch(`${SUPABASE_URL}users?id=eq.${user.id}&select=token_balance`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const balData = await balResp.json();
+      const currentBalance = balData[0]?.token_balance || 0;
+
+      // Add 30 to balance
+      await fetch(`${SUPABASE_URL}users?id=eq.${user.id}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ token_balance: currentBalance + 30 }),
       });
 
-      if (rewardResp.ok) {
-        toast.success('获得 30 积分奖励！');
-        if (user?.id) xpAPI.award(user.id, 'daily_english', 15);
-      } else {
-        toast.error('奖励发放失败');
-      }
+      // Record transaction
+      await fetch(`${SUPABASE_URL}transactions`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from_id: user.id, from_type: 'user', to_id: user.id, to_type: 'user',
+          amount: 30, type: 'daily_reward', description: '完成每日英语学习',
+          created_at: new Date().toISOString(),
+        }),
+      });
+
+      toast.success('获得 30 积分奖励！');
+      if (user?.id) xpAPI.award(user.id, 'daily_english', 15);
     } catch (e) {
       toast.error('奖励发放失败');
     } finally {

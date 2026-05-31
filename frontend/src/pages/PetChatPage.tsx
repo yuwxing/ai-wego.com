@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Mic, MicOff, Volume2, VolumeX, Settings, Sparkles, Loader2 } from 'lucide-react';
 import { SpritePet, petSpriteMap } from '../components/SpritePet';
 import { getApiKey } from '../utils/deepseek';
+import { usageAPI } from '../utils/supabase';
+import FreeUsageModal from '../components/FreeUsageModal';
 
 // DeepSeek API 配置
 const DEEPSEEK_BASE_URL = 'https://api.deepseek.com';
@@ -107,6 +109,8 @@ export const PetChatPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [cachedVoices, setCachedVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [showUsageModal, setShowUsageModal] = useState(false);
+  const [usageRemaining, setUsageRemaining] = useState(0);
   
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -225,16 +229,25 @@ export const PetChatPage: React.FC = () => {
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
 
-    // 检查API Key（拒绝使用默认共享Key）
+    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
     const apiKey = getApiKey();
     const DEFAULT_KEY = 'sk-6b389e1afd534d07b9d63b8aca7320b6';
-    if (!apiKey || apiKey === DEFAULT_KEY) {
-      setMessages(prev => [...prev, {
-        id: generateId(),
-        role: 'assistant',
-        content: '请先在"系统中心 → API密钥"中配置你自己的DeepSeek API密钥后再和我聊天哦～ 🔑',
-        timestamp: Date.now(),
-      }]);
+    const usingDefaultKey = !apiKey || apiKey === DEFAULT_KEY;
+
+    // Check free usage if using default key
+    if (usingDefaultKey && userId) {
+      const { ok, remaining } = await usageAPI.check(userId, 'pet_chat');
+      if (!ok) {
+        setUsageRemaining(remaining);
+        setShowUsageModal(true);
+        return;
+      }
+      if (remaining > 0) usageAPI.logUsage(userId, 'pet_chat');
+    }
+
+    if (usingDefaultKey) {
+      setUsageRemaining(0);
+      setShowUsageModal(true);
       return;
     }
     
@@ -412,6 +425,7 @@ export const PetChatPage: React.FC = () => {
   }
   
   return (
+    <>
     <div className="min-h-screen flex flex-col">
       {/* 顶部导航 */}
       <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-purple-100 shadow-sm">
@@ -659,6 +673,11 @@ export const PetChatPage: React.FC = () => {
         }
       `}</style>
     </div>
+
+    {showUsageModal && (
+      <FreeUsageModal remaining={usageRemaining} onClose={() => setShowUsageModal(false)} />
+    )}
+    </>
   );
 };
 

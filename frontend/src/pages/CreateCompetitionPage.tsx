@@ -614,15 +614,18 @@ export const CreateTaskPage: React.FC = () => {
         // 5. 更新本地余额显示
         setUserBalance(deductResult.newBalance || 0);
         
-        // 6. 触发Worker执行任务
+        // 6. 触发Worker执行任务（非关键，允许超时）
         try {
+          const controller = new AbortController();
+          setTimeout(() => controller.abort(), 5000);
           await fetch('https://ai-wego-worker.ai-wego-api.workers.dev/api/execute-task', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ task_id: taskId })
+            body: JSON.stringify({ task_id: taskId }),
+            signal: controller.signal,
           });
         } catch (execErr) {
-          console.warn('触发任务执行失败:', execErr);
+          console.warn('触发任务执行失败（非关键错误）:', execErr);
         }
         
         // 7. 自动匹配智能体

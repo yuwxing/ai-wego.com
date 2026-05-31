@@ -452,14 +452,14 @@ export default function ListeningSpeakingPage() {
   };
 
   const handleComplete = async () => {
-    if (!user?.phone) {
+    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+    if (!userId) {
       toast.error('请先登录');
       return;
     }
     // 记录完成状态到 localStorage
     const key = `ls_completed_${data?.date}`;
     localStorage.setItem(key, 'true');
-    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
     if (userId) xpAPI.award(userId, 'listening', 20);
     toast.success('已完成今日听说训练！');
     navigate('/benefits');

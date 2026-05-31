@@ -1683,6 +1683,10 @@ export const JobSquarePage: React.FC = () => {
                       <button
                         onClick={() => {
                           try {
+                            if (!job.url || job.url === '#') {
+                              alert('该岗位链接暂不可用');
+                              return;
+                            }
                             window.open(job.url, '_blank', 'noopener,noreferrer');
                           } catch {
                             window.location.href = job.url;

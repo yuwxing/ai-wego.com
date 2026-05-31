@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Bot, Loader2, Users, Check, X } from 'lucide-react';
-import { agentsAPI, supabaseFetch } from '../utils/supabase';
+import { agentsAPI, supabaseFetch, usageAPI } from '../utils/supabase';
 import { sendToDeepSeekSync } from '../utils/deepseek';
 import type { Agent } from '../types';
+import FreeUsageModal from '../components/FreeUsageModal';
 
 const AVATAR_COLORS = [
   'from-purple-400 to-pink-400',
@@ -23,6 +24,7 @@ interface ChatMessage {
   agentId?: number;
   agentName?: string;
   agentIndex?: number;
+  agentCaps?: string[];
   timestamp: number;
 }
 
@@ -37,15 +39,18 @@ export const GroupChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState(false);
   const [started, setStarted] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showUsageModal, setShowUsageModal] = useState(false);
+  const [usageRemaining, setUsageRemaining] = useState(0);
+  const chatRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Fetch agents
   useEffect(() => {
     (async () => {
       try {
-        const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
-        if (userId) {
-          const data = await agentsAPI.listAgents({ owner_id: userId });
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user?.id) {
+          const data = await agentsAPI.listAgents({ owner_id: user.id });
           setAgents(data || []);
         }
       } catch (e) {
@@ -56,8 +61,11 @@ export const GroupChatPage: React.FC = () => {
     })();
   }, []);
 
+  // Scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const toggleAgent = (id: number) => {
@@ -85,14 +93,38 @@ export const GroupChatPage: React.FC = () => {
   };
 
   const buildAgentPrompt = (agent: Agent) => {
-    const capabilities = Array.isArray(agent.capabilities) ? agent.capabilities.join('、') : agent.capabilities || '';
-    return `你是${agent.name}，${agent.description || '一个AI数字分身'}。${capabilities ? `你擅长：${capabilities}。` : ''}你现在在群聊中，和其他分身一起回答用户的问题。请用你的专业视角给出回答，语言风格符合你的设定。`;
+    const caps = Array.isArray(agent.capabilities) ? agent.capabilities : [];
+    const capsStr = caps.length > 0 ? `你擅长的领域：${caps.join('、')}。` : '';
+    return `你是${agent.name}，一个AI数字分身，${agent.description || '乐于助人的助手'}。${capsStr}
+
+现在你在群聊中，主人（用户）向你和其他分身一起求助。
+
+【重要规则】
+- 你的任务就是尽全力帮助主人解决问题。
+- 根据你擅长的领域给出具体、可执行的回答。
+- 绝不能说"我做不到"、"我无法"、"我不擅长"——即使不完全在你的专业范围内，也要从你的角度提供有价值的信息或建议。
+- 如果其他分身已经给出了答案，你可以补充、完善或提供不同视角。
+- 【最重要】回答务必简短精炼，控制在 3-5 句话以内，直接说要点。不要长篇大论，不要铺垫，不要写段落。这是群聊，主人要快速看到每个分身的核心观点。
+- 开头一句话表明身份和角度，然后直接说出你的建议或方案。`;
   };
 
   const sendMessage = useCallback(async () => {
     const text = inputText.trim();
     if (!text || responding) return;
     setInputText('');
+
+    // Usage gate
+    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
+    if (userId) {
+      const { ok, remaining } = await usageAPI.check(userId, 'group_chat');
+      if (!ok) {
+        setUsageRemaining(remaining);
+        setShowUsageModal(true);
+        setResponding(false);
+        return;
+      }
+      if (remaining > 0) usageAPI.logUsage(userId, 'group_chat');
+    }
 
     const selectedAgents = agents.filter(a => selectedIds.has(a.id));
     const userMsg: ChatMessage = {
@@ -121,6 +153,7 @@ export const GroupChatPage: React.FC = () => {
     for (const result of results) {
       if (result.status === 'fulfilled') {
         const { agent, idx, reply } = result.value;
+        const agentCaps = Array.isArray(agent.capabilities) ? agent.capabilities : [];
         setMessages(prev => [...prev, {
           id: generateId(),
           type: 'agent',
@@ -128,6 +161,7 @@ export const GroupChatPage: React.FC = () => {
           agentId: agent.id,
           agentName: agent.name,
           agentIndex: selectedAgents.indexOf(agent),
+          agentCaps,
           timestamp: Date.now(),
         }]);
       }
@@ -143,7 +177,7 @@ export const GroupChatPage: React.FC = () => {
   };
 
   if (loading) {
-    return (
+  return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
       </div>
@@ -151,6 +185,7 @@ export const GroupChatPage: React.FC = () => {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-lg border-b border-purple-100 px-4 py-3 sticky top-0 z-10 flex items-center gap-3">
@@ -193,6 +228,16 @@ export const GroupChatPage: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-slate-800 text-sm">{agent.name}</p>
                     <p className="text-xs text-slate-400 truncate">{agent.description || '数字分身'}</p>
+                    {agent.capabilities && Array.isArray(agent.capabilities) && agent.capabilities.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {agent.capabilities.slice(0, 3).map(cap => (
+                          <span key={cap} className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 truncate max-w-[80px]">{cap}</span>
+                        ))}
+                        {agent.capabilities.length > 3 && (
+                          <span className="text-[10px] text-slate-400">+{agent.capabilities.length - 3}</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   {selectedIds.has(agent.id) ? (
                     <Check className="w-5 h-5 text-purple-600" />
@@ -218,7 +263,7 @@ export const GroupChatPage: React.FC = () => {
 
       {/* Chat Area */}
       {started && (
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4" ref={messagesEndRef}>
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4" ref={chatRef}>
           {messages.map(msg => (
             <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] ${msg.type === 'user' ? '' : ''}`}>
@@ -232,6 +277,9 @@ export const GroupChatPage: React.FC = () => {
                     <span className={`text-xs font-medium ${msg.agentName === '系统' ? 'text-slate-400' : 'text-purple-600'}`}>
                       {msg.agentName}
                     </span>
+                    {msg.agentCaps && msg.agentCaps.length > 0 && (
+                      <span className="text-[10px] text-slate-400 ml-1">{msg.agentCaps.slice(0, 2).join(' · ')}</span>
+                    )}
                   </div>
                 )}
                 <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
@@ -256,7 +304,6 @@ export const GroupChatPage: React.FC = () => {
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
       )}
 
@@ -284,6 +331,11 @@ export const GroupChatPage: React.FC = () => {
         </div>
       )}
     </div>
+
+    {showUsageModal && (
+      <FreeUsageModal remaining={usageRemaining} onClose={() => setShowUsageModal(false)} />
+    )}
+    </>
   );
 };
 

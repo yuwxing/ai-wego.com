@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Bot, Volume2, VolumeX, Loader2, Sparkles } from 'lucide-react';
-import { agentsAPI, supabaseFetch } from '../utils/supabase';
+import { ArrowLeft, Send, Bot, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { agentsAPI, supabaseFetch, usageAPI } from '../utils/supabase';
 import { getApiKey } from '../utils/deepseek';
 import type { Agent, Task } from '../types';
+import FreeUsageModal from '../components/FreeUsageModal';
 
 const DEEPSEEK_BASE_URL = 'https://api.deepseek.com';
 const DEEPSEEK_MODEL = 'deepseek-chat';
@@ -32,6 +33,8 @@ export const AgentChatPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [userData, setUserData] = useState<string>('');
+  const [usageRemaining, setUsageRemaining] = useState<number | null>(null);
+  const [showUsageModal, setShowUsageModal] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -127,54 +130,30 @@ ${userData || '暂无用户数据'}`;
     } catch (_) {}
   }, [ttsSupported, voiceEnabled]);
 
-  const callDeepSeekAPI = async (userMessage: string, history: Message[]): Promise<string> => {
-    const recent = history.slice(-6).map(m => ({ role: m.role, content: m.content }));
-    const body = {
-      model: DEEPSEEK_MODEL,
-      messages: [
-        { role: 'system', content: buildSystemPrompt() },
-        ...recent,
-        { role: 'user', content: userMessage },
-      ],
-      temperature: 0.7,
-      max_tokens: 800,
-    };
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        const resp = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getApiKey()}`,
-          },
-          body: JSON.stringify(body),
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-        if (!resp.ok) throw new Error(`API请求失败: ${resp.status}`);
-        const data = await resp.json();
-        return data.choices?.[0]?.message?.content || '抱歉，我没有收到回复。';
-      } catch (err) {
-        if (attempt === 2) throw err;
-        await new Promise(r => setTimeout(r, 1000));
-      }
-    }
-    throw new Error('API调用失败');
-  };
-
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return;
 
+    const userId = JSON.parse(localStorage.getItem('user') || '{}')?.id;
     const apiKey = getApiKey();
-    if (!apiKey || apiKey === 'sk-6b389e1afd534d07b9d63b8aca7320b6') {
-      setMessages(prev => [...prev, {
-        id: generateId(),
-        role: 'assistant',
-        content: '请先在"系统中心 → API密钥"中配置你自己的DeepSeek API密钥后再和我聊天哦～',
-        timestamp: Date.now(),
-      }]);
+    const usingDefaultKey = !apiKey || apiKey === 'sk-6b389e1afd534d07b9d63b8aca7320b6';
+
+    // Check free usage if using default key
+    if (usingDefaultKey && userId) {
+      const { ok, remaining } = await usageAPI.check(userId, 'agent_chat');
+      if (!ok) {
+        setUsageRemaining(remaining);
+        setShowUsageModal(true);
+        return;
+      }
+      if (remaining > 0) {
+        usageAPI.logUsage(userId, 'agent_chat');
+      }
+    }
+
+    // If no free uses and no custom key, prompt
+    if (usingDefaultKey) {
+      setUsageRemaining(0);
+      setShowUsageModal(true);
       return;
     }
 
@@ -184,29 +163,72 @@ ${userData || '暂无用户数据'}`;
       content: inputText.trim(),
       timestamp: Date.now(),
     };
-    setMessages(prev => [...prev, userMsg]);
+    const assistantId = generateId();
+    setMessages(prev => [...prev, userMsg, { id: assistantId, role: 'assistant', content: '', timestamp: Date.now() }]);
     setInputText('');
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await callDeepSeekAPI(userMsg.content, messages);
-      const assistantMsg: Message = {
-        id: generateId(),
-        role: 'assistant',
-        content: response,
-        timestamp: Date.now(),
+      const recent = messages.slice(-6).map(m => ({ role: m.role, content: m.content }));
+      const body = {
+        model: DEEPSEEK_MODEL,
+        messages: [
+          { role: 'system', content: buildSystemPrompt() },
+          ...recent,
+          { role: 'user', content: userMsg.content },
+        ],
+        temperature: 0.7,
+        max_tokens: 800,
+        stream: true,
       };
-      setMessages(prev => [...prev, assistantMsg]);
-      if (voiceEnabled) speakMessage(response);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+      const resp = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getApiKey()}`,
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!resp.ok) {
+        setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: '抱歉，请求失败了，再试一次好吗？' } : m));
+        return;
+      }
+
+      let fullText = '';
+      const reader = resp.body?.getReader();
+      if (!reader) return;
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const payload = line.slice(6).trim();
+          if (payload === '[DONE]') break;
+          try {
+            const chunk = JSON.parse(payload);
+            const delta = chunk.choices?.[0]?.delta?.content || '';
+            if (delta) {
+              fullText += delta;
+              setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: fullText } : m));
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (voiceEnabled) speakMessage(fullText);
     } catch (err) {
-      setError('发送失败，请检查网络后重试');
-      setMessages(prev => [...prev, {
-        id: generateId(),
-        role: 'assistant',
-        content: '哎呀，网络好像有点问题呢... 再试一次好吗？',
-        timestamp: Date.now(),
-      }]);
+      setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: '网络好像有点问题... 再试一次好吗？' } : m));
     } finally {
       setIsLoading(false);
     }
@@ -220,7 +242,7 @@ ${userData || '暂无用户数据'}`;
   };
 
   if (!agent) {
-    return (
+  return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-purple-500 animate-spin mx-auto mb-4" />
@@ -231,6 +253,7 @@ ${userData || '暂无用户数据'}`;
   }
 
   return (
+    <>
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50">
       <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-purple-100 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-3">
@@ -329,5 +352,12 @@ ${userData || '暂无用户数据'}`;
         </div>
       </div>
     </div>
+
+      {showUsageModal && (
+        <FreeUsageModal remaining={usageRemaining ?? 0} onClose={() => setShowUsageModal(false)} />
+      )}
+    </>
   );
 };
+
+export default AgentChatPage;

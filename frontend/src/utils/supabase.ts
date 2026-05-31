@@ -755,3 +755,40 @@ export const xpAPI = {
     return data || [];
   },
 };
+
+// ============ 免费额度系统 ============
+
+const FREE_FEATURE_LIMIT = 3;
+
+export const usageAPI = {
+  check: async (userId: number, feature: string): Promise<{ ok: boolean; remaining: number; hasKey: boolean }> => {
+    const used = await usageAPI.getUsed(userId);
+    const hasKey = !!localStorage.getItem('deepseek_api_key');
+    const remaining = Math.max(0, FREE_FEATURE_LIMIT - used);
+    return { ok: remaining > 0 || hasKey, remaining, hasKey };
+  },
+
+  getUsed: async (userId: number): Promise<number> => {
+    const data = await supabaseFetch(`transactions?from_id=eq.${userId}&from_type=eq.user&type=eq.free_usage&select=id`);
+    if (!data || !Array.isArray(data)) return parseInt(localStorage.getItem('free_uses_count') || '0', 10);
+    return data.length;
+  },
+
+  logUsage: async (userId: number, feature: string) => {
+    const count = parseInt(localStorage.getItem('free_uses_count') || '0', 10);
+    localStorage.setItem('free_uses_count', String(count + 1));
+    return supabaseFetch('transactions', {
+      method: 'POST',
+      body: JSON.stringify({
+        from_id: userId,
+        from_type: 'user',
+        to_id: userId,
+        to_type: 'user',
+        amount: 0,
+        type: 'free_usage',
+        description: feature,
+        created_at: new Date().toISOString(),
+      }),
+    }).catch(() => {}); // localStorage fallback if backend fails
+  },
+};
